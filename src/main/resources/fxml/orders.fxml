@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane fx:id="anchorPane" minHeight="400.0" minWidth="300.0" prefHeight="600.0" prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="by.fly.ui.controller.OrdersController">
+    <children>
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                   AnchorPane.topAnchor="0.0">
+            <children>
+                <VBox fx:id="orderTableRegion" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <children>
+                        <TableView VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn prefWidth="75.0" text="C1"/>
+                                <TableColumn prefWidth="75.0" text="C2"/>
+                            </columns>
+                        </TableView>
+                        <Button mnemonicParsing="false" onAction="#createOrder" text="Добавить заказ"/>
+                    </children>
+                </VBox>
+                <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: gray;"/>
+                <AnchorPane fx:id="createOrderRegion" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+                            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <children>
+                        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                  AnchorPane.topAnchor="0.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                            </rowConstraints>
+                            <children>
+                                <Button mnemonicParsing="false" onAction="#saveOrder" text="OK"/>
+                            </children>
+                        </GridPane>
+                    </children>
+                </AnchorPane>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>
