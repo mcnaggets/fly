@@ -19,13 +19,12 @@ public class QOrganization extends EntityPathBase<Organization> {
 
     public static final QOrganization organization = new QOrganization("organization");
 
-    public final org.springframework.data.jpa.domain.QAbstractPersistable _super = new org.springframework.data.jpa.domain.QAbstractPersistable(this);
+    public final QAbstractModel _super = new QAbstractModel(this);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final StringPath id = _super.id;
 
     public final StringPath inn = createString("inn");
-
-    public final ArrayPath<byte[], Byte> logo = createArray("logo", byte[].class);
 
     public final StringPath name = createString("name");
 

@@ -12,20 +12,21 @@ import com.mysema.query.types.Path;
 /**
  * QHuman is a Querydsl query type for Human
  */
-@Generated("com.mysema.query.codegen.SupertypeSerializer")
-public class QHuman extends EntityPathBase<Human> {
+@Generated("com.mysema.query.codegen.EmbeddableSerializer")
+public class QHuman extends BeanPath<Human> {
 
     private static final long serialVersionUID = -121167498L;
 
     public static final QHuman human = new QHuman("human");
 
-    public final org.springframework.data.jpa.domain.QAbstractPersistable _super = new org.springframework.data.jpa.domain.QAbstractPersistable(this);
+    public final QAbstractModel _super = new QAbstractModel(this);
 
     public final StringPath address = createString("address");
 
     public final StringPath email = createString("email");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final StringPath id = _super.id;
 
     public final StringPath name = createString("name");
 

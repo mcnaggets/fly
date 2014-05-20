@@ -28,7 +28,7 @@ public class QCustomer extends EntityPathBase<Customer> {
     public final StringPath email = _super.email;
 
     //inherited
-    public final NumberPath<Long> id = _super.id;
+    public final StringPath id = _super.id;
 
     //inherited
     public final StringPath name = _super.name;

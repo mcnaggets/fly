@@ -1,26 +1,15 @@
 package by.fly.model;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import com.mysema.query.annotations.QueryEntity;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+@QueryEntity
+public class Organization extends AbstractModel {
 
-@Entity
-@Table(name = "FLY_ORGANIZATION")
-public class Organization extends AbstractPersistable<Long> {
-
-    @Column(unique = true)
+    @Indexed(unique = true)
     private String name;
 
     private String inn;
-
-    @Column(length = 100000)
-    private byte[] logo;
-
-    Organization() {
-        // for reflection
-    }
 
     public Organization(String name) {
         this.name = name;
@@ -32,14 +21,6 @@ public class Organization extends AbstractPersistable<Long> {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public byte[] getLogo() {
-        return logo;
-    }
-
-    public void setLogo(byte[] logo) {
-        this.logo = logo;
     }
 
     public String getInn() {

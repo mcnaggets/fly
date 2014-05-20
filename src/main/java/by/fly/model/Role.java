@@ -1,16 +1,12 @@
 package by.fly.model;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import com.mysema.query.annotations.QueryEntity;
+import org.springframework.data.mongodb.core.index.Indexed;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+@QueryEntity
+public class Role extends AbstractModel {
 
-@Entity
-@Table(name = "FLY_ROLE")
-public class Role extends AbstractPersistable<Long> {
-
-    @Column(unique = true)
+    @Indexed(unique = true)
     private String name;
 
     public String getName() {

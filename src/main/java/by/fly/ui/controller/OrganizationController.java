@@ -27,9 +27,9 @@ import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 @Component
@@ -105,26 +105,20 @@ public class OrganizationController {
 
         //Show open file dialog
         File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            byte[] imageData = readImageData(file);
-            organization.setLogo(imageData);
-            showOrganizationLogo(imageData);
+        if (file != null && organizationService.setOrganizationLogo(organization, Files.newInputStream(file.toPath()))) {
+            showOrganizationLogo(Files.newInputStream(file.toPath()));
         }
 
     }
 
-    private void showOrganizationLogo(byte[] imageData) {
+    private void showOrganizationLogo(InputStream imageStream) {
         try {
-            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
+            BufferedImage bufferedImage = ImageIO.read(imageStream);
             Image image = SwingFXUtils.toFXImage(bufferedImage, null);
             organizationLogo.setImage(image);
         } catch (IOException ex) {
             LOGGER.error("Error while reading logo", ex);
         }
-    }
-
-    private byte[] readImageData(File file) throws IOException {
-        return Files.readAllBytes(file.toPath());
     }
 
     public void organizationCancel(ActionEvent actionEvent) {
@@ -135,8 +129,9 @@ public class OrganizationController {
         organization = organizationService.getRootOrganization();
         organizationName.setText(organization.getName());
         organizationInn.setText(organization.getInn());
-        if (organization.getLogo() != null) {
-            showOrganizationLogo(organization.getLogo());
+        InputStream logo = organizationService.getOrganizationLogo(organization);
+        if (logo != null) {
+            showOrganizationLogo(logo);
         }
         userList.getItems().clear();
         userRepository.findAll().forEach(this::addUserItem);

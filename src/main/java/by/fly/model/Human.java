@@ -1,11 +1,6 @@
 package by.fly.model;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
-
-import javax.persistence.MappedSuperclass;
-
-@MappedSuperclass
-public abstract class Human extends AbstractPersistable<Long> {
+public abstract class Human extends AbstractModel {
 
     private String name;
     private String phone;

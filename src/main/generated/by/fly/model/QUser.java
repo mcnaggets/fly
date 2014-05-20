@@ -33,7 +33,7 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath email = _super.email;
 
     //inherited
-    public final NumberPath<Long> id = _super.id;
+    public final StringPath id = _super.id;
 
     public final StringPath login = createString("login");
 

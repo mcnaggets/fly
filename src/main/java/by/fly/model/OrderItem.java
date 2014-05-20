@@ -1,18 +1,17 @@
 package by.fly.model;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import com.mysema.query.annotations.QueryEntity;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import javax.persistence.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-@Entity
-@Table(name = "FLY_ORDER")
-public class OrderItem extends AbstractPersistable<Long> {
+@QueryEntity
+public class OrderItem extends AbstractModel {
 
-    @ManyToOne(optional = false)
+    @DBRef
     private Customer customer;
 
     private Date createdAt;
@@ -21,16 +20,12 @@ public class OrderItem extends AbstractPersistable<Long> {
 
     private String description;
 
-    @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.CREATED;
-
-    OrderItem() {
-        // for reflection
-    }
 
     public OrderItem(Customer customer, LocalDateTime deadLine) {
         setCustomer(customer);
         setDeadLine(deadLine);
+        setCreatedAt(LocalDateTime.now());
     }
 
     public Customer getCustomer() {
@@ -71,11 +66,6 @@ public class OrderItem extends AbstractPersistable<Long> {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        setCreatedAt(LocalDateTime.now());
     }
 
 }

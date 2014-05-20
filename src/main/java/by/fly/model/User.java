@@ -1,32 +1,28 @@
 package by.fly.model;
 
+import com.mysema.query.annotations.QueryEntity;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "FLY_USER")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@QueryEntity
 public class User extends Human {
 
     private String login;
 
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Indexed(unique = true)
     private String barcode;
 
-    @ManyToMany
+    @DBRef
     private List<Role> roles = new ArrayList<>();
 
-    @ManyToOne
+    @DBRef
     private Organization organization;
-
-    User() {
-        // for reflection
-    }
 
     public User(String login, @Nullable String password, @Nullable String barcode, Organization organization) {
         this.login = login;

@@ -27,20 +27,13 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile "org.springframework:spring-test:$springVersion"
 
-    compile "mysql:mysql-connector-java:5.1.16"
-
-    compile "org.hibernate:hibernate-core:$hibernateVersion"
-    compile "org.hibernate:hibernate-entitymanager:$hibernateVersion"
-
     compile "org.springframework:spring-context:$springVersion"
     compile "org.springframework:spring-orm:$springVersion"
-    compile "org.springframework.data:spring-data-jpa:$springDataVersion"
-
-    compile "commons-dbcp:commons-dbcp:1.4"
+    compile "org.springframework.data:spring-data-mongodb:$springDataMongoDBVersion"
 
     compile "com.intellij:annotations:12.0"
 
-    compile "com.mysema.querydsl:querydsl-jpa:$querydslVersion"
+    compile "com.mysema.querydsl:querydsl-mongodb:$querydslVersion"
     querydslapt "com.mysema.querydsl:querydsl-apt:$querydslVersion"
 }
 
@@ -53,7 +46,7 @@ task generateQueryDSL(type: JavaCompile, group: 'build', description: 'Generates
     classpath = configurations.compile + configurations.querydslapt
     options.compilerArgs = [
             "-proc:only",
-            "-processor", "com.mysema.query.apt.jpa.JPAAnnotationProcessor"
+            "-processor", "com.mysema.query.apt.QuerydslAnnotationProcessor"
     ]
     destinationDir = sourceSets.generated.java.srcDirs.iterator().next()
 }

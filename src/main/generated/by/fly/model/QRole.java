@@ -19,9 +19,10 @@ public class QRole extends EntityPathBase<Role> {
 
     public static final QRole role = new QRole("role");
 
-    public final org.springframework.data.jpa.domain.QAbstractPersistable _super = new org.springframework.data.jpa.domain.QAbstractPersistable(this);
+    public final QAbstractModel _super = new QAbstractModel(this);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final StringPath id = _super.id;
 
     public final StringPath name = createString("name");
 

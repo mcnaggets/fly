@@ -27,7 +27,7 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
         OrderItem orderItem = new OrderItem(customer, LocalDateTime.now().plusDays(3));
         orderItemRepository.save(orderItem);
 
-        assertTrue(orderItem.getId() > 0);
+        assertTrue(orderItem.getId() != null);
         assertNotNull(orderItem.getCreatedAt());
     }
 

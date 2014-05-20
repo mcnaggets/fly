@@ -22,17 +22,18 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
 
     public static final QOrderItem orderItem = new QOrderItem("orderItem");
 
-    public final org.springframework.data.jpa.domain.QAbstractPersistable _super = new org.springframework.data.jpa.domain.QAbstractPersistable(this);
+    public final QAbstractModel _super = new QAbstractModel(this);
 
-    public final DateTimePath<java.util.Date> createdAt = createDateTime("createdAt", java.util.Date.class);
+    public final ComparablePath<java.time.LocalDateTime> createdAt = createComparable("createdAt", java.time.LocalDateTime.class);
 
     public final QCustomer customer;
 
-    public final DateTimePath<java.util.Date> deadLine = createDateTime("deadLine", java.util.Date.class);
+    public final ComparablePath<java.time.LocalDateTime> deadLine = createComparable("deadLine", java.time.LocalDateTime.class);
 
     public final StringPath description = createString("description");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final StringPath id = _super.id;
 
     public final EnumPath<OrderStatus> status = createEnum("status", OrderStatus.class);
 
