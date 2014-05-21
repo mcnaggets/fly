@@ -1,6 +1,7 @@
 package by.fly.service;
 
 import by.fly.model.Organization;
+import by.fly.model.QOrganization;
 import by.fly.repository.OrganizationRepository;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.slf4j.Logger;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.data.mongodb.core.query.Query.query;
@@ -23,7 +26,6 @@ public class OrganizationService {
     private static final Logger LOGGER = getLogger(OrganizationService.class);
 
     private static final String LOGO_FILE = "logo.file";
-    private static final String ORGANIZATION = "organization";
 
     @Autowired
     private OrganizationRepository repository;
@@ -39,15 +41,24 @@ public class OrganizationService {
         return repository.save(organization);
     }
 
-    public boolean setOrganizationLogo(Organization organization, InputStream fileStream) {
-        return gridFsOperations.store(fileStream, getLogoFileName(organization)).getId() != null;
+    public boolean saveOrganizationLogo(Organization organization, File file) {
+        try {
+            gridFsOperations.delete(query(whereFilename().is(getLogoFileName(organization))));
+            return gridFsOperations.store(
+                    Files.newInputStream(file.toPath()),
+                    getLogoFileName(organization),
+                    Files.probeContentType(file.toPath())).getId() != null;
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     private String getLogoFileName(Organization organization) {
-        return ORGANIZATION + File.separator + organization.getName() + File.separator + LOGO_FILE;
+        return QOrganization.organization.toString() + File.separator + organization.getName() + File.separator + LOGO_FILE;
     }
 
-    public InputStream getOrganizationLogo(Organization organization) {
+    public InputStream findOrganizationLogo(Organization organization) {
         GridFSDBFile file = gridFsOperations.findOne(query(whereFilename().is(getLogoFileName(organization))));
         return file != null ? file.getInputStream() : null;
     }

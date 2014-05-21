@@ -1,7 +1,10 @@
 package by.fly.model;
 
+import org.springframework.data.mongodb.core.index.Indexed;
+
 public abstract class Human extends AbstractModel {
 
+    @Indexed
     private String name;
     private String phone;
     private String address;

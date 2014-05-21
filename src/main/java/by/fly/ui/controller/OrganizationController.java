@@ -105,7 +105,7 @@ public class OrganizationController {
 
         //Show open file dialog
         File file = fileChooser.showOpenDialog(null);
-        if (file != null && organizationService.setOrganizationLogo(organization, Files.newInputStream(file.toPath()))) {
+        if (file != null && organizationService.saveOrganizationLogo(organization, file)) {
             showOrganizationLogo(Files.newInputStream(file.toPath()));
         }
 
@@ -129,7 +129,7 @@ public class OrganizationController {
         organization = organizationService.getRootOrganization();
         organizationName.setText(organization.getName());
         organizationInn.setText(organization.getInn());
-        InputStream logo = organizationService.getOrganizationLogo(organization);
+        InputStream logo = organizationService.findOrganizationLogo(organization);
         if (logo != null) {
             showOrganizationLogo(logo);
         }

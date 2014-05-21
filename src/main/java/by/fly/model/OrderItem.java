@@ -2,6 +2,7 @@ package by.fly.model;
 
 import com.mysema.query.annotations.QueryEntity;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @QueryEntity
+@Document
 public class OrderItem extends AbstractModel {
 
     @DBRef
