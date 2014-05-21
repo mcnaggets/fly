@@ -6,7 +6,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@PropertySource("classpath:application.properties")
+@PropertySource(value = "classpath:application.properties")
+@PropertySource(value = "file:${user.dir}/application.properties", ignoreResourceNotFound = true)
 public class PropertyConfig {
 
     @Bean

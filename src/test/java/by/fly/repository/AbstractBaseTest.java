@@ -1,7 +1,7 @@
 package by.fly.repository;
 
 import by.fly.config.ApplicationConfig;
-import by.fly.config.MongoPersistenceConfig;
+import by.fly.config.MongoConfig;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +22,7 @@ public abstract class AbstractBaseTest {
     MongoOperations mongoOperations;
 
     @Configuration
-    static class TestMongoPersistenceConfig extends MongoPersistenceConfig {
+    static class TestMongoConfig extends MongoConfig {
 
         @Autowired
         MongoDbFactory mongoDbFactory;

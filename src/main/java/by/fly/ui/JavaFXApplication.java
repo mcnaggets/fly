@@ -7,18 +7,27 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JavaFXApplication extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaFXApplication.class);
+
+    public static void main(String[] args) throws Exception{
+        try {
+            launch(args);
+        } catch (Exception x) {
+            LOGGER.error(x.getMessage(), x);
+            throw x;
+        }
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         MainController controller = (MainController) SpringFXMLLoader.load("/fxml/main.fxml");
         Scene scene = new Scene((Parent) controller.getView(), 800, 600);
-        primaryStage.setTitle("Fly app");
+        primaryStage.setTitle(SpringFXMLLoader.APPLICATION_CONTEXT.getEnvironment().getProperty("application.name"));
         primaryStage.setScene(scene);
         primaryStage.show();
 

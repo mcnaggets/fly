@@ -55,6 +55,8 @@
     <orderEntry type="library" exported="" name="Gradle: jcl-over-slf4j-1.7.7" level="project" />
     <orderEntry type="library" exported="" name="Gradle: mongo-java-driver-2.12.1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: querydsl-mongodb-3.3.2" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: logback-classic-1.1.2" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: logback-core-1.1.2" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

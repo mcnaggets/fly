@@ -1,8 +1,9 @@
 package by.fly.ui.controller;
 
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 
-public interface Controller {
+public interface Controller extends Initializable {
 
     Node getView();
 

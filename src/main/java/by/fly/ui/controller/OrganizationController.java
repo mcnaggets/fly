@@ -8,7 +8,6 @@ import by.fly.service.OrganizationService;
 import by.fly.service.UserService;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -30,10 +29,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
+import java.util.ResourceBundle;
 
 @Component
-public class OrganizationController {
+public class OrganizationController extends AbstractController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
@@ -71,16 +72,16 @@ public class OrganizationController {
         barcodeText.addEventFilter(InputEvent.ANY, event -> user.setBarcode(barcodeText.getText()));
 
         final HBox hBox = new HBox(
-                new Label("Мастер:"),
+                new Label(resourceBundle.getString("master")),
                 userNameText,
-                new Label("Код:"),
+                new Label(resourceBundle.getString("code")),
                 barcodeText
         );
         hBox.setSpacing(10);
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setUserData(user);
 
-        final Button deleteButton = new Button("Удалить");
+        final Button deleteButton = new Button(resourceBundle.getString("delete"));
         deleteButton.setOnAction(event -> {
             userRepository.delete(user);
             userList.getItems().remove(hBox);
@@ -90,8 +91,9 @@ public class OrganizationController {
         userList.getItems().add(hBox);
     }
 
-    @FXML
-    void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        super.initialize(url, resourceBundle);
         bindOrganization();
     }
 

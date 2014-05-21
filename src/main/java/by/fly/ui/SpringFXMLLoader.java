@@ -11,15 +11,18 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ResourceBundle;
 
 public class SpringFXMLLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringFXMLLoader.class);
-    private static final ApplicationContext APPLICATION_CONTEXT = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+
+    static final ApplicationContext APPLICATION_CONTEXT = new AnnotationConfigApplicationContext(ApplicationConfig.class);
 
     public static Controller load(String url) {
         try (InputStream fxmlStream = SpringFXMLLoader.class.getResourceAsStream(url)) {
             FXMLLoader loader = new FXMLLoader();
+            loader.setResources(ResourceBundle.getBundle("i18n.messages"));
             loader.setControllerFactory(aClass -> APPLICATION_CONTEXT.getBean(aClass));
 
             Node view = loader.load(fxmlStream);

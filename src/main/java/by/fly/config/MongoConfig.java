@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @EnableMongoRepositories(basePackages = {"by.fly.repository"})
 @Profile("default")
-public class MongoPersistenceConfig extends AbstractMongoConfiguration {
+public class MongoConfig extends AbstractMongoConfiguration {
 
     @Value("${mongo.db.name}")
     private String mongoDBName;
