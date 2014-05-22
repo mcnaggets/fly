@@ -101,9 +101,8 @@ public class OrganizationController extends AbstractController {
         FileChooser fileChooser = new FileChooser();
 
         //Set extension filter
-        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
-        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(resourceBundle.getString("images"), new String[]{"*.jpg", "*.png", "*.gif", "*.bmp"});
+        fileChooser.getExtensionFilters().add(extFilter);
 
         //Show open file dialog
         File file = fileChooser.showOpenDialog(null);
