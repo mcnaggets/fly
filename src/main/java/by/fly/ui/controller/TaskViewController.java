@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
@@ -22,14 +21,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Component
-public class TaskViewController {
+public class TaskViewController extends AbstractController {
 
     public ListView<StackPane> taskList;
     public ProgressIndicator progressIndicator;
@@ -39,12 +40,13 @@ public class TaskViewController {
 
     private GetOrdersService service = new GetOrdersService();
 
-    final Background orangeBackground = new Background(new BackgroundFill(Color.ORANGE, null, null));
-    final Background greenBackground = new Background(new BackgroundFill(Color.LIGHTGREEN, null, null));
-    final Background redBackground = new Background(new BackgroundFill(Color.ORANGERED, null, null));
+    static final Background orangeBackground = new Background(new BackgroundFill(Color.ORANGE, null, null));
+    static final Background greenBackground = new Background(new BackgroundFill(Color.LIGHTGREEN, null, null));
+    static final Background redBackground = new Background(new BackgroundFill(Color.ORANGERED, null, null));
 
-    @FXML
-    void initialize() {
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        super.initialize(url, resourceBundle);
 
         progressIndicator.setMaxSize(150, 150);
         progressIndicator.progressProperty().bind(service.progressProperty());
@@ -58,15 +60,8 @@ public class TaskViewController {
         timeline.play();
     }
 
-    public class GetOrdersService extends Service<ObservableList<StackPane>> {
+    class GetOrdersService extends Service<ObservableList<StackPane>> {
 
-        /**
-         * Create and return the task for fetching the data. Note that this
-         * method is called on the background thread (all other code in this
-         * application is on the JavaFX Application Thread!).
-         *
-         * @return A task
-         */
         @Override
         protected Task<ObservableList<StackPane>> createTask() {
             return new GetOrdersTask();
@@ -74,7 +69,7 @@ public class TaskViewController {
 
     }
 
-    public class GetOrdersTask extends Task<ObservableList<StackPane>> {
+    class GetOrdersTask extends Task<ObservableList<StackPane>> {
         @Override
         protected ObservableList<StackPane> call() throws Exception {
 

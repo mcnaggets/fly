@@ -1,45 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="anchorPane" minHeight="400.0" minWidth="300.0" prefHeight="600.0" prefWidth="800.0"
-            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="by.fly.ui.controller.OrdersController">
+
+<AnchorPane fx:id="anchorPane" minHeight="400.0" minWidth="300.0" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.OrdersController">
     <children>
-        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                   AnchorPane.topAnchor="0.0">
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <VBox fx:id="orderTableRegion" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
-                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <AnchorPane fx:id="createOrderRegion" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
-                        <TableView VBox.vgrow="ALWAYS">
-                            <columns>
-                                <TableColumn prefWidth="75.0" text="C1"/>
-                                <TableColumn prefWidth="75.0" text="C2"/>
-                            </columns>
-                        </TableView>
-                        <Button mnemonicParsing="false" onAction="#createOrder" text="Добавить заказ"/>
-                    </children>
-                </VBox>
-                <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: gray;"/>
-                <AnchorPane fx:id="createOrderRegion" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
-                            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0"
-                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
                                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
                                     <children>
-                                        <Label fx:id="numberLabel" alignment="CENTER" text="Заказ №"/>
-                                        <Label alignment="CENTER" text="???"/>
-                                        <Label fx:id="orderDateLabel" alignment="CENTER"/>
+                                        <Label fx:id="numberLabel" alignment="CENTER" text="Заказ №" />
+                                        <Label alignment="CENTER" text="???" />
+                                        <Label fx:id="orderDateLabel" alignment="CENTER" />
                                     </children>
                                 </HBox>
-                                <Button mnemonicParsing="false" onAction="#saveOrder" text="OK" GridPane.rowIndex="2"/>
+                                <GridPane>
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Label text="Информация о заказчике:" />
+                                        <Label text="Контактный телефон:" GridPane.rowIndex="1" />
+                                        <TextField GridPane.columnIndex="1" fx:id="clientNameText" />
+                                        <TextField GridPane.columnIndex="1" fx:id="clientPhoneText" GridPane.rowIndex="1" />
+                                    </children>
+                                </GridPane>
+                                <Label alignment="CENTER" text="Детали заказа" />
+                                <VBox fx:id="orderItems" prefHeight="200.0" prefWidth="100.0" spacing="10.0" VBox.vgrow="ALWAYS">
+                                </VBox>
+                                <HBox spacing="10.0">
+                                    <children>
+                                        <Button mnemonicParsing="false" onAction="#addOrderItem" text="Добавить" />
+                                        <Button mnemonicParsing="false" onAction="#saveOrder" text="OK" />
+                                        <Button mnemonicParsing="false" onAction="#cancelOrder" text="Отмена" />
+                                    </children>
+                                </HBox>
                             </children>
                         </VBox>
                     </children>
                 </AnchorPane>
+                <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: gray;" />
+                <StackPane fx:id="orderTableRegion">
+                    <children>
+                        <ProgressIndicator fx:id="progressIndicator" progress="-1" />
+                        <VBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <TableView fx:id="ordersTable" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="numberColumn" prefWidth="75.0" text="№" />
+                                        <TableColumn fx:id="orderCodeColumn" prefWidth="75.0" text="Код" />
+                                        <TableColumn fx:id="barCodeColumn" prefWidth="75.0" text="Штрихкод" />
+                                        <TableColumn fx:id="printerTypeColumn" prefWidth="75.0" text="Тип" />
+                                        <TableColumn fx:id="workTypeColumn" prefWidth="75.0" text="Вид работ" />
+                                        <TableColumn fx:id="printerModelColumn" prefWidth="75.0" text="Модель" />
+                                        <TableColumn fx:id="clientNameColumn" prefWidth="75.0" text="Клиент" />
+                                        <TableColumn fx:id="clientPhoneColumn" prefWidth="75.0" text="Телефон" />
+                                        <TableColumn fx:id="createdAtColumn" prefWidth="75.0" text="Время приёма" />
+                                        <TableColumn fx:id="deadLineColumn" prefWidth="75.0" text="Время выполнения" />
+                                        <TableColumn fx:id="statusColumn" prefWidth="75.0" text="Статус" />
+                                        <TableColumn fx:id="priceColumn" prefWidth="75.0" text="Стоимость" />
+                                    </columns>
+                                </TableView>
+                                <Pagination fx:id="pagination" prefHeight="50.0" prefWidth="200.0" />
+                                <Button mnemonicParsing="false" onAction="#createOrder" text="Добавить заказ" />
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
             </children>
         </StackPane>
     </children>

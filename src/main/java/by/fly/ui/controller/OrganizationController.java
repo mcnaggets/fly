@@ -19,8 +19,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.InputEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +33,6 @@ import java.util.ResourceBundle;
 
 @Component
 public class OrganizationController extends AbstractController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
     public TextField organizationName;
     public TextField organizationInn;

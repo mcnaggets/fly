@@ -57,6 +57,9 @@
     <orderEntry type="library" exported="" name="Gradle: querydsl-mongodb-3.3.2" level="project" />
     <orderEntry type="library" exported="" name="Gradle: logback-classic-1.1.2" level="project" />
     <orderEntry type="library" exported="" name="Gradle: logback-core-1.1.2" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: jfxtras-controls-8.0-r1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: jfxtras-common-8.0-r1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: jfxtras-fxml-8.0-r1" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

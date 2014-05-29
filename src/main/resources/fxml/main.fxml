@@ -6,6 +6,11 @@
          prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8"
          xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.MainController">
     <tabs>
+        <Tab text="Заказы">
+            <content>
+                <fx:include source="/fxml/orders.fxml"/>
+            </content>
+        </Tab>
         <Tab onSelectionChanged="#showOrganizationTab" text="Настройки организации">
             <content>
                 <fx:include source="/fxml/organization.fxml"/>
@@ -14,11 +19,6 @@
         <Tab text="Задачи">
             <content>
                 <fx:include source="/fxml/tasks.fxml"/>
-            </content>
-        </Tab>
-        <Tab text="Заказы">
-            <content>
-                <fx:include source="/fxml/orders.fxml"/>
             </content>
         </Tab>
     </tabs>

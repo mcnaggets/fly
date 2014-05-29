@@ -32,8 +32,7 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
     }
 
     private Customer createCustomer() {
-        Customer customer = new Customer();
-        customer.setName("Валера");
+        Customer customer = new Customer("Валера", "+375297861213");
         customerRepository.save(customer);
         return customer;
     }
