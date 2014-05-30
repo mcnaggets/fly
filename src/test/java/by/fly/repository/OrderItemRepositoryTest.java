@@ -6,6 +6,8 @@ import by.fly.model.OrderStatus;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
@@ -31,7 +33,8 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
     public void testRepo() {
         Customer customer = createCustomer();
 
-        OrderItem orderItem = new OrderItem(customer, LocalDateTime.now().plusDays(3));
+        OrderItem orderItem = new OrderItem(LocalDateTime.now().plusDays(3));
+        orderItem.setCustomer(customer);
         orderItemRepository.save(orderItem);
 
         assertTrue(orderItem.getId() != null);
@@ -45,6 +48,19 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
         assertThat(execute, hasItem(customer.getName()));
     }
 
+    @Test
+    public void testDBRefSearch() {
+        Customer customer = createCustomer();
+
+        OrderItem orderItem = new OrderItem(LocalDateTime.now().plusDays(3));
+        orderItem.setCustomer(customer);
+        orderItemRepository.save(orderItem);
+
+        Query query = new Query(Criteria.where("customer.$id").is(customer.getName()));
+        List<OrderItem> items = mongoOperations.find(query, OrderItem.class);
+        assertThat(items, hasItem(orderItem));
+    }
+
     private Customer createCustomer() {
         Customer customer = new Customer("Валера", "+375297861213");
         customerRepository.save(customer);
@@ -56,7 +72,8 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
     public void populateData() {
         Customer customer = createCustomer();
         for (int i = 0; i < 100; i++) {
-            OrderItem orderItem = new OrderItem(customer, LocalDateTime.now().plusDays((long) (10 * Math.random())));
+            OrderItem orderItem = new OrderItem(LocalDateTime.now().plusDays((long) (10 * Math.random())));
+            orderItem.setCustomer(customer);
             orderItem.setStatus(OrderStatus.IN_PROGRESS);
             orderItemRepository.save(orderItem);
         }

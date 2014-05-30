@@ -202,8 +202,7 @@ public class OrderItemControl extends FlowPane {
     }
 
     public OrderItem createOrderItem() {
-        OrderItem orderItem = new OrderItem(null,
-                LocalDateTime.of(deadLineDatePicker.getValue(), deadLineTimePicker.getLocalTime()));
+        OrderItem orderItem = new OrderItem(LocalDateTime.of(deadLineDatePicker.getValue(), deadLineTimePicker.getLocalTime()));
         orderItem.setBarcode(barcodeText.getText());
         orderItem.setPrinterModel(printerModelText.getText());
         orderItem.setPrinterType(printerTypeCombo.getValue());

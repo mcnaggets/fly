@@ -16,6 +16,8 @@ import java.util.Date;
 @Document
 public class OrderItem extends AbstractModel {
 
+    public static final String ORDER_CODE_PREFIX = "*1Z";
+
     @DBRef
     private Customer customer;
 
@@ -31,6 +33,9 @@ public class OrderItem extends AbstractModel {
     @Indexed(unique = true)
     private long orderNumber;
 
+    @Indexed(unique = true)
+    private String orderCode;
+
     private WorkType workType;
 
     private PrinterType printerType;
@@ -44,11 +49,16 @@ public class OrderItem extends AbstractModel {
 
     private OrderStatus status = OrderStatus.CREATED;
 
+    @Indexed
+    private String clientPhone;
+
+    @Indexed
+    private String clientName;
+
     @PersistenceConstructor
     public OrderItem() {}
 
-    public OrderItem(Customer customer, LocalDateTime deadLine) {
-        setCustomer(customer);
+    public OrderItem(LocalDateTime deadLine) {
         setDeadLine(deadLine);
         setCreatedAt(LocalDateTime.now());
     }
@@ -81,6 +91,8 @@ public class OrderItem extends AbstractModel {
     }
 
     public void setCustomer(Customer customer) {
+        this.clientName = customer.getName();
+        this.clientPhone = customer.getPhone();
         this.customer = customer;
     }
 
@@ -116,6 +128,7 @@ public class OrderItem extends AbstractModel {
 
     public void setOrderNumber(long orderNumber) {
         this.orderNumber = orderNumber;
+        setOrderCode(ORDER_CODE_PREFIX + orderNumber);
     }
 
     public float getPrice() {
@@ -140,5 +153,21 @@ public class OrderItem extends AbstractModel {
 
     public void setWorkType(WorkType workType) {
         this.workType = workType;
+    }
+
+    public String getOrderCode() {
+        return orderCode;
+    }
+
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public String getClientPhone() {
+        return clientPhone;
     }
 }

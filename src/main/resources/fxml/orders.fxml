@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import by.fly.ui.control.AutoCompleteTextField?>
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
@@ -37,15 +37,15 @@
                                         </Label>
                                     </children>
                                 </HBox>
-                                <HBox spacing="10">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
                                     <padding>
                                         <Insets left="10"/>
                                     </padding>
                                     <children>
-                                        <Label text="Информация о заказчике:" />
-                                        <AutoCompleteTextField fx:id="clientNameText" />
-                                        <Label text="Контактный телефон:" />
-                                        <AutoCompleteTextField fx:id="clientPhoneText" />
+                                        <Label text="Информация о заказчике:"/>
+                                        <AutoCompleteTextField fx:id="clientNameText"/>
+                                        <Label text="Контактный телефон:"/>
+                                        <AutoCompleteTextField fx:id="clientPhoneText"/>
                                     </children>
                                 </HBox>
                                 <Label text="Информация о заказе:">
@@ -58,8 +58,7 @@
                                 </Label>
                                 <ScrollPane VBox.vgrow="ALWAYS">
                                     <content>
-                                        <VBox fx:id="orderItems" spacing="10.0" VBox.vgrow="ALWAYS">
-                                        </VBox>
+                                        <VBox fx:id="orderItems" spacing="10.0" VBox.vgrow="ALWAYS"/>
                                     </content>
                                 </ScrollPane>
                                 <GridPane hgap="10" vgap="10">
@@ -73,33 +72,54 @@
                                         <ColumnConstraints/>
                                     </columnConstraints>
                                     <children>
-                                        <Button onAction="#addOrderItem" text="Добавить" GridPane.columnIndex="3"/>
-                                        <Label text="Итого:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                                        <Button onAction="#addOrderItem" text="Добавить" GridPane.columnIndex="1"/>
+                                        <Label text="Итого:" GridPane.columnIndex="2"/>
                                         <TextField fx:id="totalPriceText" text="0" GridPane.columnIndex="3"
-                                                   GridPane.rowIndex="1" editable="false"/>
-                                        <Button onAction="#saveOrder" text="Принять в работу" GridPane.columnIndex="1"
-                                                GridPane.rowIndex="2"/>
-                                        <Button onAction="#saveOrder" text="Выдан" GridPane.columnIndex="2"
-                                                GridPane.rowIndex="2"/>
+                                                   editable="false"/>
+                                        <Button fx:id="inProgressButton" onAction="#saveOrder" text="Принять в работу"
+                                                GridPane.columnIndex="1"
+                                                GridPane.rowIndex="1" style="-fx-background-color: orange;"/>
+                                        <Button fx:id="readyButton" onAction="#saveOrder" text="Выдан"
+                                                GridPane.columnIndex="2"
+                                                GridPane.rowIndex="1" style="-fx-background-color: palegreen;"/>
                                         <Button onAction="#cancelOrder" text="Отмена" GridPane.columnIndex="3"
-                                                GridPane.rowIndex="2"/>
+                                                GridPane.rowIndex="1"/>
                                     </children>
                                 </GridPane>
                             </children>
                         </VBox>
                     </children>
                 </AnchorPane>
-                <Region prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: gray;"/>
+                <Pane style="-fx-background-color: #f4f4f4;"/>
                 <StackPane fx:id="orderTableRegion">
                     <children>
                         <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
-                        <VBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+                        <VBox AnchorPane.bottomAnchor="0.0"
                               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
-                                <HBox>
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <padding>
+                                        <Insets left="10" top="10" bottom="10" right="10"/>
+                                    </padding>
                                     <children>
                                         <Label text="Заказы за число:"/>
-                                        <DatePicker fx:id="ordersDateFilter"/>
+                                        <DatePicker fx:id="orderDateFilter"/>
+                                    </children>
+                                </HBox>
+
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <padding>
+                                        <Insets left="10" top="10" bottom="10" right="10"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="Код:"/>
+                                        <TextField fx:id="orderCodeFilter"/>
+                                        <Label text="Штрихкод:"/>
+                                        <TextField fx:id="orderBarcodeFilter"/>
+                                        <Label text="Клиент:"/>
+                                        <TextField fx:id="clientNameFilter"/>
+                                        <Label text="Телефон:"/>
+                                        <TextField fx:id="clientPhoneFilter"/>
                                     </children>
                                 </HBox>
                                 <TableView fx:id="ordersTable" VBox.vgrow="ALWAYS">

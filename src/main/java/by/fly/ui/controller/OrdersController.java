@@ -38,7 +38,6 @@ public class OrdersController extends AbstractController {
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
 
     private static final int PAGE_SIZE = 10;
-    public static final String ORDER_CODE_PREFIX = "*1Z";
 
     public Region orderTableRegion;
     public Region createOrderRegion;
@@ -67,9 +66,17 @@ public class OrdersController extends AbstractController {
     public AutoCompleteTextField<String> clientPhoneText;
     public AutoCompleteTextField<String> clientNameText;
 
-    public DatePicker ordersDateFilter;
     public TextField totalPriceText;
     public Label orderCodeLabel;
+
+    public Button inProgressButton;
+    public Button readyButton;
+
+    public DatePicker orderDateFilter;
+    public TextField orderCodeFilter;
+    public TextField orderBarcodeFilter;
+    public TextField clientNameFilter;
+    public TextField clientPhoneFilter;
 
     private GetOrdersService service = new GetOrdersService();
 
@@ -92,7 +99,7 @@ public class OrdersController extends AbstractController {
 
         orderNumber = orderService.getNexOrderNumber();
         orderNumberLabel.setText("Заказ №" + orderNumber);
-        orderCodeLabel.setText(ORDER_CODE_PREFIX + orderNumber);
+        orderCodeLabel.setText(OrderItem.ORDER_CODE_PREFIX + orderNumber);
         orderDateLabel.setText(DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()));
 
         clientNameText.setText("");
@@ -108,7 +115,11 @@ public class OrdersController extends AbstractController {
 
         orderItems.getChildren().forEach(node -> {
             OrderItem orderItem = ((OrderItemControl) node).createOrderItem();
-            orderItem.setStatus(OrderStatus.IN_PROGRESS);
+            if (actionEvent.getTarget() == inProgressButton) {
+                orderItem.setStatus(OrderStatus.IN_PROGRESS);
+            } else if (actionEvent.getTarget() == readyButton) {
+                orderItem.setStatus(OrderStatus.READY);
+            }
             orderItem.setOrderNumber(orderNumber);
             String clientName = clientNameText.getText();
             String clientPhone = clientPhoneText.getText();
@@ -128,14 +139,23 @@ public class OrdersController extends AbstractController {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
 
-        ordersDateFilter.setValue(LocalDate.now());
-        ordersDateFilter.setOnAction(e -> service.restart());
+        initializeFilter();
 
         clientNameText.setItems(FXCollections.observableList(customerService.findCustomerNames()));
         clientPhoneText.setItems(FXCollections.observableList(customerService.findCustomerPhones()));
 
         initializeColumns();
         bindService();
+    }
+
+    private void initializeFilter() {
+        orderDateFilter.setValue(LocalDate.now());
+        orderDateFilter.setOnAction(e -> service.restart());
+
+        orderCodeFilter.textProperty().addListener(e -> service.restart());
+        orderBarcodeFilter.textProperty().addListener(e -> service.restart());
+        clientNameFilter.textProperty().addListener(e -> service.restart());
+        clientPhoneFilter.textProperty().addListener(e -> service.restart());
     }
 
     private void bindService() {
@@ -150,7 +170,7 @@ public class OrdersController extends AbstractController {
 
     private void initializeColumns() {
         numberColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getOrderNumber())));
-        orderNumberColumn.setCellValueFactory(data -> new SimpleStringProperty(ORDER_CODE_PREFIX + String.valueOf(data.getValue().getOrderNumber())));
+        orderNumberColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getOrderCode()));
         barCodeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBarcode()));
         printerTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterType().getMessage()));
         printerModelColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterModel()));
@@ -195,10 +215,22 @@ public class OrdersController extends AbstractController {
             return new Task<ObservableList<OrderItem>>() {
                 @Override
                 protected ObservableList<OrderItem> call() throws Exception {
-                    LocalDate filterDate = ordersDateFilter.getValue();
+                    LocalDate filterDate = orderDateFilter.getValue();
                     filterPredicate = QOrderItem.orderItem.deadLine.between(
                             Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
                             Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                    if (!orderCodeFilter.getText().trim().isEmpty()) {
+                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.orderCode.containsIgnoreCase(orderCodeFilter.getText().trim()));
+                    }
+                    if (!orderBarcodeFilter.getText().trim().isEmpty()) {
+                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.barcode.containsIgnoreCase(orderBarcodeFilter.getText().trim()));
+                    }
+                    if (!clientNameFilter.getText().trim().isEmpty()) {
+                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
+                    }
+                    if (!clientPhoneFilter.getText().trim().isEmpty()) {
+                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientPhone.containsIgnoreCase(clientPhoneFilter.getText().trim()));
+                    }
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
                             new PageRequest(pagination.getCurrentPageIndex(), PAGE_SIZE)
                     );
