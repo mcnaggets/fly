@@ -2,6 +2,7 @@ package by.fly.ui.controller;
 
 import by.fly.model.OrderItem;
 import by.fly.model.OrderStatus;
+import by.fly.model.QOrderItem;
 import by.fly.repository.OrderItemRepository;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -76,7 +77,7 @@ public class TaskViewController extends AbstractController {
             ObservableList<StackPane> tasks = FXCollections.observableArrayList();
 
             final List<OrderItem> orderItems = orderItemRepository.findByStatus(OrderStatus.IN_PROGRESS,
-                    new PageRequest(0, 30, Sort.Direction.ASC, "deadLine"));
+                    new PageRequest(0, 30, Sort.Direction.ASC, QOrderItem.orderItem.deadLine.toString()));
 
             if (orderItems.isEmpty()) {
                 return tasks;

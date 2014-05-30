@@ -1,14 +1,15 @@
 package by.fly.model;
 
 import com.mysema.query.annotations.QueryEntity;
+import com.mysema.query.annotations.QueryTransient;
 import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
 import java.util.Date;
 
 @QueryEntity
@@ -18,14 +19,25 @@ public class OrderItem extends AbstractModel {
     @DBRef
     private Customer customer;
 
+    @Indexed
     private Date createdAt;
+
+    @Indexed
     private Date deadLine;
 
+    @Indexed
     private String barcode;
-    private String orderCode;
-    private String workType;
-    private String printerType;
+
+    @Indexed(unique = true)
+    private long orderNumber;
+
+    private WorkType workType;
+
+    private PrinterType printerType;
+
+    @Indexed
     private String printerModel;
+
     private String description;
 
     private float price;
@@ -46,14 +58,6 @@ public class OrderItem extends AbstractModel {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
-    }
-
-    public String getPrinterType() {
-        return printerType;
-    }
-
-    public void setPrinterType(String printerType) {
-        this.printerType = printerType;
     }
 
     public String getPrinterModel() {
@@ -80,6 +84,7 @@ public class OrderItem extends AbstractModel {
         this.customer = customer;
     }
 
+    @QueryTransient
     public LocalDateTime getCreatedAt() {
         return createdAt != null ? LocalDateTime.ofInstant(Instant.ofEpochMilli(createdAt.getTime()), ZoneId.systemDefault()) : null;
     }
@@ -88,6 +93,7 @@ public class OrderItem extends AbstractModel {
         this.createdAt = createdAt != null ? Date.from(createdAt.atZone(ZoneId.systemDefault()).toInstant()) : null;
     }
 
+    @QueryTransient
     public LocalDateTime getDeadLine() {
         return deadLine != null ? LocalDateTime.ofInstant(Instant.ofEpochMilli(deadLine.getTime()), ZoneId.systemDefault()) : null;
     }
@@ -104,20 +110,12 @@ public class OrderItem extends AbstractModel {
         this.status = status;
     }
 
-    public String getOrderCode() {
-        return orderCode;
+    public long getOrderNumber() {
+        return orderNumber;
     }
 
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
-    }
-
-    public String getWorkType() {
-        return workType;
-    }
-
-    public void setWorkType(String workType) {
-        this.workType = workType;
+    public void setOrderNumber(long orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
     public float getPrice() {
@@ -126,5 +124,21 @@ public class OrderItem extends AbstractModel {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public PrinterType getPrinterType() {
+        return printerType;
+    }
+
+    public void setPrinterType(PrinterType printerType) {
+        this.printerType = printerType;
+    }
+
+    public WorkType getWorkType() {
+        return workType;
+    }
+
+    public void setWorkType(WorkType workType) {
+        this.workType = workType;
     }
 }

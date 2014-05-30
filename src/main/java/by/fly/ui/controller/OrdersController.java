@@ -3,10 +3,12 @@ package by.fly.ui.controller;
 import by.fly.model.Customer;
 import by.fly.model.OrderItem;
 import by.fly.model.OrderStatus;
-import by.fly.model.QCustomer;
-import by.fly.repository.CustomerRepository;
-import by.fly.repository.OrderItemRepository;
+import by.fly.model.QOrderItem;
+import by.fly.service.CustomerService;
+import by.fly.service.OrderService;
+import by.fly.ui.control.AutoCompleteTextField;
 import by.fly.ui.control.OrderItemControl;
+import com.mysema.query.types.expr.BooleanExpression;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,24 +26,30 @@ import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 @Component
 public class OrdersController extends AbstractController {
 
-    private static final int PAGE_SIZE = 5;
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+
+    private static final int PAGE_SIZE = 10;
+    public static final String ORDER_CODE_PREFIX = "*1Z";
 
     public Region orderTableRegion;
     public Region createOrderRegion;
 
-    public Label numberLabel;
+    public Label orderNumberLabel;
     public Label orderDateLabel;
 
     public TableColumn<OrderItem, String> createdAtColumn;
     public TableColumn<OrderItem, String> numberColumn;
     public TableColumn<OrderItem, String> printerTypeColumn;
-    public TableColumn<OrderItem, String> orderCodeColumn;
+    public TableColumn<OrderItem, String> orderNumberColumn;
     public TableColumn<OrderItem, String> barCodeColumn;
     public TableColumn<OrderItem, String> workTypeColumn;
     public TableColumn<OrderItem, String> printerModelColumn;
@@ -55,23 +64,39 @@ public class OrdersController extends AbstractController {
     public TableView ordersTable;
 
     public VBox orderItems;
-    public TextField clientPhoneText;
-    public TextField clientNameText;
+    public AutoCompleteTextField<String> clientPhoneText;
+    public AutoCompleteTextField<String> clientNameText;
+
+    public DatePicker ordersDateFilter;
+    public TextField totalPriceText;
+    public Label orderCodeLabel;
 
     private GetOrdersService service = new GetOrdersService();
 
     @Autowired
-    private OrderItemRepository orderItemRepository;
+    private OrderService orderService;
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private CustomerService customerService;
+
+    @Autowired
+    private BeanFactory beanFactory;
+
+    private BooleanExpression filterPredicate;
+
+    private long orderNumber;
 
     public void createOrder(ActionEvent actionEvent) {
         orderItems.getChildren().clear();
-        orderItems.getChildren().add(new OrderItemControl());
+        orderItems.getChildren().add(createOrderItemControl());
 
-        numberLabel.setText("Заказ №" + orderItemRepository.count());
+        orderNumber = orderService.getNexOrderNumber();
+        orderNumberLabel.setText("Заказ №" + orderNumber);
+        orderCodeLabel.setText(ORDER_CODE_PREFIX + orderNumber);
         orderDateLabel.setText(DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()));
+
+        clientNameText.setText("");
+        clientPhoneText.setText("");
 
         orderTableRegion.toBack();
         createOrderRegion.toFront();
@@ -84,28 +109,33 @@ public class OrdersController extends AbstractController {
         orderItems.getChildren().forEach(node -> {
             OrderItem orderItem = ((OrderItemControl) node).createOrderItem();
             orderItem.setStatus(OrderStatus.IN_PROGRESS);
+            orderItem.setOrderNumber(orderNumber);
             String clientName = clientNameText.getText();
             String clientPhone = clientPhoneText.getText();
-            Customer customer = customerRepository.findOne(QCustomer.customer.name.eq(clientName).and(QCustomer.customer.phone.eq(clientPhone)));
+            Customer customer = customerService.findByNameAndPhone(clientName, clientPhone);
             if (customer == null) {
                 customer = new Customer(clientName, clientPhone);
-                customerRepository.save(customer);
+                customerService.save(customer);
             }
             orderItem.setCustomer(customer);
-            orderItemRepository.save(orderItem);
+            orderService.save(orderItem);
         });
 
         service.restart();
-
-        refreshPagination();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
+
+        ordersDateFilter.setValue(LocalDate.now());
+        ordersDateFilter.setOnAction(e -> service.restart());
+
+        clientNameText.setItems(FXCollections.observableList(customerService.findCustomerNames()));
+        clientPhoneText.setItems(FXCollections.observableList(customerService.findCustomerPhones()));
+
         initializeColumns();
         bindService();
-        refreshPagination();
     }
 
     private void bindService() {
@@ -115,28 +145,48 @@ public class OrdersController extends AbstractController {
         ordersTable.itemsProperty().bind(service.valueProperty());
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
         service.start();
+        service.setOnSucceeded(e -> refreshPagination());
     }
 
     private void initializeColumns() {
-        numberColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getId()));
-        orderCodeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getOrderCode()));
+        numberColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getOrderNumber())));
+        orderNumberColumn.setCellValueFactory(data -> new SimpleStringProperty(ORDER_CODE_PREFIX + String.valueOf(data.getValue().getOrderNumber())));
         barCodeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBarcode()));
-        printerTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterType()));
+        printerTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterType().getMessage()));
         printerModelColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterModel()));
-        workTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWorkType()));
+        workTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWorkType().getMessage()));
         statusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus().getMessage()));
         priceColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getPrice())));
         clientNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCustomer().getName()));
         clientPhoneColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCustomer().getPhone()));
-        createdAtColumn.setCellValueFactory(data -> new SimpleStringProperty(DateTimeFormatter.ISO_TIME.format(data.getValue().getCreatedAt())));
-        deadLineColumn.setCellValueFactory(data -> new SimpleStringProperty(DateTimeFormatter.ISO_TIME.format(data.getValue().getDeadLine())));
+        createdAtColumn.setCellValueFactory(data -> new SimpleStringProperty(TIME_FORMATTER.format(data.getValue().getCreatedAt())));
+        deadLineColumn.setCellValueFactory(data -> new SimpleStringProperty(TIME_FORMATTER.format(data.getValue().getDeadLine())));
     }
 
     public void addOrderItem(ActionEvent actionEvent) {
-        orderItems.getChildren().add(new OrderItemControl());
+        orderItems.getChildren().add(createOrderItemControl());
+    }
+
+    private OrderItemControl createOrderItemControl() {
+        OrderItemControl orderItemControl = beanFactory.getBean(OrderItemControl.class);
+        orderItemControl.initialize();
+        orderItemControl.setOnPriceChanged(e -> totalPriceText.setText(String.valueOf(calculateTotalPrice())));
+        orderItemControl.setOnBarcodeChanged(e -> {
+            String barcode = (String) e.getSource();
+            OrderItem item = orderService.findLastItemByBarcode(barcode);
+            clientNameText.setText(item.getCustomer().getName());
+            clientPhoneText.setText(item.getCustomer().getPhone());
+        });
+        return orderItemControl;
+    }
+
+    private double calculateTotalPrice() {
+        return orderItems.getChildren().stream().mapToDouble(node -> ((OrderItemControl) node).getPrice()).sum();
     }
 
     public void cancelOrder(ActionEvent actionEvent) {
+        createOrderRegion.toBack();
+        orderTableRegion.toFront();
     }
 
     private class GetOrdersService extends Service<ObservableList<OrderItem>> {
@@ -145,7 +195,13 @@ public class OrdersController extends AbstractController {
             return new Task<ObservableList<OrderItem>>() {
                 @Override
                 protected ObservableList<OrderItem> call() throws Exception {
-                    Page<OrderItem> orderItems = orderItemRepository.findAll(new PageRequest(pagination.getCurrentPageIndex(), PAGE_SIZE));
+                    LocalDate filterDate = ordersDateFilter.getValue();
+                    filterPredicate = QOrderItem.orderItem.deadLine.between(
+                            Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                            Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                    Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
+                            new PageRequest(pagination.getCurrentPageIndex(), PAGE_SIZE)
+                    );
                     return FXCollections.observableList(orderItems.getContent());
                 }
             };
@@ -153,9 +209,13 @@ public class OrdersController extends AbstractController {
     }
 
     private void refreshPagination() {
-        int totalCount = (int) orderItemRepository.count();
+        int totalCount = (int) orderService.count(filterPredicate);
         float floatCount = Float.valueOf(totalCount) / Float.valueOf(PAGE_SIZE);
         int intCount = totalCount / PAGE_SIZE;
+
+        if (intCount == 0) {
+            intCount = 1;
+        }
 
         pagination.setPageCount((floatCount > intCount) ? ++intCount : intCount);
     }

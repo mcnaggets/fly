@@ -1,13 +1,12 @@
 package by.fly.model;
 
-import static com.mysema.query.types.PathMetadataFactory.*;
-
+import com.mysema.query.types.Path;
+import com.mysema.query.types.PathMetadata;
 import com.mysema.query.types.path.*;
 
-import com.mysema.query.types.PathMetadata;
 import javax.annotation.Generated;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.path.PathInits;
+
+import static com.mysema.query.types.PathMetadataFactory.forVariable;
 
 
 /**
@@ -24,18 +23,30 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
 
     public final QAbstractModel _super = new QAbstractModel(this);
 
-    public final ComparablePath<java.time.LocalDateTime> createdAt = createComparable("createdAt", java.time.LocalDateTime.class);
+    public final StringPath barcode = createString("barcode");
+
+    public final DateTimePath<java.util.Date> createdAt = createDateTime("createdAt", java.util.Date.class);
 
     public final QCustomer customer;
 
-    public final ComparablePath<java.time.LocalDateTime> deadLine = createComparable("deadLine", java.time.LocalDateTime.class);
+    public final DateTimePath<java.util.Date> deadLine = createDateTime("deadLine", java.util.Date.class);
 
     public final StringPath description = createString("description");
 
     //inherited
     public final StringPath id = _super.id;
 
+    public final StringPath orderCode = createString("orderCode");
+
+    public final NumberPath<Float> price = createNumber("price", Float.class);
+
+    public final StringPath printerModel = createString("printerModel");
+
+    public final StringPath printerType = createString("printerType");
+
     public final EnumPath<OrderStatus> status = createEnum("status", OrderStatus.class);
+
+    public final StringPath workType = createString("workType");
 
     public QOrderItem(String variable) {
         this(OrderItem.class, forVariable(variable), INITS);

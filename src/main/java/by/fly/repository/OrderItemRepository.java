@@ -9,7 +9,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 import java.util.List;
 
-public interface OrderItemRepository extends MongoRepository<OrderItem, String>, QueryDslPredicateExecutor {
+public interface OrderItemRepository extends MongoRepository<OrderItem, String>, QueryDslPredicateExecutor<OrderItem> {
 
     List<OrderItem> findByStatus(OrderStatus status, Pageable pageable);
 

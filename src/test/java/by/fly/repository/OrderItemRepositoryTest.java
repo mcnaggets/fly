@@ -5,11 +5,15 @@ import by.fly.model.OrderItem;
 import by.fly.model.OrderStatus;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class OrderItemRepositoryTest extends AbstractBaseTest {
@@ -20,6 +24,9 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
     @Autowired
     CustomerRepository customerRepository;
 
+    @Autowired
+    MongoTemplate mongoTemplate;
+
     @Test
     public void testRepo() {
         Customer customer = createCustomer();
@@ -29,6 +36,13 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
 
         assertTrue(orderItem.getId() != null);
         assertNotNull(orderItem.getCreatedAt());
+    }
+
+    @Test
+    public void testDistinct() {
+        Customer customer = createCustomer();
+        List<String> execute = mongoOperations.execute(call -> call.getCollection("customer").distinct("name"));
+        assertThat(execute, hasItem(customer.getName()));
     }
 
     private Customer createCustomer() {

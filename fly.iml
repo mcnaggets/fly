@@ -60,6 +60,7 @@
     <orderEntry type="library" exported="" name="Gradle: jfxtras-controls-8.0-r1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: jfxtras-common-8.0-r1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: jfxtras-fxml-8.0-r1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: controlsfx-8.0.5" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

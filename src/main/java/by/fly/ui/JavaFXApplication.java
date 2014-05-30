@@ -26,7 +26,7 @@ public class JavaFXApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         MainController controller = (MainController) SpringFXMLLoader.load("/fxml/main.fxml");
-        Scene scene = new Scene((Parent) controller.getView(), 800, 600);
+        Scene scene = new Scene((Parent) controller.getView(), 1000, 750);
         primaryStage.setTitle(SpringFXMLLoader.APPLICATION_CONTEXT.getEnvironment().getProperty("application.name"));
         primaryStage.setScene(scene);
         primaryStage.show();
