@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="by.fly.ui.controller.DailyOrdersController">
+    <children>
+        <StackPane fx:id="orderTableRegion">
+            <children>
+                <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
+
+                <TableView fx:id="dailyOrdersTable" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
+                           AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columns>
+                        <TableColumn prefWidth="75.0" text="№"/>
+                        <TableColumn prefWidth="75.0" text="Дата"/>
+                        <TableColumn prefWidth="75.0" text="Количество"/>
+                        <TableColumn prefWidth="75.0" text="Сумма"/>
+                        <TableColumn prefWidth="75.0" text="Выданы"/>
+                        <TableColumn prefWidth="75.0" text="Не забраны"/>
+                    </columns>
+                </TableView>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>

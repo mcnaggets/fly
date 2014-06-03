@@ -11,11 +11,11 @@
                      AnchorPane.topAnchor="0" fx:id="tabs"
                      tabClosingPolicy="UNAVAILABLE">
                 <tabs>
-                    <!--<Tab text="Настройки организации">-->
-                        <!--<content>-->
-                            <!--<fx:include source="/fxml/organization.fxml"/>-->
-                        <!--</content>-->
-                    <!--</Tab>-->
+                    <Tab text="Заказы по дням">
+                        <content>
+                            <fx:include source="/fxml/daily-orders.fxml"/>
+                        </content>
+                    </Tab>
                     <Tab text="Заказы">
                         <content>
                             <fx:include source="/fxml/orders.fxml"/>
