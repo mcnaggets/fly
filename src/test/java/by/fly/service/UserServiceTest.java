@@ -23,7 +23,7 @@ public class UserServiceTest extends AbstractBaseTest {
     @Test
     public void testBarcode() {
         User user = new User("fly", null, null, organizationService.getRootOrganization());
-        user.setBarcode(userService.generateBarcode());
+        user.setBarcode(userService.generateMasterBarcode());
         userRepository.save(user);
         assertThat(user.getBarcode(), notNullValue());
     }

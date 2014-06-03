@@ -62,4 +62,8 @@ public class OrganizationService {
         GridFSDBFile file = gridFsOperations.findOne(query(whereFilename().is(getLogoFileName(organization))));
         return file != null ? file.getInputStream() : null;
     }
+
+    public void save(Organization organization) {
+        repository.save(organization);
+    }
 }

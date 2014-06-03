@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
-         prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8"
-         xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.MainController">
-    <tabs>
-        <Tab text="Заказы">
-            <content>
-                <fx:include source="/fxml/orders.fxml"/>
-            </content>
-        </Tab>
-        <Tab onSelectionChanged="#showOrganizationTab" text="Настройки организации">
-            <content>
-                <fx:include source="/fxml/organization.fxml"/>
-            </content>
-        </Tab>
-        <Tab text="Задачи">
-            <content>
-                <fx:include source="/fxml/tasks.fxml"/>
-            </content>
-        </Tab>
-    </tabs>
-</TabPane>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="by.fly.ui.controller.MainController">
+    <children>
+        <AnchorPane>
+            <TabPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+                     AnchorPane.topAnchor="0" fx:id="tabs"
+                     tabClosingPolicy="UNAVAILABLE">
+                <tabs>
+                    <!--<Tab text="Настройки организации">-->
+                        <!--<content>-->
+                            <!--<fx:include source="/fxml/organization.fxml"/>-->
+                        <!--</content>-->
+                    <!--</Tab>-->
+                    <Tab text="Заказы">
+                        <content>
+                            <fx:include source="/fxml/orders.fxml"/>
+                        </content>
+                    </Tab>
+                    <Tab text="Задачи">
+                        <content>
+                            <fx:include source="/fxml/tasks.fxml"/>
+                        </content>
+                    </Tab>
+                </tabs>
+            </TabPane>
+        </AnchorPane>
+        <Hyperlink text="Войти" StackPane.alignment="TOP_RIGHT" onAction="#doLogin" fx:id="loginLink">
+            <padding>
+                <Insets right="5" top="5"></Insets>
+            </padding>
+        </Hyperlink>
+    </children>
+</StackPane>

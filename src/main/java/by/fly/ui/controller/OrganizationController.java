@@ -2,18 +2,14 @@ package by.fly.ui.controller;
 
 import by.fly.model.Organization;
 import by.fly.model.User;
-import by.fly.repository.OrganizationRepository;
-import by.fly.repository.UserRepository;
 import by.fly.service.OrganizationService;
 import by.fly.service.UserService;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.InputEvent;
@@ -35,12 +31,14 @@ import java.util.ResourceBundle;
 public class OrganizationController extends AbstractController {
 
     public TextField organizationName;
-    public TextField organizationInn;
+    public TextField organizationUnp;
     public ImageView organizationLogo;
     public ListView<Node> userList;
-
-    @Autowired
-    private OrganizationRepository organizationRepository;
+    public TextField registrationData;
+    public DatePicker registrationDate;
+    public TextField address;
+    public TextField bankDetails;
+    public TextField paymentAccount;
 
     @Autowired
     private OrganizationService organizationService;
@@ -48,14 +46,11 @@ public class OrganizationController extends AbstractController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
     private Organization organization;
 
     public void handleNewUser(ActionEvent actionEvent) {
-        User user = new User("", null, userService.generateBarcode(), organizationService.getRootOrganization());
-        userRepository.save(user);
+        User user = new User("", null, userService.generateMasterBarcode(), organizationService.getRootOrganization());
+        userService.save(user);
         addUserItem(user);
     }
 
@@ -74,12 +69,13 @@ public class OrganizationController extends AbstractController {
                 barcodeText
         );
         hBox.setSpacing(10);
+        hBox.setPadding(new Insets(5));
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setUserData(user);
 
         final Button deleteButton = new Button(resourceBundle.getString("delete"));
         deleteButton.setOnAction(event -> {
-            userRepository.delete(user);
+            userService.delete(user);
             userList.getItems().remove(hBox);
         });
         hBox.getChildren().add(deleteButton);
@@ -97,7 +93,7 @@ public class OrganizationController extends AbstractController {
         FileChooser fileChooser = new FileChooser();
 
         //Set extension filter
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(resourceBundle.getString("images"), new String[]{"*.jpg", "*.png", "*.gif", "*.bmp"});
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(resourceBundle.getString("images"), "*.jpg", "*.png", "*.gif", "*.bmp");
         fileChooser.getExtensionFilters().add(extFilter);
 
         //Show open file dialog
@@ -125,22 +121,31 @@ public class OrganizationController extends AbstractController {
     private void bindOrganization() {
         organization = organizationService.getRootOrganization();
         organizationName.setText(organization.getName());
-        organizationInn.setText(organization.getInn());
+        organizationUnp.setText(organization.getUnp());
+        address.setText(organization.getAddress());
+        bankDetails.setText(organization.getBankDetails());
+        paymentAccount.setText(organization.getPaymentAccount());
+        registrationData.setText(organization.getRegistrationData());
+        registrationDate.setValue(organization.getRegistrationDate());
+        organizationUnp.setText(organization.getUnp());
         InputStream logo = organizationService.findOrganizationLogo(organization);
         if (logo != null) {
             showOrganizationLogo(logo);
         }
         userList.getItems().clear();
-        userRepository.findAll().forEach(this::addUserItem);
+        userService.findAll().forEach(this::addUserItem);
     }
 
     public void organizationSave(ActionEvent actionEvent) {
-        userList.getItems().forEach(node -> {
-            userRepository.save((User) node.getUserData());
-        });
+        userList.getItems().forEach(node -> userService.save((User) node.getUserData()));
         organization.setName(organizationName.getText());
-        organization.setInn(organizationInn.getText());
-        organizationRepository.save(organization);
+        organization.setUnp(organizationUnp.getText());
+        organization.setAddress(address.getText());
+        organization.setBankDetails(bankDetails.getText());
+        organization.setPaymentAccount(paymentAccount.getText());
+        organization.setRegistrationData(registrationData.getText());
+        organization.setRegistrationDate(registrationDate.getValue());
+        organizationService.save(organization);
     }
 
 

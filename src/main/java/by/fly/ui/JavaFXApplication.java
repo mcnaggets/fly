@@ -4,9 +4,7 @@ import by.fly.ui.controller.MainController;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +28,6 @@ public class JavaFXApplication extends Application {
         primaryStage.setTitle(SpringFXMLLoader.APPLICATION_CONTEXT.getEnvironment().getProperty("application.name"));
         primaryStage.setScene(scene);
         primaryStage.show();
-
-        final Stage dialog = new Stage(StageStyle.TRANSPARENT);
-        dialog.initModality(Modality.WINDOW_MODAL);
-        dialog.initOwner(primaryStage);
-        dialog.setScene(new Scene((Parent) SpringFXMLLoader.load("/fxml/login.fxml").getView()));
-//        dialog.show();
+        controller.setStage(primaryStage);
     }
 }

@@ -14,7 +14,7 @@ public class OrganizationRepositoryTest extends AbstractBaseTest {
     @Rollback(false)
     public void createDefaultOrganization() {
         Organization organization = new Organization("fly");
-        organization.setInn("111");
+        organization.setUnp("111");
         organizationRepository.save(organization);
     }
 

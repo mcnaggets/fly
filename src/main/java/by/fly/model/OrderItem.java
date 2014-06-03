@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -98,7 +97,7 @@ public class OrderItem extends AbstractModel {
 
     @QueryTransient
     public LocalDateTime getCreatedAt() {
-        return createdAt != null ? LocalDateTime.ofInstant(Instant.ofEpochMilli(createdAt.getTime()), ZoneId.systemDefault()) : null;
+        return createdAt != null ? LocalDateTime.ofInstant(createdAt.toInstant(), ZoneId.systemDefault()) : null;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
@@ -107,7 +106,7 @@ public class OrderItem extends AbstractModel {
 
     @QueryTransient
     public LocalDateTime getDeadLine() {
-        return deadLine != null ? LocalDateTime.ofInstant(Instant.ofEpochMilli(deadLine.getTime()), ZoneId.systemDefault()) : null;
+        return deadLine != null ? LocalDateTime.ofInstant(deadLine.toInstant(), ZoneId.systemDefault()) : null;
     }
 
     public void setDeadLine(LocalDateTime deadLine) {

@@ -1,12 +1,14 @@
 package by.fly.model;
 
-import static com.mysema.query.types.PathMetadataFactory.*;
-
-import com.mysema.query.types.path.*;
-
-import com.mysema.query.types.PathMetadata;
-import javax.annotation.Generated;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.PathMetadata;
+import com.mysema.query.types.path.DateTimePath;
+import com.mysema.query.types.path.EntityPathBase;
+import com.mysema.query.types.path.StringPath;
+
+import javax.annotation.Generated;
+
+import static com.mysema.query.types.PathMetadataFactory.forVariable;
 
 
 /**
@@ -21,12 +23,22 @@ public class QOrganization extends EntityPathBase<Organization> {
 
     public final QAbstractModel _super = new QAbstractModel(this);
 
+    public final StringPath address = createString("address");
+
+    public final StringPath bankDetails = createString("bankDetails");
+
     //inherited
     public final StringPath id = _super.id;
 
-    public final StringPath inn = createString("inn");
-
     public final StringPath name = createString("name");
+
+    public final StringPath paymentAccount = createString("paymentAccount");
+
+    public final StringPath registrationData = createString("registrationData");
+
+    public final DateTimePath<java.util.Date> registrationDate = createDateTime("registrationDate", java.util.Date.class);
+
+    public final StringPath unp = createString("unp");
 
     public QOrganization(String variable) {
         super(Organization.class, forVariable(variable));

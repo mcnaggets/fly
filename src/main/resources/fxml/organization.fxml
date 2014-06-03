@@ -4,88 +4,70 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<AnchorPane minHeight="400.0" minWidth="300.0" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8"
+<AnchorPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.OrganizationController">
     <children>
-        <GridPane layoutX="58.0" layoutY="67.0" prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0"
+        <GridPane hgap="10" vgap="10"  AnchorPane.bottomAnchor="0.0"
                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" percentWidth="20"/>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="533.0" minWidth="10.0" percentWidth="80"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints maxHeight="40.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints maxHeight="40.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                <RowConstraints maxHeight="150.0" minHeight="150.0" prefHeight="150.0" vgrow="SOMETIMES"/>
-                <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="150.0" prefHeight="150.0" vgrow="SOMETIMES"/>
+                <RowConstraints maxHeight="Infinity" minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS"/>
                 <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <children>
-                <Label text="Имя">
+                <Label text="Наименование организации" />
+                <Label text="УНП" GridPane.rowIndex="1" />
+                <Label text="Регистрационные данные" GridPane.rowIndex="2" />
+                <Label text="Дата регистрации" GridPane.rowIndex="3" />
+                <Label text="Юридический адрес" GridPane.rowIndex="4" />
+                <Label text="Банковские реквизиты" GridPane.rowIndex="5" />
+                <Label text="Р/С" GridPane.rowIndex="6" />
+                <Label text="Фирменный знак" GridPane.rowIndex="7" />
+                <TextField fx:id="organizationName" GridPane.columnIndex="1" />
+                <TextField fx:id="organizationUnp" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <TextField fx:id="registrationData" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <DatePicker fx:id="registrationDate" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <TextField fx:id="address" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <TextField fx:id="bankDetails" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                <TextField fx:id="paymentAccount" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+
+                <HBox alignment="CENTER_LEFT" spacing="10" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2"
+                      GridPane.rowIndex="9">
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </padding>
-                </Label>
-                <Label text="ИНН" GridPane.rowIndex="1">
-                    <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </padding>
-                </Label>
-                <Label text="Логотип" GridPane.rowIndex="2">
-                    <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </padding>
-                </Label>
-                <TextField fx:id="organizationName" GridPane.columnIndex="1">
-                    <GridPane.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </GridPane.margin>
-                </TextField>
-                <TextField fx:id="organizationInn" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                    <GridPane.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </GridPane.margin>
-                </TextField>
-                <HBox alignment="BOTTOM_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="2"
-                      GridPane.rowIndex="4">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#handleNewUser" text="Новый сотрудник">
-                            <HBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="5.0" top="10.0"/>
-                            </HBox.margin>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#organizationSave" text="Сохранить">
-                            <HBox.margin>
-                                <Insets bottom="10.0" left="5.0" right="5.0" top="10.0"/>
-                            </HBox.margin>
-                        </Button>
-                        <Button mnemonicParsing="false" onAction="#organizationCancel" text="Отмена">
-                            <HBox.margin>
-                                <Insets bottom="10.0" left="5.0" right="10.0" top="10.0"/>
-                            </HBox.margin>
-                        </Button>
+                        <Button mnemonicParsing="false" onAction="#handleNewUser" text="Новый сотрудник" />
+                        <Button mnemonicParsing="false" onAction="#organizationSave" text="Сохранить" />
+                        <Button mnemonicParsing="false" onAction="#organizationCancel" text="Отмена" />
                     </children>
                     <opaqueInsets>
                         <Insets/>
                     </opaqueInsets>
                 </HBox>
-                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
                     <children>
                         <ImageView fx:id="organizationLogo" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <HBox.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                            </HBox.margin>
-                        </ImageView>
+                                   preserveRatio="true" />
                         <Button alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#loadOrganizationLogo"
-                                text="Загрузить">
-                            <HBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                            </HBox.margin>
-                        </Button>
+                                text="Загрузить" />
                     </children>
                 </HBox>
-                <ListView fx:id="userList" GridPane.columnSpan="2" GridPane.rowIndex="3"/>
+                <ListView fx:id="userList" GridPane.columnSpan="2" GridPane.rowIndex="8"/>
             </children>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
