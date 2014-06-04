@@ -42,6 +42,9 @@ dependencies {
 
     compile "ch.qos.logback:logback-classic:1.1.2"
     compile "org.slf4j:jcl-over-slf4j:1.7.7"
+    compile "org.logback-extensions:logback-ext-spring:0.1.2"
+
+    compile "javax.mail:mail:1.4.7"
 
     compile "org.jfxtras:jfxtras-controls:8.0-r1"
     compile "org.controlsfx:controlsfx:8.0.5"

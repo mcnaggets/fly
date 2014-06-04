@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Import;
 @ComponentScan("by.fly")
 @Import({
         PropertyConfig.class, // do leave this in first place!!!
-        MongoConfig.class
+        MongoConfig.class,
+        LogbackConfig.class
 })
 public class ApplicationConfig {
 }
