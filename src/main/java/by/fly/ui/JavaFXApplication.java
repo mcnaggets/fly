@@ -23,6 +23,8 @@ public class JavaFXApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        Thread.setDefaultUncaughtExceptionHandler((t, x) -> LOGGER.error(x.getMessage(), x));
+
         MainController controller = (MainController) SpringFXMLLoader.load("/fxml/main.fxml");
         Scene scene = new Scene((Parent) controller.getView(), 1000, 750);
         primaryStage.setTitle(SpringFXMLLoader.APPLICATION_CONTEXT.getEnvironment().getProperty("application.name"));

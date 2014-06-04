@@ -5,22 +5,27 @@
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="by.fly.ui.controller.DailyOrdersController">
     <children>
-        <StackPane fx:id="orderTableRegion">
+        <StackPane fx:id="orderTableRegion" AnchorPane.bottomAnchor="0.0"
+                   AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
+                <VBox>
+                    <children>
+                        <TableView fx:id="dailyOrdersTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn prefWidth="75.0" text="№" fx:id="numberColumn"/>
+                                <TableColumn prefWidth="75.0" text="Дата" fx:id="dateColumn"/>
+                                <TableColumn prefWidth="75.0" text="Количество" fx:id="countColumn"/>
+                                <TableColumn prefWidth="75.0" text="Сумма" fx:id="priceColumn"/>
+                                <TableColumn prefWidth="75.0" text="Выданы" fx:id="paidColumn"/>
+                                <TableColumn prefWidth="75.0" text="Не забраны" fx:id="readyColumn"/>
+                            </columns>
+                        </TableView>
+                        <Pagination fx:id="pagination" prefHeight="50.0" prefWidth="200.0"/>
+                        <Button mnemonicParsing="false" onAction="#refreshData" text="Обновить"/>
+                    </children>
+                </VBox>
                 <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
-
-                <TableView fx:id="dailyOrdersTable" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
-                           AnchorPane.leftAnchor="0.0"
-                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <columns>
-                        <TableColumn prefWidth="75.0" text="№"/>
-                        <TableColumn prefWidth="75.0" text="Дата"/>
-                        <TableColumn prefWidth="75.0" text="Количество"/>
-                        <TableColumn prefWidth="75.0" text="Сумма"/>
-                        <TableColumn prefWidth="75.0" text="Выданы"/>
-                        <TableColumn prefWidth="75.0" text="Не забраны"/>
-                    </columns>
-                </TableView>
             </children>
         </StackPane>
     </children>

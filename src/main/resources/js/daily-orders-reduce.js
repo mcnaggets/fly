@@ -1,12 +1,9 @@
 function dailyOrdersReduceFunction(key, values) {
-    return values.reduce(function(prev, current) {
-        if (current.status == 'READY') {
-            prev.readyCount++;
-        } else if (current.status == 'PAID') {
-            prev.paidCount++;
-        }
-        prev.price += current.price;
-        return prev;
+    return values.reduce(function(accum, current) {
+        accum.readyCount += current.readyCount;
+        accum.paidCount += current.paidCount;
+        accum.price += current.price;
+        return accum;
     }, {
         price: 0,
         readyCount: 0,

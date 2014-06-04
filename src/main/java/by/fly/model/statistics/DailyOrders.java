@@ -1,10 +1,18 @@
 package by.fly.model.statistics;
 
+import com.mysema.query.annotations.QueryEntity;
+import com.mysema.query.annotations.QueryTransient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
+@Document
+@QueryEntity
 public class DailyOrders {
 
     @Id
@@ -36,8 +44,9 @@ public class DailyOrders {
         return paidCount;
     }
 
-    public Date getDate() {
-        return date;
+    @QueryTransient
+    public LocalDate getDate() {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalDate();
     }
 
     @Override

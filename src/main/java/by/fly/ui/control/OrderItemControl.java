@@ -4,7 +4,6 @@ import by.fly.model.OrderItem;
 import by.fly.model.PrinterType;
 import by.fly.model.WorkType;
 import by.fly.service.OrderService;
-import by.fly.ui.controller.OrdersController;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -28,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 
+import static by.fly.ui.UIUtils.TIME_FORMATTER;
 import static jdk.nashorn.internal.runtime.JSType.isNumber;
 
 @Component
@@ -90,7 +90,7 @@ public class OrderItemControl extends FlowPane {
     }
 
     private void populateGrid(GridPane grid) {
-        TextField currentTime = new TextField(OrdersController.TIME_FORMATTER.format(LocalTime.now()));
+        TextField currentTime = new TextField(TIME_FORMATTER.format(LocalTime.now()));
         currentTime.setEditable(false);
 
         grid.add(new Label("Штрихкод:"), 0, 0);

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
@@ -72,6 +73,7 @@ public class LogbackConfig {
     }
 
     @Bean(initMethod = "start", destroyMethod = "stop")
+    @Profile("default")
     public SMTPAppender smtpAppender(
             @Value("${mail.username}") String username,
             @Value("${mail.password}") String password,

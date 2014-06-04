@@ -6,7 +6,7 @@
     <appender name="rollingFileAppender" class="ch.qos.logback.ext.spring.DelegatingLogbackAppender" />
 
     <root>
-        <level value="INFO"/>
+        <level value="ERROR"/>
         <appender-ref ref="consoleAppender"/>
         <appender-ref ref="rollingFileAppender"/>
         <appender-ref ref="smtpAppender"/>

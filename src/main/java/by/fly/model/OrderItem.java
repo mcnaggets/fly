@@ -29,7 +29,7 @@ public class OrderItem extends AbstractModel {
     @Indexed
     private String barcode;
 
-    @Indexed(unique = true)
+    @Indexed
     private long orderNumber;
 
     @Indexed(unique = true)

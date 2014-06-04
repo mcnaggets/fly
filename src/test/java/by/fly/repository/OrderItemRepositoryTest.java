@@ -1,9 +1,8 @@
 package by.fly.repository;
 
-import by.fly.model.Customer;
-import by.fly.model.OrderItem;
-import by.fly.model.OrderStatus;
+import by.fly.model.*;
 import by.fly.model.statistics.DailyOrders;
+import by.fly.model.statistics.QDailyOrders;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -13,7 +12,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.*;
@@ -43,20 +46,41 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
     }
 
     @Test
-    public void testMapReduce() {
-        for (int i = 0; i < 1000; i++) {
-            OrderItem orderItem = new OrderItem(LocalDateTime.now().plusDays((long) (10 * Math.random())));
-            orderItem.setOrderNumber(System.nanoTime());
-            orderItem.setPrice((float) (1000 * Math.random()));
-            orderItem.setStatus(Math.random() > 0.5 ? OrderStatus.READY : OrderStatus.PAID);
-            orderItemRepository.save(orderItem);
-        }
+    public void testMapReduce() throws InterruptedException {
+        long time = System.currentTimeMillis();
+        Executors.newFixedThreadPool(4).invokeAll(Arrays.asList(
+                (Callable<Object>) this::createManyOrders,
+                this::createManyOrders,
+                this::createManyOrders,
+                this::createManyOrders
+        ));
+        System.out.println("create time: " + (System.currentTimeMillis() - time));
 
+        time = System.currentTimeMillis();
         MapReduceResults<DailyOrders> dailyOrders = mongoOperations.mapReduce(
                 new Query(Criteria.where("status").in(OrderStatus.READY.name(), OrderStatus.PAID.name())),
                 "orderItem", "classpath:js/daily-orders-map.js", "classpath:js/daily-orders-reduce.js",
-                options().outputCollection("jmr1_out"), DailyOrders.class);
-        dailyOrders.forEach(System.out::println);
+                options().outputTypeReplace().outputCollection(QDailyOrders.dailyOrders.toString()), DailyOrders.class);
+        System.out.println("mapreduce time: " + (System.currentTimeMillis() - time));
+        dailyOrders.getCounts();
+    }
+
+    private Void createManyOrders() {
+        List<OrderItem> batch = new LinkedList<>();
+        for (int i = 0; i < 250_000; i++) {
+            OrderItem orderItem = new OrderItem(LocalDateTime.now().plusDays((long) (50 * Math.random())));
+            orderItem.setOrderNumber(System.nanoTime());
+            orderItem.setPrinterType(Math.random() > 0.5 ? PrinterType.JET : PrinterType.LASER);
+            orderItem.setWorkType(WorkType.values()[((int) (System.nanoTime() % 3))]);
+            orderItem.setPrice((float) (1000 * Math.random()));
+            orderItem.setStatus(Math.random() > 0.5 ? OrderStatus.READY : OrderStatus.PAID);
+            batch.add(orderItem);
+            if (batch.size() == 100) {
+                orderItemRepository.save(batch);
+                batch.clear();
+            }
+        }
+        return null;
     }
 
     @Test

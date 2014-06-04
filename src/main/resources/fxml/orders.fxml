@@ -11,10 +11,9 @@
         <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                    AnchorPane.topAnchor="0.0">
             <children>
-                <AnchorPane fx:id="createOrderRegion" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
-                            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <AnchorPane fx:id="createOrderRegion">
                     <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" AnchorPane.bottomAnchor="0.0"
+                        <VBox prefHeight="200.0" spacing="10.0" AnchorPane.bottomAnchor="0.0"
                               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
                                 <HBox alignment="CENTER" prefHeight="30.0" prefWidth="200.0" spacing="50.0">
@@ -92,7 +91,6 @@
                 <Pane style="-fx-background-color: #f4f4f4;"/>
                 <StackPane fx:id="orderTableRegion">
                     <children>
-                        <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
                         <VBox AnchorPane.bottomAnchor="0.0"
                               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
@@ -103,6 +101,7 @@
                                     <children>
                                         <Label text="Заказы за число:"/>
                                         <DatePicker fx:id="orderDateFilter"/>
+                                        <CheckBox fx:id="anyDateFilter" text="любое число" />
                                     </children>
                                 </HBox>
 
@@ -141,6 +140,7 @@
                                 <Button mnemonicParsing="false" onAction="#createOrder" text="Добавить заказ"/>
                             </children>
                         </VBox>
+                        <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
                     </children>
                 </StackPane>
             </children>

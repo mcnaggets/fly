@@ -28,16 +28,13 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.ResourceBundle;
 
+import static by.fly.ui.UIUtils.*;
+
 @Component
 public class OrdersController extends AbstractController {
-
-    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
-
-    private static final int PAGE_SIZE = 10;
 
     public Region orderTableRegion;
     public Region createOrderRegion;
@@ -77,6 +74,7 @@ public class OrdersController extends AbstractController {
     public TextField orderBarcodeFilter;
     public TextField clientNameFilter;
     public TextField clientPhoneFilter;
+    public CheckBox anyDateFilter;
 
     private GetOrdersService service = new GetOrdersService();
 
@@ -151,6 +149,10 @@ public class OrdersController extends AbstractController {
     private void initializeFilter() {
         orderDateFilter.setValue(LocalDate.now());
         orderDateFilter.setOnAction(e -> service.restart());
+        anyDateFilter.setOnAction(e -> {
+            orderDateFilter.setDisable(anyDateFilter.isSelected());
+            service.restart();
+        });
 
         orderCodeFilter.textProperty().addListener(e -> service.restart());
         orderBarcodeFilter.textProperty().addListener(e -> service.restart());
@@ -165,11 +167,11 @@ public class OrdersController extends AbstractController {
         ordersTable.itemsProperty().bind(service.valueProperty());
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
         service.start();
-        service.setOnSucceeded(e -> refreshPagination());
+        service.setOnSucceeded(e -> updatePagination());
     }
 
     private void initializeColumns() {
-        numberColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getOrderNumber())));
+        numberColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(getRowIndex(pagination, data))));
         orderNumberColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getOrderCode()));
         barCodeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBarcode()));
         printerTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterType().getMessage()));
@@ -177,8 +179,8 @@ public class OrdersController extends AbstractController {
         workTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWorkType().getMessage()));
         statusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus().getMessage()));
         priceColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getPrice())));
-        clientNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCustomer().getName()));
-        clientPhoneColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCustomer().getPhone()));
+        clientNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getClientName()));
+        clientPhoneColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getClientPhone()));
         createdAtColumn.setCellValueFactory(data -> new SimpleStringProperty(TIME_FORMATTER.format(data.getValue().getCreatedAt())));
         deadLineColumn.setCellValueFactory(data -> new SimpleStringProperty(TIME_FORMATTER.format(data.getValue().getDeadLine())));
     }
@@ -216,9 +218,12 @@ public class OrdersController extends AbstractController {
                 @Override
                 protected ObservableList<OrderItem> call() throws Exception {
                     LocalDate filterDate = orderDateFilter.getValue();
-                    filterPredicate = QOrderItem.orderItem.deadLine.between(
-                            Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                            Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+                    filterPredicate = QOrderItem.orderItem.orderCode.isNotNull();
+                    if (!anyDateFilter.isSelected()) {
+                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
+                                Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                                Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())));
+                    }
                     if (!orderCodeFilter.getText().trim().isEmpty()) {
                         filterPredicate = filterPredicate.and(QOrderItem.orderItem.orderCode.containsIgnoreCase(orderCodeFilter.getText().trim()));
                     }
@@ -232,7 +237,7 @@ public class OrdersController extends AbstractController {
                         filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientPhone.containsIgnoreCase(clientPhoneFilter.getText().trim()));
                     }
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
-                            new PageRequest(pagination.getCurrentPageIndex(), PAGE_SIZE)
+                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE)
                     );
                     return FXCollections.observableList(orderItems.getContent());
                 }
@@ -240,15 +245,8 @@ public class OrdersController extends AbstractController {
         }
     }
 
-    private void refreshPagination() {
+    private void updatePagination() {
         int totalCount = (int) orderService.count(filterPredicate);
-        float floatCount = Float.valueOf(totalCount) / Float.valueOf(PAGE_SIZE);
-        int intCount = totalCount / PAGE_SIZE;
-
-        if (intCount == 0) {
-            intCount = 1;
-        }
-
-        pagination.setPageCount((floatCount > intCount) ? ++intCount : intCount);
+        refreshPagination(pagination, totalCount);
     }
 }
