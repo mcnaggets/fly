@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import by.fly.ui.control.AutoCompleteTextField?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import java.lang.String?>
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="by.fly.ui.controller.OrdersController">
     <children>
@@ -41,9 +41,9 @@
                                     </padding>
                                     <children>
                                         <Label text="Информация о заказчике:"/>
-                                        <AutoCompleteTextField fx:id="clientNameText"/>
+                                        <TextField fx:id="clientNameText"/>
                                         <Label text="Контактный телефон:"/>
-                                        <AutoCompleteTextField fx:id="clientPhoneText"/>
+                                        <TextField fx:id="clientPhoneText"/>
                                     </children>
                                 </HBox>
                                 <Label text="Информация о заказе:">
@@ -101,7 +101,7 @@
                                     <children>
                                         <Label text="Заказы за число:"/>
                                         <DatePicker fx:id="orderDateFilter"/>
-                                        <CheckBox fx:id="anyDateFilter" text="любое число" />
+                                        <CheckBox fx:id="anyDateFilter" text="любое число"/>
                                     </children>
                                 </HBox>
 
@@ -136,8 +136,14 @@
                                         <TableColumn fx:id="priceColumn" prefWidth="75.0" text="Стоимость"/>
                                     </columns>
                                 </TableView>
-                                <Pagination fx:id="pagination" prefHeight="50.0" prefWidth="200.0"/>
-                                <Button mnemonicParsing="false" onAction="#createOrder" text="Добавить заказ"/>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <padding>
+                                        <Insets left="10"/>
+                                    </padding>
+                                    <Button onAction="#createOrder" text="Добавить заказ"/>
+                                    <Button onAction="#refreshData" text="Обновить" />
+                                    <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>
+                                </HBox>
                             </children>
                         </VBox>
                         <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
@@ -146,4 +152,7 @@
             </children>
         </StackPane>
     </children>
+    <stylesheets>
+        <String fx:value="/css/orders.css"/>
+    </stylesheets>
 </AnchorPane>

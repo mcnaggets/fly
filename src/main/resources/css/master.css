@@ -1,0 +1,25 @@
+.bigLabel {
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+}
+
+.detailsGrid {
+    -fx-background-color: white;
+    -fx-background-radius: 5.0;
+    -fx-padding: 10;
+    -fx-hgap: 30;
+    -fx-vgap: 10;
+}
+
+.rootGrid {
+    -fx-padding: 10;
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+}
+
+.masterWindow {
+    -fx-border-color: grey;
+    -fx-border-radius: 10;
+    -fx-border-width: 3;
+    -fx-alignment: center;
+}

@@ -1,0 +1,7 @@
+.root {
+    -fx-padding: 100;
+}
+
+.barcodeText {
+    -fx-font-size: 48;
+}

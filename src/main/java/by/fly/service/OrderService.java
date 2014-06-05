@@ -7,6 +7,7 @@ import com.mysema.query.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,8 @@ public class OrderService {
         orderItemRepository.save(orderItem);
     }
 
-    public Page<OrderItem> findAll(Predicate filterPredicate, PageRequest pageRequest) {
-        return orderItemRepository.findAll(filterPredicate, pageRequest);
+    public Page<OrderItem> findAll(Predicate filterPredicate, Pageable pageable) {
+        return orderItemRepository.findAll(filterPredicate, pageable);
     }
 
     public OrderItem findOne(Predicate filterPredicate) {

@@ -1,7 +1,6 @@
 package by.fly.ui.controller;
 
 import by.fly.ui.SpringFXMLLoader;
-import javafx.event.ActionEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,11 +25,11 @@ public class MainController extends AbstractController {
 
     private Stage stage;
 
-    public void handleCancelButtonAction(ActionEvent actionEvent) {
+    public void handleCancelButtonAction() {
         loginPane.getScene().getWindow().hide();
     }
 
-    public void handleSubmitButtonAction(ActionEvent actionEvent) {
+    public void handleSubmitButtonAction() {
         if (loginSuccess()) {
             loginPane.getScene().getWindow().hide();
             internalLogin();
@@ -49,7 +48,7 @@ public class MainController extends AbstractController {
                 && "admin".equals(passwordField.getText());
     }
 
-    public void doLogin(ActionEvent actionEvent) {
+    public void doLogin() {
         if (Boolean.TRUE.equals(loginLink.getUserData())) {
             internalLogout();
         } else {
@@ -76,4 +75,9 @@ public class MainController extends AbstractController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+
+    public Stage getStage() {
+        return stage;
+    }
+
 }

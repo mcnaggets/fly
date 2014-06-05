@@ -6,7 +6,6 @@ import by.fly.model.OrderStatus;
 import by.fly.model.QOrderItem;
 import by.fly.service.CustomerService;
 import by.fly.service.OrderService;
-import by.fly.ui.control.AutoCompleteTextField;
 import by.fly.ui.control.OrderItemControl;
 import com.mysema.query.types.expr.BooleanExpression;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,6 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -57,11 +57,11 @@ public class OrdersController extends AbstractController {
 
     public Pagination pagination;
     public ProgressIndicator progressIndicator;
-    public TableView ordersTable;
+    public TableView<OrderItem> ordersTable;
 
     public VBox orderItems;
-    public AutoCompleteTextField<String> clientPhoneText;
-    public AutoCompleteTextField<String> clientNameText;
+    public TextField clientPhoneText;
+    public TextField clientNameText;
 
     public TextField totalPriceText;
     public Label orderCodeLabel;
@@ -91,7 +91,7 @@ public class OrdersController extends AbstractController {
 
     private long orderNumber;
 
-    public void createOrder(ActionEvent actionEvent) {
+    public void createOrder() {
         orderItems.getChildren().clear();
         orderItems.getChildren().add(createOrderItemControl());
 
@@ -136,12 +136,7 @@ public class OrdersController extends AbstractController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
-
         initializeFilter();
-
-        clientNameText.setItems(FXCollections.observableList(customerService.findCustomerNames()));
-        clientPhoneText.setItems(FXCollections.observableList(customerService.findCustomerPhones()));
-
         initializeColumns();
         bindService();
     }
@@ -166,8 +161,9 @@ public class OrdersController extends AbstractController {
         progressIndicator.visibleProperty().bind(service.runningProperty());
         ordersTable.itemsProperty().bind(service.valueProperty());
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
-        service.start();
+        service.setOnRunning(e -> ordersTable.setPlaceholder(new Text("Загрузка...")));
         service.setOnSucceeded(e -> updatePagination());
+        service.start();
     }
 
     private void initializeColumns() {
@@ -185,7 +181,7 @@ public class OrdersController extends AbstractController {
         deadLineColumn.setCellValueFactory(data -> new SimpleStringProperty(TIME_FORMATTER.format(data.getValue().getDeadLine())));
     }
 
-    public void addOrderItem(ActionEvent actionEvent) {
+    public void addOrderItem() {
         orderItems.getChildren().add(createOrderItemControl());
     }
 
@@ -206,9 +202,13 @@ public class OrdersController extends AbstractController {
         return orderItems.getChildren().stream().mapToDouble(node -> ((OrderItemControl) node).getPrice()).sum();
     }
 
-    public void cancelOrder(ActionEvent actionEvent) {
+    public void cancelOrder() {
         createOrderRegion.toBack();
         orderTableRegion.toFront();
+    }
+
+    public void refreshData() {
+        service.restart();
     }
 
     private class GetOrdersService extends Service<ObservableList<OrderItem>> {

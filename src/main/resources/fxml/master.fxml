@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import java.lang.String?>
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="by.fly.ui.controller.MasterController" styleClass="masterWindow">
+    <children>
+        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                  AnchorPane.topAnchor="0.0" styleClass="rootGrid">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="20"/>
+                <ColumnConstraints percentWidth="80"/>
+            </columnConstraints>
+            <children>
+                <HBox GridPane.columnSpan="2" alignment="CENTER" spacing="60">
+                    <Text fx:id="barcodeText" HBox.hgrow="ALWAYS" styleClass="bigLabel"/>
+                    <Label fx:id="currentDateLabel" HBox.hgrow="ALWAYS" styleClass="bigLabel"/>
+                    <Label fx:id="currentTimeLabel" HBox.hgrow="ALWAYS" styleClass="bigLabel"/>
+                </HBox>
+                <GridPane GridPane.columnSpan="2" GridPane.rowIndex="1" styleClass="detailsGrid">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints/>
+                        <RowConstraints valignment="TOP"/>
+                    </rowConstraints>
+                    <children>
+                        <Label text="Модель"/>
+                        <Label text="Клиент" GridPane.columnIndex="1"/>
+                        <Label text="Вид работ" GridPane.columnIndex="2"/>
+                        <Label text="Дополнительные работы" GridPane.columnIndex="3"/>
+                        <Label text="Тест" GridPane.columnIndex="4"/>
+                        <Label text="Код мастера" GridPane.columnIndex="5"/>
+                        <Label text="Мастер" GridPane.columnIndex="6"/>
+
+                        <Text fx:id="printerModelText" GridPane.rowIndex="1"/>
+                        <Text fx:id="clientNameText" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Text fx:id="workTypeText" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                        <TextField fx:id="additionalWorkText" GridPane.rowIndex="1" GridPane.columnIndex="3"
+                                   prefWidth="300"/>
+                        <CheckBox fx:id="testCheckBox" selected="true" GridPane.rowIndex="1" GridPane.columnIndex="4"/>
+                        <TextField fx:id="masterBarcodeText" prefWidth="50" GridPane.rowIndex="1"
+                                   GridPane.columnIndex="5"/>
+                        <Text fx:id="masterNameText" GridPane.rowIndex="1" GridPane.columnIndex="6"/>
+
+                    </children>
+                </GridPane>
+                <Label text="Примечание:" GridPane.rowIndex="2" GridPane.valignment="TOP" GridPane.halignment="CENTER"/>
+                <TextArea fx:id="descriptionArea" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" spacing="10">
+                    <Button text="Отмена" onAction="#cancel"/>
+                    <Button text="Применить" onAction="#apply"/>
+                    <Button text="ОК" onAction="#save" fx:id="saveButton"/>
+                </HBox>
+            </children>
+        </GridPane>
+    </children>
+    <stylesheets>
+        <String fx:value="/css/master.css"/>
+    </stylesheets>
+
+</AnchorPane>

@@ -25,6 +25,10 @@ public class UserService {
         return MASTER_CODE_PREFIX + sequenceService.getNextSequence(MASTER);
     }
 
+    public User findMasterByBarcode(String barcode) {
+        return repository.findByBarcode(barcode);
+    }
+
     public void save(User user) {
         repository.save(user);
     }

@@ -12,6 +12,7 @@ import javafx.scene.control.Pagination;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.text.Text;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -67,8 +68,9 @@ public class DailyOrdersController extends AbstractController {
         progressIndicator.visibleProperty().bind(service.runningProperty());
         dailyOrdersTable.itemsProperty().bind(service.valueProperty());
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
-        service.start();
         service.setOnSucceeded(e -> updatePagination());
+        service.setOnRunning(e -> dailyOrdersTable.setPlaceholder(new Text("Загрузка...")));
+        service.start();
     }
 
     public void refreshData() {

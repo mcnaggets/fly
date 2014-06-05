@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import java.lang.String?>
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="by.fly.ui.controller.BarcodeReaderController" styleClass="root">
+    <center>
+        <TextField fx:id="barcodeText" styleClass="barcodeText"
+                   promptText="Введите штрихкод"/>
+    </center>
+    <stylesheets>
+        <String fx:value="/css/barcode-reader.css"/>
+    </stylesheets>
+
+</BorderPane>

@@ -11,6 +11,16 @@
                      AnchorPane.topAnchor="0" fx:id="tabs"
                      tabClosingPolicy="UNAVAILABLE">
                 <tabs>
+                    <Tab text="Штрихкод">
+                        <content>
+                            <fx:include source="/fxml/barcode-reader.fxml"/>
+                        </content>
+                    </Tab>
+                    <Tab text="Задачи">
+                        <content>
+                            <fx:include source="/fxml/tasks.fxml"/>
+                        </content>
+                    </Tab>
                     <Tab text="Заказы по дням">
                         <content>
                             <fx:include source="/fxml/daily-orders.fxml"/>
@@ -21,17 +31,12 @@
                             <fx:include source="/fxml/orders.fxml"/>
                         </content>
                     </Tab>
-                    <Tab text="Задачи">
-                        <content>
-                            <fx:include source="/fxml/tasks.fxml"/>
-                        </content>
-                    </Tab>
                 </tabs>
             </TabPane>
         </AnchorPane>
         <Hyperlink text="Войти" StackPane.alignment="TOP_RIGHT" onAction="#doLogin" fx:id="loginLink">
             <padding>
-                <Insets right="5" top="5"></Insets>
+                <Insets right="5" top="5"/>
             </padding>
         </Hyperlink>
     </children>

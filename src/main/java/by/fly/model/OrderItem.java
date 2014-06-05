@@ -54,6 +54,13 @@ public class OrderItem extends AbstractModel {
     @Indexed
     private String clientName;
 
+    private boolean test;
+
+    @DBRef
+    private User master;
+
+    private String additionalWork;
+
     @PersistenceConstructor
     public OrderItem() {}
 
@@ -169,4 +176,48 @@ public class OrderItem extends AbstractModel {
     public String getClientPhone() {
         return clientPhone;
     }
+
+    public boolean isTest() {
+        return test;
+    }
+
+    public User getMaster() {
+        return master;
+    }
+
+    public String getAdditionalWork() {
+        return additionalWork;
+    }
+
+    public void setTest(boolean test) {
+        this.test = test;
+    }
+
+    public void setMaster(User master) {
+        this.master = master;
+    }
+
+    public void setAdditionalWork(String additionalWork) {
+        this.additionalWork = additionalWork;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "createdAt=" + createdAt +
+                ", deadLine=" + deadLine +
+                ", barcode='" + barcode + '\'' +
+                ", orderNumber=" + orderNumber +
+                ", orderCode='" + orderCode + '\'' +
+                ", workType=" + workType +
+                ", printerType=" + printerType +
+                ", printerModel='" + printerModel + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", status=" + status +
+                ", clientPhone='" + clientPhone + '\'' +
+                ", clientName='" + clientName + '\'' +
+                '}';
+    }
+
 }

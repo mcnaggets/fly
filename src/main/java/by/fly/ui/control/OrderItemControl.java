@@ -39,7 +39,7 @@ public class OrderItemControl extends FlowPane {
 
     private TextField barcodeText;
     private ComboBox<PrinterType> printerTypeCombo;
-    private AutoCompleteTextField<String> printerModelText;
+    private TextField printerModelText;
     private LocalTimeTextField deadLineTimePicker;
     private DatePicker deadLineDatePicker;
     private ToggleGroup workTypeGroup;
@@ -52,7 +52,7 @@ public class OrderItemControl extends FlowPane {
     public void initialize() {
         createChildren();
         setBorder(new Border(
-                new BorderStroke(Color.BLACK, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderStroke.DEFAULT_WIDTHS)
+                new BorderStroke(Color.GRAY, BorderStrokeStyle.DOTTED, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)
         ));
     }
 
@@ -133,8 +133,7 @@ public class OrderItemControl extends FlowPane {
     }
 
     private void createPrinterModelText() {
-        printerModelText = new AutoCompleteTextField<>();
-        printerModelText.setItems(FXCollections.observableList(orderService.findPrinterModels()));
+        printerModelText = new TextField();
     }
 
     private GridPane createGridPane() {

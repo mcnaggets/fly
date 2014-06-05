@@ -35,6 +35,6 @@
     </HBox>
 
     <stylesheets>
-        <String fx:value="/fxml/modal-dialog.css"/>
+        <String fx:value="/css/modal-dialog.css"/>
     </stylesheets>
 </GridPane>

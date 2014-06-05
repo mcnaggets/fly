@@ -4,18 +4,22 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.*?>
-<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.TaskViewController">
+<?import javafx.geometry.Insets?>
+<AnchorPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.TaskController">
     <children>
         <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                    AnchorPane.topAnchor="0.0">
             <children>
                 <VBox>
                     <children>
-                        <ListView fx:id="taskList" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                  AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                        <Button alignment="CENTER" layoutX="8.1875" layoutY="187.5" mnemonicParsing="false"
-                                onAction="#refreshTasks" text="Обновить"/>
+                        <ListView fx:id="taskList" VBox.vgrow="ALWAYS"/>
+                        <HBox>
+                            <padding>
+                                <Insets top="10" bottom="10" left="10"/>
+                            </padding>
+                            <Button onAction="#refreshTasks" text="Обновить"/>
+                        </HBox>
                     </children>
                 </VBox>
                 <ProgressIndicator fx:id="progressIndicator" progress="-1"/>

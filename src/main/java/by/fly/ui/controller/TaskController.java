@@ -3,7 +3,8 @@ package by.fly.ui.controller;
 import by.fly.model.OrderItem;
 import by.fly.model.OrderStatus;
 import by.fly.model.QOrderItem;
-import by.fly.repository.OrderItemRepository;
+import by.fly.service.OrderService;
+import by.fly.ui.UIUtils;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -16,6 +17,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -31,19 +34,19 @@ import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Component
-public class TaskViewController extends AbstractController {
+public class TaskController extends AbstractController {
 
     public ListView<StackPane> taskList;
     public ProgressIndicator progressIndicator;
 
     @Autowired
-    OrderItemRepository orderItemRepository;
+    private OrderService orderService;
 
     private GetOrdersService service = new GetOrdersService();
 
-    static final Background orangeBackground = new Background(new BackgroundFill(Color.ORANGE, null, null));
-    static final Background greenBackground = new Background(new BackgroundFill(Color.LIGHTGREEN, null, null));
-    static final Background redBackground = new Background(new BackgroundFill(Color.ORANGERED, null, null));
+    static final Background orangeBackground = new Background(new BackgroundFill(Color.ORANGE, new CornerRadii(5), null));
+    static final Background greenBackground = new Background(new BackgroundFill(Color.PALEGREEN, new CornerRadii(5), null));
+    static final Background redBackground = new Background(new BackgroundFill(Color.CRIMSON, new CornerRadii(5), null));
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -56,7 +59,7 @@ public class TaskViewController extends AbstractController {
 
         service.start();
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(10), event -> service.restart()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.minutes(1), event -> service.restart()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
@@ -74,23 +77,30 @@ public class TaskViewController extends AbstractController {
         @Override
         protected ObservableList<StackPane> call() throws Exception {
 
-            ObservableList<StackPane> tasks = FXCollections.observableArrayList();
+            final ObservableList<StackPane> tasks = FXCollections.observableArrayList();
 
-            final List<OrderItem> orderItems = orderItemRepository.findByStatus(OrderStatus.IN_PROGRESS,
-                    new PageRequest(0, 30, Sort.Direction.ASC, QOrderItem.orderItem.deadLine.toString()));
+            final List<OrderItem> orderItems = orderService.findAll(QOrderItem.orderItem.status.eq(OrderStatus.IN_PROGRESS),
+                    new PageRequest(0, 30, Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())).getContent();
 
             if (orderItems.isEmpty()) {
                 return tasks;
             }
 
-            final LocalDateTime minDeadLine = orderItems.get(0).getDeadLine();
-            final LocalDateTime maxDeadLine = orderItems.get(orderItems.size() - 1).getDeadLine();
+            final OrderItem firstItem = orderItems.stream().findFirst().get();
+            final OrderItem lastItem = orderItems.stream().reduce((c, p) -> p).get();
+
             final LocalDateTime now = LocalDateTime.now();
+            final LocalDateTime minDeadLine = firstItem.getDeadLine().isBefore(now) ? now : firstItem.getDeadLine();
+            final LocalDateTime maxDeadLine = lastItem.getDeadLine().isBefore(now) ? now : lastItem.getDeadLine();
 
             final long wholeIntervalInMinutes = MINUTES.between(minDeadLine, maxDeadLine);
 
             orderItems.forEach(order -> {
-                int completed = (int) (100 * MINUTES.between(minDeadLine, order.getDeadLine()) / wholeIntervalInMinutes);
+                final long betweenHours = HOURS.between(now, order.getDeadLine());
+                final long betweenMinutes = MINUTES.between(now, order.getDeadLine()) % 60;
+
+                int completed = isOverdue(betweenHours, betweenMinutes) ? 0 : wholeIntervalInMinutes == 0 ? 100 :
+                        (int) (100 * MINUTES.between(minDeadLine, order.getDeadLine()) / wholeIntervalInMinutes);
 
                 GridPane gridPane = new GridPane();
                 ColumnConstraints constraints = new ColumnConstraints();
@@ -101,17 +111,17 @@ public class TaskViewController extends AbstractController {
                 constraints.setPercentWidth(100 - completed);
                 gridPane.getColumnConstraints().add(constraints);
 
-                gridPane.getRowConstraints().add(new RowConstraints(40));
-
-                final long between = HOURS.between(now, order.getDeadLine());
+                gridPane.getRowConstraints().add(new RowConstraints(50));
 
                 Label label = new Label();
-                if (between < 0) {
+                label.setWrapText(true);
+                if (isOverdue(betweenHours, betweenMinutes)) {
                     Region rect = new Region();
                     rect.setBackground(redBackground);
                     gridPane.add(rect, 1, 0);
 
-                    label.setText("Задача просрочена на " + -between + " часа");
+                    label.setFont(Font.font("System bold", FontWeight.BOLD, 14));
+                    label.setText(getTaskLabel(order, -betweenHours, -betweenMinutes, true));
                 } else {
                     Region rect = new Region();
                     rect.setBackground(greenBackground);
@@ -120,7 +130,8 @@ public class TaskViewController extends AbstractController {
                     rect.setBackground(orangeBackground);
                     gridPane.add(rect, 1, 0);
 
-                    label.setText("Осталось " + between + " часа");
+                    label.setFont(Font.font("System bold", 14));
+                    label.setText(getTaskLabel(order, betweenHours, betweenMinutes, false));
 
                 }
 
@@ -130,6 +141,23 @@ public class TaskViewController extends AbstractController {
             });
 
             return tasks;
+        }
+
+        private boolean isOverdue(long betweenHours, long betweenMinutes) {
+            return betweenHours < 0 || betweenMinutes < 0;
+        }
+
+        private String getTaskLabel(OrderItem order, long betweenHours, long betweenMinutes, boolean overdue) {
+            String prefix;
+            if (overdue) {
+                prefix = "Задача просрочена на";
+            } else {
+                prefix = "Осталось";
+            }
+            return String.format("Заказ №%d %s %s %s %s %s\n%s %d часа %d минут",
+                    order.getOrderNumber(), order.getOrderCode(), order.getBarcode(),
+                    order.getPrinterModel(), order.getWorkType().getMessage(), UIUtils.TIME_FORMATTER.format(order.getDeadLine()),
+                    prefix, betweenHours, betweenMinutes);
         }
     }
 

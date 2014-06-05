@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="by.fly.ui.controller.DailyOrdersController">
     <children>
@@ -21,8 +24,13 @@
                                 <TableColumn prefWidth="75.0" text="Не забраны" fx:id="readyColumn"/>
                             </columns>
                         </TableView>
-                        <Pagination fx:id="pagination" prefHeight="50.0" prefWidth="200.0"/>
-                        <Button mnemonicParsing="false" onAction="#refreshData" text="Обновить"/>
+                        <HBox alignment="CENTER_LEFT">
+                            <padding>
+                                <Insets left="10" />
+                            </padding>
+                            <Button onAction="#refreshData" text="Обновить" />
+                            <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>
+                        </HBox>
                     </children>
                 </VBox>
                 <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
