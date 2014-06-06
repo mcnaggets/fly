@@ -15,9 +15,8 @@ public abstract class AbstractModel {
 
         AbstractModel that = (AbstractModel) o;
 
-        if (!id.equals(that.id)) return false;
+        return id.equals(that.id);
 
-        return true;
     }
 
     @Override

@@ -28,7 +28,7 @@ import static by.fly.ui.UIUtils.*;
 @Component
 public class DailyOrdersController extends AbstractController {
 
-    public TableView dailyOrdersTable;
+    public TableView<DailyOrders> dailyOrdersTable;
 
     public ProgressIndicator progressIndicator;
     public Pagination pagination;
@@ -39,12 +39,12 @@ public class DailyOrdersController extends AbstractController {
     public TableColumn<DailyOrders, String> paidColumn;
     public TableColumn<DailyOrders, String> readyColumn;
 
-    private GetDailyOrdersService service = new GetDailyOrdersService();
+    private final GetDailyOrdersService service = new GetDailyOrdersService();
 
     @Autowired
     private DailyOrdersService dailyOrdersService;
 
-    private AtomicBoolean doRefreshData = new AtomicBoolean(true);
+    private final AtomicBoolean doRefreshData = new AtomicBoolean(true);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

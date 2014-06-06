@@ -33,7 +33,7 @@ public class UIUtils {
     }
 
     public static void refreshPagination(Pagination pagination, int totalCount, int pageSize) {
-        float floatCount = Float.valueOf(totalCount) / Float.valueOf(pageSize);
+        float floatCount = (float) totalCount / pageSize;
         int intCount = totalCount / DEFAULT_PAGE_SIZE;
 
         if (intCount == 0) {

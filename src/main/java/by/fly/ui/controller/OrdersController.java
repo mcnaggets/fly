@@ -76,7 +76,7 @@ public class OrdersController extends AbstractController {
     public TextField clientPhoneFilter;
     public CheckBox anyDateFilter;
 
-    private GetOrdersService service = new GetOrdersService();
+    private final GetOrdersService service = new GetOrdersService();
 
     @Autowired
     private OrderService orderService;

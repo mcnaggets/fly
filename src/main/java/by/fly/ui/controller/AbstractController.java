@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 
 public abstract class AbstractController implements Controller {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
     private Node view;
     protected ResourceBundle resourceBundle;
 

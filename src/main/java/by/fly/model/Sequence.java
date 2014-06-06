@@ -48,9 +48,8 @@ public class Sequence {
         Sequence sequence = (Sequence) o;
 
         if (seq != sequence.seq) return false;
-        if (!id.equals(sequence.id)) return false;
+        return id.equals(sequence.id);
 
-        return true;
     }
 
     @Override

@@ -118,7 +118,7 @@ public class OrderItemControl extends FlowPane {
             radioButton.setToggleGroup(workTypeGroup);
             radioButton.setUserData(workType);
             return radioButton;
-        }).toArray(size -> new Node[size])), 7, 1);
+        }).toArray(Node[]::new)), 7, 1);
     }
 
     private void createDescriptionArea() {

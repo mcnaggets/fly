@@ -11,7 +11,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
@@ -42,7 +41,7 @@ public class TaskController extends AbstractController {
     @Autowired
     private OrderService orderService;
 
-    private GetOrdersService service = new GetOrdersService();
+    private final GetOrdersService service = new GetOrdersService();
 
     static final Background orangeBackground = new Background(new BackgroundFill(Color.ORANGE, new CornerRadii(5), null));
     static final Background greenBackground = new Background(new BackgroundFill(Color.PALEGREEN, new CornerRadii(5), null));
@@ -161,7 +160,7 @@ public class TaskController extends AbstractController {
         }
     }
 
-    public void refreshTasks(ActionEvent actionEvent) {
+    public void refreshTasks() {
         service.restart();
     }
 

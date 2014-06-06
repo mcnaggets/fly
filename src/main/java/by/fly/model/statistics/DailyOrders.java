@@ -16,11 +16,11 @@ import java.util.Date;
 public class DailyOrders {
 
     @Id
-    private Date date;
+    private final Date date;
 
-    private float price;
-    private int readyCount;
-    private int paidCount;
+    private final float price;
+    private final int readyCount;
+    private final int paidCount;
 
     public DailyOrders(Date date,
                        @Value("#root.value.readyCount") int readyCount,

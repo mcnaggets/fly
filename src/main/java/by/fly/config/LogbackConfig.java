@@ -24,7 +24,7 @@ public class LogbackConfig {
     public static final String LOG_PATTERN = "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg %n";
     public static final String LOG_DIR = System.getProperty("user.dir") + "/logs/";
 
-    private LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    private final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
     @Bean
     public ApplicationContextHolder applicationContextHolder() {

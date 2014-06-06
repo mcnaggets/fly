@@ -5,7 +5,6 @@ import by.fly.model.User;
 import by.fly.service.OrganizationService;
 import by.fly.service.UserService;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -48,7 +47,7 @@ public class OrganizationController extends AbstractController {
 
     private Organization organization;
 
-    public void handleNewUser(ActionEvent actionEvent) {
+    public void handleNewUser() {
         User user = new User("", null, userService.generateMasterBarcode(), organizationService.getRootOrganization());
         userService.save(user);
         addUserItem(user);
@@ -89,7 +88,7 @@ public class OrganizationController extends AbstractController {
         bindOrganization();
     }
 
-    public void loadOrganizationLogo(ActionEvent actionEvent) throws IOException {
+    public void loadOrganizationLogo() throws IOException {
         FileChooser fileChooser = new FileChooser();
 
         //Set extension filter
@@ -114,7 +113,7 @@ public class OrganizationController extends AbstractController {
         }
     }
 
-    public void organizationCancel(ActionEvent actionEvent) {
+    public void organizationCancel() {
         bindOrganization();
     }
 
@@ -136,7 +135,7 @@ public class OrganizationController extends AbstractController {
         userService.findAll().forEach(this::addUserItem);
     }
 
-    public void organizationSave(ActionEvent actionEvent) {
+    public void organizationSave() {
         userList.getItems().forEach(node -> userService.save((User) node.getUserData()));
         organization.setName(organizationName.getText());
         organization.setUnp(organizationUnp.getText());

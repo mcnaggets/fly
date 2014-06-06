@@ -12,9 +12,9 @@ import java.util.List;
 @Service
 public class CustomerService {
 
-    public static final String CUSTOMER = QCustomer.customer.toString();
-    public static final String CUSTOMER_NAME = QCustomer.customer.name.getMetadata().getName();
-    public static final String CUSTOMER_PHONE = QCustomer.customer.phone.getMetadata().getName();
+    private static final String CUSTOMER = QCustomer.customer.toString();
+    private static final String CUSTOMER_NAME = QCustomer.customer.name.getMetadata().getName();
+    private static final String CUSTOMER_PHONE = QCustomer.customer.phone.getMetadata().getName();
 
     @Autowired
     private MongoOperations mongoOperations;

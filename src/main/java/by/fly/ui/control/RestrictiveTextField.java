@@ -28,8 +28,8 @@ import javafx.scene.control.TextField;
  */
 public class RestrictiveTextField extends TextField {
  
-    private IntegerProperty maxLength = new SimpleIntegerProperty(this, "maxLength", -1);
-    private StringProperty restrict = new SimpleStringProperty(this, "restrict");
+    private final IntegerProperty maxLength = new SimpleIntegerProperty(this, "maxLength", -1);
+    private final StringProperty restrict = new SimpleStringProperty(this, "restrict");
  
     public RestrictiveTextField() {
  
