@@ -23,14 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
-import static java.time.temporal.ChronoUnit.HOURS;
-import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.*;
 
 @Component
 public class TaskController extends AbstractController {
@@ -73,91 +75,112 @@ public class TaskController extends AbstractController {
     }
 
     class GetOrdersTask extends Task<ObservableList<StackPane>> {
+
+        private LocalDateTime now;
+        private LocalDateTime minDeadLine;
+        private LocalDateTime maxDeadLine;
+        private long wholeIntervalInMinutes;
+
         @Override
         protected ObservableList<StackPane> call() throws Exception {
-
             final ObservableList<StackPane> tasks = FXCollections.observableArrayList();
+            final List<OrderItem> orderItems = getOrderItems();
+            if (orderItems.isEmpty()) return tasks;
 
-            final List<OrderItem> orderItems = orderService.findAll(QOrderItem.orderItem.status.eq(OrderStatus.IN_PROGRESS),
-                    new PageRequest(0, 30, Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())).getContent();
-
-            if (orderItems.isEmpty()) {
-                return tasks;
-            }
-
-            final OrderItem firstItem = orderItems.stream().findFirst().get();
-            final OrderItem lastItem = orderItems.stream().reduce((c, p) -> p).get();
-
-            final LocalDateTime now = LocalDateTime.now();
-            final LocalDateTime minDeadLine = firstItem.getDeadLine().isBefore(now) ? now : firstItem.getDeadLine();
-            final LocalDateTime maxDeadLine = lastItem.getDeadLine().isBefore(now) ? now : lastItem.getDeadLine();
-
-            final long wholeIntervalInMinutes = MINUTES.between(minDeadLine, maxDeadLine);
+            initializeDates(orderItems);
 
             orderItems.forEach(order -> {
-                final long betweenHours = HOURS.between(now, order.getDeadLine());
+                final long betweenDays = DAYS.between(now, order.getDeadLine());
+                final long betweenHours = HOURS.between(now, order.getDeadLine()) % 24;
                 final long betweenMinutes = MINUTES.between(now, order.getDeadLine()) % 60;
 
-                int completed = isOverdue(betweenHours, betweenMinutes) ? 0 : wholeIntervalInMinutes == 0 ? 100 :
-                        (int) (100 * MINUTES.between(minDeadLine, order.getDeadLine()) / wholeIntervalInMinutes);
+                int completed = order.getDeadLine().isBefore(now) ? 0 : wholeIntervalInMinutes == 0 ? 100 :
+                        (int) (100 * (float) MINUTES.between(minDeadLine, order.getDeadLine()) / wholeIntervalInMinutes);
 
-                GridPane gridPane = new GridPane();
-                ColumnConstraints constraints = new ColumnConstraints();
-                constraints.setPercentWidth(completed);
-                gridPane.getColumnConstraints().add(constraints);
-
-                constraints = new ColumnConstraints();
-                constraints.setPercentWidth(100 - completed);
-                gridPane.getColumnConstraints().add(constraints);
-
-                gridPane.getRowConstraints().add(new RowConstraints(50));
-
-                Label label = new Label();
-                label.setWrapText(true);
-                if (isOverdue(betweenHours, betweenMinutes)) {
-                    Region rect = new Region();
-                    rect.setBackground(redBackground);
-                    gridPane.add(rect, 1, 0);
-
-                    label.setFont(Font.font("System bold", FontWeight.BOLD, 14));
-                    label.setText(getTaskLabel(order, -betweenHours, -betweenMinutes, true));
-                } else {
-                    Region rect = new Region();
-                    rect.setBackground(greenBackground);
-                    gridPane.add(rect, 0, 0);
-                    rect = new Pane();
-                    rect.setBackground(orangeBackground);
-                    gridPane.add(rect, 1, 0);
-
-                    label.setFont(Font.font("System bold", 14));
-                    label.setText(getTaskLabel(order, betweenHours, betweenMinutes, false));
-
-                }
+                GridPane gridPane = createGridPane(completed);
+                Label label = createTaskLabel(order, betweenDays, betweenHours, betweenMinutes, gridPane);
 
                 StackPane stackPane = new StackPane(gridPane, label);
-
                 tasks.add(stackPane);
             });
 
             return tasks;
         }
 
-        private boolean isOverdue(long betweenHours, long betweenMinutes) {
-            return betweenHours < 0 || betweenMinutes < 0;
+        private Label createTaskLabel(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, GridPane gridPane) {
+            Label label = new Label();
+            label.setWrapText(true);
+            if (order.getDeadLine().isBefore(now)) {
+                createOverdueRegion(order, betweenDays, betweenHours, betweenMinutes, gridPane, label);
+            } else {
+                createWorkingRegion(order, betweenDays, betweenHours, betweenMinutes, gridPane, label);
+            }
+            return label;
         }
 
-        private String getTaskLabel(OrderItem order, long betweenHours, long betweenMinutes, boolean overdue) {
-            String prefix;
-            if (overdue) {
-                prefix = "Задача просрочена на";
-            } else {
-                prefix = "Осталось";
-            }
-            return String.format("Заказ №%d %s %s %s %s %s\n%s %d часа %d минут",
+        private void initializeDates(List<OrderItem> orderItems) {
+            final OrderItem firstItem = orderItems.stream().findFirst().get();
+            final OrderItem lastItem = orderItems.stream().reduce((c, p) -> p).get();
+
+            now = LocalDateTime.now();
+            minDeadLine = firstItem.getDeadLine().isBefore(now) ? now : firstItem.getDeadLine();
+            maxDeadLine = lastItem.getDeadLine().isBefore(now) ? now : lastItem.getDeadLine();
+            wholeIntervalInMinutes = MINUTES.between(minDeadLine, maxDeadLine);
+        }
+
+        private List<OrderItem> getOrderItems() {
+            return orderService.findAll(QOrderItem.orderItem.status.eq(OrderStatus.IN_PROGRESS),
+                            new PageRequest(0, 30, Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())).getContent();
+        }
+
+        private void createWorkingRegion(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, GridPane gridPane, Label label) {
+            Region rect = new Region();
+            rect.setBackground(greenBackground);
+            gridPane.add(rect, 0, 0);
+            rect = new Pane();
+            rect.setBackground(orangeBackground);
+            gridPane.add(rect, 1, 0);
+
+            label.setFont(Font.font("System", 14));
+            label.setText(getTaskLabel(order, betweenDays, betweenHours, betweenMinutes, false));
+        }
+
+        private void createOverdueRegion(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, GridPane gridPane, Label label) {
+            Region rect = new Region();
+            rect.setBackground(redBackground);
+            gridPane.add(rect, 1, 0);
+
+            label.setFont(Font.font("System bold", FontWeight.BOLD, 14));
+            label.setText(getTaskLabel(order, -betweenDays, -betweenHours, -betweenMinutes, true));
+        }
+
+        private GridPane createGridPane(int completed) {
+            GridPane gridPane = new GridPane();
+            ColumnConstraints constraints = new ColumnConstraints();
+            constraints.setPercentWidth(completed);
+            gridPane.getColumnConstraints().add(constraints);
+
+            constraints = new ColumnConstraints();
+            constraints.setPercentWidth(100 - completed);
+            gridPane.getColumnConstraints().add(constraints);
+
+            gridPane.getRowConstraints().add(new RowConstraints(50));
+            return gridPane;
+        }
+
+        private String getTaskLabel(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, boolean overdue) {
+            return String.format("Заказ №%d %s %s %s %s %s\n%s %s %s %s",
                     order.getOrderNumber(), order.getOrderCode(), order.getBarcode(),
                     order.getPrinterModel(), order.getWorkType().getMessage(), UIUtils.TIME_FORMATTER.format(order.getDeadLine()),
-                    prefix, betweenHours, betweenMinutes);
+                    overdue ? "Задача просрочена на" : "Осталось",
+                    UIUtils.daysCountMessage(betweenDays), UIUtils.hoursCountMessage(betweenHours), UIUtils.minutesCountMessage(betweenMinutes));
         }
+
+    }
+
+    public static void main(String[] args) {
+        I18n i18n = I18nFactory.getI18n(TaskController.class, Locale.GERMAN);
+        System.out.println(i18n.tr("This text will be translated"));
     }
 
     public void refreshTasks() {

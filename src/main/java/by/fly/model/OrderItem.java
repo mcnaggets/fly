@@ -32,7 +32,7 @@ public class OrderItem extends AbstractModel {
     @Indexed
     private long orderNumber;
 
-    @Indexed(unique = true)
+    @Indexed
     private String orderCode;
 
     private WorkType workType;

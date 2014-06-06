@@ -111,26 +111,39 @@ public class OrdersController extends AbstractController {
         createOrderRegion.toBack();
         orderTableRegion.toFront();
 
+        Customer customer = saveCustomer();
+        saveOrderItems(actionEvent, customer);
+
+        service.restart();
+    }
+
+    private void saveOrderItems(ActionEvent actionEvent, Customer customer) {
         orderItems.getChildren().forEach(node -> {
             OrderItem orderItem = ((OrderItemControl) node).createOrderItem();
-            if (actionEvent.getTarget() == inProgressButton) {
-                orderItem.setStatus(OrderStatus.IN_PROGRESS);
-            } else if (actionEvent.getTarget() == readyButton) {
-                orderItem.setStatus(OrderStatus.READY);
-            }
+            setOrderItemStatus(actionEvent, orderItem);
             orderItem.setOrderNumber(orderNumber);
-            String clientName = clientNameText.getText();
-            String clientPhone = clientPhoneText.getText();
-            Customer customer = customerService.findByNameAndPhone(clientName, clientPhone);
-            if (customer == null) {
-                customer = new Customer(clientName, clientPhone);
-                customerService.save(customer);
-            }
             orderItem.setCustomer(customer);
             orderService.save(orderItem);
         });
+    }
 
-        service.restart();
+    private void setOrderItemStatus(ActionEvent actionEvent, OrderItem orderItem) {
+        if (actionEvent.getTarget() == inProgressButton) {
+            orderItem.setStatus(OrderStatus.IN_PROGRESS);
+        } else if (actionEvent.getTarget() == readyButton) {
+            orderItem.setStatus(OrderStatus.READY);
+        }
+    }
+
+    private Customer saveCustomer() {
+        String clientName = clientNameText.getText();
+        String clientPhone = clientPhoneText.getText();
+        Customer customer = customerService.findByNameAndPhone(clientName, clientPhone);
+        if (customer == null) {
+            customer = new Customer(clientName, clientPhone);
+            customerService.save(customer);
+        }
+        return customer;
     }
 
     @Override
@@ -217,31 +230,38 @@ public class OrdersController extends AbstractController {
             return new Task<ObservableList<OrderItem>>() {
                 @Override
                 protected ObservableList<OrderItem> call() throws Exception {
-                    LocalDate filterDate = orderDateFilter.getValue();
-                    filterPredicate = QOrderItem.orderItem.orderCode.isNotNull();
-                    if (!anyDateFilter.isSelected()) {
-                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
-                                Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                                Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())));
-                    }
-                    if (!orderCodeFilter.getText().trim().isEmpty()) {
-                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.orderCode.containsIgnoreCase(orderCodeFilter.getText().trim()));
-                    }
-                    if (!orderBarcodeFilter.getText().trim().isEmpty()) {
-                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.barcode.containsIgnoreCase(orderBarcodeFilter.getText().trim()));
-                    }
-                    if (!clientNameFilter.getText().trim().isEmpty()) {
-                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
-                    }
-                    if (!clientPhoneFilter.getText().trim().isEmpty()) {
-                        filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientPhone.containsIgnoreCase(clientPhoneFilter.getText().trim()));
-                    }
+                    createFilterPredicate();
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
-                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE)
-                    );
+                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE));
                     return FXCollections.observableList(orderItems.getContent());
                 }
             };
+        }
+    }
+
+    private void createFilterPredicate() {
+        createDateFilterPredicate();
+        if (!orderCodeFilter.getText().trim().isEmpty()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.orderCode.containsIgnoreCase(orderCodeFilter.getText().trim()));
+        }
+        if (!orderBarcodeFilter.getText().trim().isEmpty()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.barcode.containsIgnoreCase(orderBarcodeFilter.getText().trim()));
+        }
+        if (!clientNameFilter.getText().trim().isEmpty()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
+        }
+        if (!clientPhoneFilter.getText().trim().isEmpty()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientPhone.containsIgnoreCase(clientPhoneFilter.getText().trim()));
+        }
+    }
+
+    private void createDateFilterPredicate() {
+        LocalDate filterDate = orderDateFilter.getValue();
+        filterPredicate = QOrderItem.orderItem.orderCode.isNotNull();
+        if (!anyDateFilter.isSelected()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
+                    Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                    Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())));
         }
     }
 

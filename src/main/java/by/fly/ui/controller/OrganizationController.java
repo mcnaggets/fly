@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.InputEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,60 +46,71 @@ public class OrganizationController extends AbstractController {
 
     private Organization organization;
 
-    public void handleNewUser() {
+    public void createNewUser() {
         User user = new User("", null, userService.generateMasterBarcode(), organizationService.getRootOrganization());
         userService.save(user);
         addUserItem(user);
     }
 
     private void addUserItem(User user) {
-        final TextField userNameText = new TextField(user.getName());
-        userNameText.addEventFilter(InputEvent.ANY, event -> user.setName(userNameText.getText()));
+        final TextField userNameText = createUserNameText(user);
+        final TextField barcodeText = createBarcodeText(user);
+        final Button deleteButton = createDeleteUserButton(user);
 
-        final TextField barcodeText = new TextField(user.getBarcode());
-        barcodeText.setEditable(false);
-        barcodeText.addEventFilter(InputEvent.ANY, event -> user.setBarcode(barcodeText.getText()));
+        final HBox hBox = createUserControlArea(user);
+        hBox.getChildren().addAll(
+                new Label(resourceBundle.getString("master")), userNameText,
+                new Label(resourceBundle.getString("code")), barcodeText,
+                deleteButton);
 
-        final HBox hBox = new HBox(
-                new Label(resourceBundle.getString("master")),
-                userNameText,
-                new Label(resourceBundle.getString("code")),
-                barcodeText
-        );
-        hBox.setSpacing(10);
+        userList.getItems().add(hBox);
+    }
+
+    private HBox createUserControlArea(User user) {
+        final HBox hBox = new HBox(10);
         hBox.setPadding(new Insets(5));
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setUserData(user);
+        return hBox;
+    }
 
+    private TextField createBarcodeText(User user) {
+        final TextField barcodeText = new TextField(user.getBarcode());
+        barcodeText.setEditable(false);
+        barcodeText.textProperty().addListener(event -> user.setBarcode(barcodeText.getText()));
+        return barcodeText;
+    }
+
+    private TextField createUserNameText(User user) {
+        final TextField userNameText = new TextField(user.getName());
+        userNameText.textProperty().addListener(event -> user.setName(userNameText.getText()));
+        return userNameText;
+    }
+
+    private Button createDeleteUserButton(User user) {
         final Button deleteButton = new Button(resourceBundle.getString("delete"));
         deleteButton.setOnAction(event -> {
             userService.delete(user);
-            userList.getItems().remove(hBox);
+            userList.getItems().remove(deleteButton.getParent());
         });
-        hBox.getChildren().add(deleteButton);
-
-        userList.getItems().add(hBox);
+        return deleteButton;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
-        bindOrganization();
+        bindRootOrganization();
     }
 
     public void loadOrganizationLogo() throws IOException {
         FileChooser fileChooser = new FileChooser();
-
-        //Set extension filter
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(resourceBundle.getString("images"), "*.jpg", "*.png", "*.gif", "*.bmp");
         fileChooser.getExtensionFilters().add(extFilter);
 
-        //Show open file dialog
         File file = fileChooser.showOpenDialog(null);
         if (file != null && organizationService.saveOrganizationLogo(organization, file)) {
             showOrganizationLogo(Files.newInputStream(file.toPath()));
         }
-
     }
 
     private void showOrganizationLogo(InputStream imageStream) {
@@ -114,10 +124,10 @@ public class OrganizationController extends AbstractController {
     }
 
     public void organizationCancel() {
-        bindOrganization();
+        bindRootOrganization();
     }
 
-    private void bindOrganization() {
+    private void bindRootOrganization() {
         organization = organizationService.getRootOrganization();
         organizationName.setText(organization.getName());
         organizationUnp.setText(organization.getUnp());
@@ -146,6 +156,5 @@ public class OrganizationController extends AbstractController {
         organization.setRegistrationDate(registrationDate.getValue());
         organizationService.save(organization);
     }
-
 
 }

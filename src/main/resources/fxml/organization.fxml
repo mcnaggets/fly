@@ -48,7 +48,7 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                     </padding>
                     <children>
-                        <Button mnemonicParsing="false" onAction="#handleNewUser" text="Новый сотрудник" />
+                        <Button mnemonicParsing="false" onAction="#createNewUser" text="Новый сотрудник" />
                         <Button mnemonicParsing="false" onAction="#organizationSave" text="Сохранить" />
                         <Button mnemonicParsing="false" onAction="#organizationCancel" text="Отмена" />
                     </children>

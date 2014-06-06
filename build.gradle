@@ -47,7 +47,8 @@ dependencies {
     compile "javax.mail:mail:1.4.7"
 
     compile "org.jfxtras:jfxtras-controls:8.0-r1"
-    compile "org.controlsfx:controlsfx:8.0.5"
+
+    compile "com.googlecode.gettext-commons:gettext-commons:0.9.8"
 
 }
 
