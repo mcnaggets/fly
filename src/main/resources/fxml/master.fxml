@@ -55,8 +55,8 @@
                 </GridPane>
                 <Label text="Примечание:" GridPane.rowIndex="2" GridPane.valignment="TOP" GridPane.halignment="CENTER"/>
                 <TextArea fx:id="descriptionArea" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" spacing="10">
-                    <Button text="Отмена" onAction="#cancel"/>
+                <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="buttonBar">
+                    <Button text="Отмена" onAction="#cancel" cancelButton="true"/>
                     <Button text="Применить" onAction="#apply"/>
                     <Button text="ОК" onAction="#save" fx:id="saveButton"/>
                 </HBox>

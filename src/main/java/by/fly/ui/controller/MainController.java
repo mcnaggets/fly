@@ -1,6 +1,7 @@
 package by.fly.ui.controller;
 
 import by.fly.ui.SpringFXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -52,10 +53,13 @@ public class MainController extends AbstractController {
         if (Boolean.TRUE.equals(loginLink.getUserData())) {
             internalLogout();
         } else {
-            final Stage dialog = new Stage(StageStyle.TRANSPARENT);
+            final Stage dialog = new Stage(StageStyle.UTILITY);
             dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setMaximized(false);
+            dialog.setResizable(false);
             dialog.initOwner(stage);
-            dialog.setScene(new Scene((Parent) SpringFXMLLoader.load("/fxml/login.fxml").getView()));
+            Node view = SpringFXMLLoader.load("/fxml/login.fxml").getView();
+            dialog.setScene(new Scene((Parent) view));
             dialog.show();
         }
     }

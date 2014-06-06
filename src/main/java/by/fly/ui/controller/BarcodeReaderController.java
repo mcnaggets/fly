@@ -33,8 +33,10 @@ public class BarcodeReaderController extends AbstractController {
             OrderItem orderItem = orderService.findLastItemByBarcode(barcode);
             if (orderItem != null) {
                 barcodeText.textProperty().setValue("");
-                final Stage dialog = new Stage(StageStyle.TRANSPARENT);
+                final Stage dialog = new Stage(StageStyle.UTILITY);
                 dialog.initModality(Modality.WINDOW_MODAL);
+                dialog.setMaximized(false);
+                dialog.setResizable(false);
                 dialog.initOwner(barcodeText.getScene().getWindow());
                 MasterController masterController = (MasterController) SpringFXMLLoader.load("/fxml/master.fxml");
                 masterController.setOrderItem(orderItem);

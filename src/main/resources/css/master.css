@@ -4,7 +4,6 @@
 }
 
 .detailsGrid {
-    -fx-background-color: white;
     -fx-background-radius: 5.0;
     -fx-padding: 10;
     -fx-hgap: 30;
@@ -18,8 +17,11 @@
 }
 
 .masterWindow {
-    -fx-border-color: grey;
-    -fx-border-radius: 10;
-    -fx-border-width: 3;
     -fx-alignment: center;
+    -fx-font-size: 14;
+}
+
+.buttonBar {
+    -fx-font-size: 20;
+    -fx-spacing: 10;
 }

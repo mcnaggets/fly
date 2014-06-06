@@ -31,7 +31,7 @@
         <Button text="Вход"
                 onAction="#handleSubmitButtonAction" defaultButton="true"/>
         <Button text="Отмена"
-                onAction="#handleCancelButtonAction"/>
+                onAction="#handleCancelButtonAction" cancelButton="true"/>
     </HBox>
 
     <stylesheets>

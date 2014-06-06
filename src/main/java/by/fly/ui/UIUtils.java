@@ -1,7 +1,10 @@
 package by.fly.ui;
 
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.TableColumn;
+import javafx.stage.Stage;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -38,6 +41,36 @@ public class UIUtils {
         }
 
         pagination.setPageCount((floatCount > intCount) ? ++intCount : intCount);
+    }
+
+    public static void makeDraggable(final Stage stage, final Node byNode) {
+        final Delta dragDelta = new Delta();
+        byNode.setOnMousePressed(mouseEvent -> {
+            // record a delta distance for the drag and drop operation.
+            dragDelta.x = stage.getX() - mouseEvent.getScreenX();
+            dragDelta.y = stage.getY() - mouseEvent.getScreenY();
+            byNode.setCursor(Cursor.MOVE);
+        });
+        byNode.setOnMouseReleased(mouseEvent -> byNode.setCursor(Cursor.HAND));
+        byNode.setOnMouseDragged(mouseEvent -> {
+            stage.setX(mouseEvent.getScreenX() + dragDelta.x);
+            stage.setY(mouseEvent.getScreenY() + dragDelta.y);
+        });
+        byNode.setOnMouseEntered(mouseEvent -> {
+            if (!mouseEvent.isPrimaryButtonDown()) {
+                byNode.setCursor(Cursor.HAND);
+            }
+        });
+        byNode.setOnMouseExited(mouseEvent -> {
+            if (!mouseEvent.isPrimaryButtonDown()) {
+                byNode.setCursor(Cursor.DEFAULT);
+            }
+        });
+    }
+
+    /** records relative x and y co-ordinates. */
+    private static class Delta {
+        double x, y;
     }
 
 }
