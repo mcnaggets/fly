@@ -1,0 +1,11 @@
+.createOrderHeader {
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-spacing: 50;
+    -fx-alignment: center;
+    -fx-padding: 10;
+}
+
+.delimiterPanel {
+    -fx-background-color: #f4f4f4;
+}

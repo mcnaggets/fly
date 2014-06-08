@@ -26,13 +26,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static by.fly.ui.UIUtils.TIME_FORMATTER;
 import static jdk.nashorn.internal.runtime.JSType.isNumber;
 
-@Component
+@Component(OrderItemControl.NAME)
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class OrderItemControl extends FlowPane {
+
+    public static final String NAME = "orderItemControl";
 
     @Autowired
     private OrderService orderService;
@@ -49,8 +52,17 @@ public class OrderItemControl extends FlowPane {
     private final ObjectProperty<EventHandler<ActionEvent>> onPriceChanged = new SimpleObjectProperty<>();
     private final ObjectProperty<EventHandler<ActionEvent>> onBarcodeChanged = new SimpleObjectProperty<>();
 
+    private final OrderItem orderItem;
+
+    public OrderItemControl(Optional<OrderItem> orderItem) {
+        this.orderItem = orderItem.orElse(new OrderItem(null));
+    }
+
     public void initialize() {
         createChildren();
+        if (!orderItem.isNew()) {
+            bindOrderItem();
+        }
         setBorder(new Border(
                 new BorderStroke(Color.GRAY, BorderStrokeStyle.DOTTED, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)
         ));
@@ -85,7 +97,9 @@ public class OrderItemControl extends FlowPane {
         if (item != null) {
             printerModelText.setText(item.getPrinterModel());
             printerTypeCombo.setValue(item.getPrinterType());
-            onBarcodeChanged.get().handle(new ActionEvent(barcode, this));
+            if (onBarcodeChanged.get() != null) {
+                onBarcodeChanged.get().handle(new ActionEvent(barcode, this));
+            }
         }
     }
 
@@ -179,7 +193,7 @@ public class OrderItemControl extends FlowPane {
     }
 
     private void priceChanged() {
-        if (isNumber(priceText.getText())) {
+        if (onPriceChanged.get() != null && isNumber(priceText.getText())) {
             onPriceChanged.get().handle(new ActionEvent(getPrice(), this));
         }
     }
@@ -200,8 +214,20 @@ public class OrderItemControl extends FlowPane {
         this.onBarcodeChanged.set(handler);
     }
 
-    public OrderItem createOrderItem() {
-        OrderItem orderItem = new OrderItem(LocalDateTime.of(deadLineDatePicker.getValue(), deadLineTimePicker.getLocalTime()));
+    public void bindOrderItem() {
+        deadLineDatePicker.setValue(orderItem.getDeadLine().toLocalDate());
+        deadLineTimePicker.setLocalTime(orderItem.getDeadLine().toLocalTime());
+        barcodeText.setText(orderItem.getBarcode());
+        printerModelText.setText(orderItem.getPrinterModel());
+        printerTypeCombo.setValue(orderItem.getPrinterType());
+        workTypeGroup.selectToggle(workTypeGroup.getToggles().stream().filter(toggle -> toggle.getUserData() == orderItem.getWorkType()).findFirst().get());
+        descriptionArea.setText(orderItem.getDescription());
+        priceText.setText(String.valueOf((long) orderItem.getPrice()));
+    }
+
+    public OrderItem getOrderItem() {
+        LocalDateTime deadLine = LocalDateTime.of(deadLineDatePicker.getValue(), deadLineTimePicker.getLocalTime());
+        orderItem.setDeadLine(deadLine);
         orderItem.setBarcode(barcodeText.getText());
         orderItem.setPrinterModel(printerModelText.getText());
         orderItem.setPrinterType(printerTypeCombo.getValue());

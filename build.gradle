@@ -48,8 +48,6 @@ dependencies {
 
     compile "org.jfxtras:jfxtras-controls:8.0-r1"
 
-    compile "com.googlecode.gettext-commons:gettext-commons:0.9.8"
-
 }
 
 if (!JavaVersion.current().isJava8Compatible()) {

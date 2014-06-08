@@ -30,7 +30,7 @@ public class BarcodeReaderController extends AbstractController {
         barcodeText.textProperty().addListener(e -> {
             String barcode = barcodeText.getText();
             if (barcode == null || barcode.isEmpty()) return;
-            OrderItem orderItem = orderService.findLastItemByBarcode(barcode);
+            OrderItem orderItem = orderService.findInProgressItemByBarcode(barcode);
             if (orderItem != null) {
                 barcodeText.textProperty().setValue("");
                 final Stage dialog = new Stage(StageStyle.UTILITY);

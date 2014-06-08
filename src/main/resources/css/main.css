@@ -1,0 +1,15 @@
+.padding10 {
+    -fx-padding: 10;
+}
+
+.orangeBackground {
+    -fx-background-color: orange;
+    -fx-border-color: grey;
+    -fx-border-radius: 3;
+}
+
+.palegreenBackground {
+    -fx-background-color: palegreen;
+    -fx-border-color: grey;
+    -fx-border-radius: 3;
+}

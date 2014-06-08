@@ -13,8 +13,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -22,6 +22,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -29,9 +30,11 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static by.fly.ui.UIUtils.*;
+import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 
 @Component
 public class OrdersController extends AbstractController {
@@ -67,7 +70,9 @@ public class OrdersController extends AbstractController {
     public Label orderCodeLabel;
 
     public Button inProgressButton;
-    public Button readyButton;
+    public Button paidButton;
+    public Button addOrderItemButton;
+    public Button saveButton;
 
     public DatePicker orderDateFilter;
     public TextField orderCodeFilter;
@@ -91,10 +96,25 @@ public class OrdersController extends AbstractController {
 
     private long orderNumber;
 
-    public void createOrder() {
-        orderItems.getChildren().clear();
-        orderItems.getChildren().add(createOrderItemControl());
+    public void createNewOrder() {
+        showOrderUI(Optional.empty());
+    }
 
+    private void showOrderUI(Optional<OrderItem> orderItemOptional) {
+        orderItems.getChildren().clear();
+        orderItems.getChildren().add(createOrderItemControl(orderItemOptional));
+
+        if (orderItemOptional.isPresent()) {
+            bindPresentedOrderItem(orderItemOptional.get());
+        } else {
+            bindNewOrderItem();
+        }
+
+        orderTableRegion.toBack();
+        createOrderRegion.toFront();
+    }
+
+    private void bindNewOrderItem() {
         orderNumber = orderService.getNexOrderNumber();
         orderNumberLabel.setText("Заказ №" + orderNumber);
         orderCodeLabel.setText(OrderItem.ORDER_CODE_PREFIX + orderNumber);
@@ -103,35 +123,52 @@ public class OrdersController extends AbstractController {
         clientNameText.setText("");
         clientPhoneText.setText("");
 
-        orderTableRegion.toBack();
-        createOrderRegion.toFront();
+        addOrderItemButton.setDisable(false);
+        inProgressButton.setVisible(true);
+        paidButton.setVisible(false);
+        saveButton.setVisible(false);
     }
 
-    public void saveOrder(ActionEvent actionEvent) {
+    private void bindPresentedOrderItem(OrderItem orderItem) {
+        orderNumberLabel.setText("Заказ №" + orderItem.getOrderNumber());
+        orderCodeLabel.setText(orderItem.getOrderCode());
+        orderDateLabel.setText(DateTimeFormatter.ISO_LOCAL_DATE.format(orderItem.getCreatedAt()));
+
+        clientNameText.setText(orderItem.getClientName());
+        clientPhoneText.setText(orderItem.getClientPhone());
+
+        totalPriceText.setText(String.valueOf(orderItem.getPrice()));
+
+        addOrderItemButton.setDisable(true);
+        inProgressButton.setVisible(false);
+        paidButton.setVisible(orderItem.getStatus() == OrderStatus.READY);
+        saveButton.setVisible(orderItem.getStatus() != OrderStatus.READY);
+    }
+
+    public void saveOrder() {
         createOrderRegion.toBack();
         orderTableRegion.toFront();
 
-        Customer customer = saveCustomer();
-        saveOrderItems(actionEvent, customer);
+        saveOrderItems(saveCustomer());
 
         service.restart();
     }
 
-    private void saveOrderItems(ActionEvent actionEvent, Customer customer) {
+    private void saveOrderItems(Customer customer) {
         orderItems.getChildren().forEach(node -> {
-            OrderItem orderItem = ((OrderItemControl) node).createOrderItem();
-            setOrderItemStatus(actionEvent, orderItem);
+            OrderItem orderItem = ((OrderItemControl) node).getOrderItem();
+            setOrderItemStatus(orderItem);
             orderItem.setOrderNumber(orderNumber);
             orderItem.setCustomer(customer);
             orderService.save(orderItem);
         });
     }
 
-    private void setOrderItemStatus(ActionEvent actionEvent, OrderItem orderItem) {
-        if (actionEvent.getTarget() == inProgressButton) {
+    private void setOrderItemStatus(OrderItem orderItem) {
+        if (orderItem.getStatus() == OrderStatus.CREATED) {
             orderItem.setStatus(OrderStatus.IN_PROGRESS);
-        } else if (actionEvent.getTarget() == readyButton) {
-            orderItem.setStatus(OrderStatus.READY);
+        } else if (orderItem.getStatus() == OrderStatus.READY) {
+            orderItem.setStatus(OrderStatus.PAID);
         }
     }
 
@@ -151,7 +188,20 @@ public class OrdersController extends AbstractController {
         super.initialize(url, resourceBundle);
         initializeFilter();
         initializeColumns();
+        initializeTable();
         bindService();
+    }
+
+    private void initializeTable() {
+        ordersTable.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
+        ordersTable.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                OrderItem orderItem = ordersTable.getSelectionModel().getSelectedItem();
+                if (mouseEvent.getClickCount() == 2 && orderItem != null) {
+                    showOrderUI(Optional.of(orderItem));
+                }
+            }
+        });
     }
 
     private void initializeFilter() {
@@ -195,11 +245,11 @@ public class OrdersController extends AbstractController {
     }
 
     public void addOrderItem() {
-        orderItems.getChildren().add(createOrderItemControl());
+        orderItems.getChildren().add(createOrderItemControl(Optional.empty()));
     }
 
-    private OrderItemControl createOrderItemControl() {
-        OrderItemControl orderItemControl = beanFactory.getBean(OrderItemControl.class);
+    private OrderItemControl createOrderItemControl(Optional<OrderItem> orderItemOptional) {
+        OrderItemControl orderItemControl = (OrderItemControl) beanFactory.getBean(OrderItemControl.NAME, orderItemOptional);
         orderItemControl.initialize();
         orderItemControl.setOnPriceChanged(e -> totalPriceText.setText(String.valueOf(calculateTotalPrice())));
         orderItemControl.setOnBarcodeChanged(e -> {
@@ -232,7 +282,8 @@ public class OrdersController extends AbstractController {
                 protected ObservableList<OrderItem> call() throws Exception {
                     createFilterPredicate();
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
-                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE));
+                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE,
+                                    new Sort(Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())));
                     return FXCollections.observableList(orderItems.getContent());
                 }
             };

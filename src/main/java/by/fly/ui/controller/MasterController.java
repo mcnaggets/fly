@@ -82,11 +82,7 @@ public class MasterController extends AbstractController {
 
     public void save() {
         populateOrderItem();
-        if (orderItem.getStatus() == OrderStatus.READY) {
-            orderItem.setStatus(OrderStatus.PAID);
-        } else if (orderItem.getStatus() == OrderStatus.IN_PROGRESS) {
-            orderItem.setStatus(OrderStatus.READY);
-        }
+        orderItem.setStatus(OrderStatus.READY);
         orderService.save(orderItem);
         getView().getScene().getWindow().hide();
     }
@@ -100,14 +96,11 @@ public class MasterController extends AbstractController {
         if (orderItem.getMaster() != null) {
             masterNameText.setText(orderItem.getMaster().getName());
             masterBarcodeText.setText(orderItem.getMaster().getBarcode());
-            masterBarcodeText.setEditable(orderItem.getStatus() == OrderStatus.IN_PROGRESS);
         }
 
         additionalWorkText.setText(orderItem.getAdditionalWork());
-        additionalWorkText.setEditable(orderItem.getStatus() == OrderStatus.IN_PROGRESS);
 
         testCheckBox.setSelected(orderItem.isTest());
-        testCheckBox.setDisable(orderItem.getStatus() != OrderStatus.IN_PROGRESS);
 
         barcodeText.setText("Штрихкод: " + orderItem.getBarcode());
 

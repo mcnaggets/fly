@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <?import java.lang.String?>
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="by.fly.ui.controller.OrdersController">
@@ -16,23 +15,11 @@
                         <VBox prefHeight="200.0" spacing="10.0" AnchorPane.bottomAnchor="0.0"
                               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
-                                <HBox alignment="CENTER" prefHeight="30.0" prefWidth="200.0" spacing="50.0">
+                                <HBox styleClass="createOrderHeader">
                                     <children>
-                                        <Label fx:id="orderNumberLabel" alignment="CENTER" text="Заказ №">
-                                            <font>
-                                                <Font name="System Bold" size="14.0"/>
-                                            </font>
-                                        </Label>
-                                        <Label fx:id="orderCodeLabel" alignment="CENTER">
-                                            <font>
-                                                <Font name="System Bold" size="14.0"/>
-                                            </font>
-                                        </Label>
-                                        <Label fx:id="orderDateLabel" alignment="CENTER">
-                                            <font>
-                                                <Font name="System Bold" size="14.0"/>
-                                            </font>
-                                        </Label>
+                                        <Label fx:id="orderNumberLabel"/>
+                                        <Label fx:id="orderCodeLabel"/>
+                                        <Label fx:id="orderDateLabel"/>
                                     </children>
                                 </HBox>
                                 <HBox spacing="10" alignment="CENTER_LEFT">
@@ -46,23 +33,13 @@
                                         <TextField fx:id="clientPhoneText"/>
                                     </children>
                                 </HBox>
-                                <Label text="Информация о заказе:">
-                                    <padding>
-                                        <Insets left="10"/>
-                                    </padding>
-                                    <font>
-                                        <Font name="System Bold" size="14.0"/>
-                                    </font>
-                                </Label>
+                                <Label text="Информация о заказе:" styleClass="createOrderHeader"/>
                                 <ScrollPane VBox.vgrow="ALWAYS">
                                     <content>
                                         <VBox fx:id="orderItems" spacing="10.0" VBox.vgrow="ALWAYS"/>
                                     </content>
                                 </ScrollPane>
-                                <GridPane hgap="10" vgap="10">
-                                    <padding>
-                                        <Insets bottom="10" top="10" left="10" right="10"/>
-                                    </padding>
+                                <GridPane hgap="10" vgap="10" styleClass="padding10">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="ALWAYS"/>
                                         <ColumnConstraints/>
@@ -70,16 +47,19 @@
                                         <ColumnConstraints/>
                                     </columnConstraints>
                                     <children>
-                                        <Button onAction="#addOrderItem" text="Добавить" GridPane.columnIndex="1"/>
+                                        <Button onAction="#addOrderItem" fx:id="addOrderItemButton" text="Добавить"
+                                                GridPane.columnIndex="1"/>
                                         <Label text="Итого:" GridPane.columnIndex="2"/>
                                         <TextField fx:id="totalPriceText" text="0" GridPane.columnIndex="3"
                                                    editable="false"/>
                                         <Button fx:id="inProgressButton" onAction="#saveOrder" text="Принять в работу"
-                                                GridPane.columnIndex="1"
-                                                GridPane.rowIndex="1" style="-fx-background-color: orange;"/>
-                                        <Button fx:id="readyButton" onAction="#saveOrder" text="Выдан"
-                                                GridPane.columnIndex="2"
-                                                GridPane.rowIndex="1" style="-fx-background-color: palegreen;"/>
+                                                GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                                styleClass="orangeBackground" prefWidth="150"/>
+                                        <Button fx:id="saveButton" onAction="#saveOrder" text="Сохранить"
+                                                GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="150"/>
+                                        <Button fx:id="paidButton" onAction="#saveOrder" text="Выдан"
+                                                GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                                styleClass="palegreenBackground" prefWidth="150"/>
                                         <Button onAction="#cancelOrder" text="Отмена" GridPane.columnIndex="3"
                                                 GridPane.rowIndex="1"/>
                                     </children>
@@ -88,16 +68,13 @@
                         </VBox>
                     </children>
                 </AnchorPane>
-                <Pane style="-fx-background-color: #f4f4f4;"/>
+                <Pane styleClass="delimiterPanel"/>
                 <StackPane fx:id="orderTableRegion">
                     <children>
                         <VBox AnchorPane.bottomAnchor="0.0"
                               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
-                                <HBox spacing="10" alignment="CENTER_LEFT">
-                                    <padding>
-                                        <Insets left="10" top="10" bottom="10" right="10"/>
-                                    </padding>
+                                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
                                     <children>
                                         <Label text="Заказы за число:"/>
                                         <DatePicker fx:id="orderDateFilter"/>
@@ -105,10 +82,7 @@
                                     </children>
                                 </HBox>
 
-                                <HBox spacing="10" alignment="CENTER_LEFT">
-                                    <padding>
-                                        <Insets left="10" top="10" bottom="10" right="10"/>
-                                    </padding>
+                                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
                                     <children>
                                         <Label text="Код:"/>
                                         <TextField fx:id="orderCodeFilter"/>
@@ -122,26 +96,26 @@
                                 </HBox>
                                 <TableView fx:id="ordersTable" VBox.vgrow="ALWAYS">
                                     <columns>
-                                        <TableColumn fx:id="numberColumn" prefWidth="75.0" text="№"/>
-                                        <TableColumn fx:id="orderNumberColumn" prefWidth="75.0" text="Код"/>
-                                        <TableColumn fx:id="barCodeColumn" prefWidth="75.0" text="Штрихкод"/>
-                                        <TableColumn fx:id="printerTypeColumn" prefWidth="75.0" text="Тип"/>
-                                        <TableColumn fx:id="workTypeColumn" prefWidth="75.0" text="Вид работ"/>
-                                        <TableColumn fx:id="printerModelColumn" prefWidth="75.0" text="Модель"/>
-                                        <TableColumn fx:id="clientNameColumn" prefWidth="75.0" text="Клиент"/>
-                                        <TableColumn fx:id="clientPhoneColumn" prefWidth="75.0" text="Телефон"/>
-                                        <TableColumn fx:id="createdAtColumn" prefWidth="75.0" text="Время приёма"/>
-                                        <TableColumn fx:id="deadLineColumn" prefWidth="75.0" text="Время выполнения"/>
-                                        <TableColumn fx:id="statusColumn" prefWidth="75.0" text="Статус"/>
-                                        <TableColumn fx:id="priceColumn" prefWidth="75.0" text="Стоимость"/>
+                                        <TableColumn fx:id="numberColumn" text="№"/>
+                                        <TableColumn fx:id="orderNumberColumn" text="Код"/>
+                                        <TableColumn fx:id="barCodeColumn" text="Штрихкод"/>
+                                        <TableColumn fx:id="printerTypeColumn" text="Тип"/>
+                                        <TableColumn fx:id="workTypeColumn" text="Вид работ"/>
+                                        <TableColumn fx:id="printerModelColumn" text="Модель"/>
+                                        <TableColumn fx:id="clientNameColumn" text="Клиент"/>
+                                        <TableColumn fx:id="clientPhoneColumn" text="Телефон"/>
+                                        <TableColumn fx:id="createdAtColumn" text="Время приёма"/>
+                                        <TableColumn fx:id="deadLineColumn" text="Время выполнения"/>
+                                        <TableColumn fx:id="statusColumn" text="Статус"/>
+                                        <TableColumn fx:id="priceColumn" text="Стоимость"/>
                                     </columns>
                                 </TableView>
                                 <HBox alignment="CENTER_LEFT" spacing="10">
                                     <padding>
                                         <Insets left="10"/>
                                     </padding>
-                                    <Button onAction="#createOrder" text="Добавить заказ"/>
-                                    <Button onAction="#refreshData" text="Обновить" />
+                                    <Button onAction="#createNewOrder" text="Добавить заказ"/>
+                                    <Button onAction="#refreshData" text="Обновить"/>
                                     <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>
                                 </HBox>
                             </children>
@@ -153,6 +127,7 @@
         </StackPane>
     </children>
     <stylesheets>
+        <String fx:value="/css/main.css"/>
         <String fx:value="/css/orders.css"/>
     </stylesheets>
 </AnchorPane>

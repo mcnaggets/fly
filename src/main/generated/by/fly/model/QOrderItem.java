@@ -24,6 +24,8 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
 
     public final QAbstractModel _super = new QAbstractModel(this);
 
+    public final StringPath additionalWork = createString("additionalWork");
+
     public final StringPath barcode = createString("barcode");
 
     public final StringPath clientName = createString("clientName");
@@ -41,6 +43,8 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
     //inherited
     public final StringPath id = _super.id;
 
+    public final QUser master;
+
     public final StringPath orderCode = createString("orderCode");
 
     public final NumberPath<Long> orderNumber = createNumber("orderNumber", Long.class);
@@ -52,6 +56,8 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
     public final EnumPath<PrinterType> printerType = createEnum("printerType", PrinterType.class);
 
     public final EnumPath<OrderStatus> status = createEnum("status", OrderStatus.class);
+
+    public final BooleanPath test = createBoolean("test");
 
     public final EnumPath<WorkType> workType = createEnum("workType", WorkType.class);
 
@@ -74,6 +80,7 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
     public QOrderItem(Class<? extends OrderItem> type, PathMetadata<?> metadata, PathInits inits) {
         super(type, metadata, inits);
         this.customer = inits.isInitialized("customer") ? new QCustomer(forProperty("customer")) : null;
+        this.master = inits.isInitialized("master") ? new QUser(forProperty("master"), inits.get("master")) : null;
     }
 
 }

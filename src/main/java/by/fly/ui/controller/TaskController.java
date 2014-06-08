@@ -23,13 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static java.time.temporal.ChronoUnit.*;
@@ -130,7 +127,7 @@ public class TaskController extends AbstractController {
 
         private List<OrderItem> getOrderItems() {
             return orderService.findAll(QOrderItem.orderItem.status.eq(OrderStatus.IN_PROGRESS),
-                            new PageRequest(0, 30, Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())).getContent();
+                    new PageRequest(0, 30, Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())).getContent();
         }
 
         private void createWorkingRegion(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, GridPane gridPane, Label label) {
@@ -176,11 +173,6 @@ public class TaskController extends AbstractController {
                     UIUtils.daysCountMessage(betweenDays), UIUtils.hoursCountMessage(betweenHours), UIUtils.minutesCountMessage(betweenMinutes));
         }
 
-    }
-
-    public static void main(String[] args) {
-        I18n i18n = I18nFactory.getI18n(TaskController.class, Locale.GERMAN);
-        System.out.println(i18n.tr("This text will be translated"));
     }
 
     public void refreshTasks() {

@@ -1,7 +1,10 @@
 package by.fly.model;
 
+import org.springframework.data.annotation.Id;
+
 public abstract class AbstractModel {
 
+    @Id
     private String id;
 
     public String getId() {
@@ -18,6 +21,11 @@ public abstract class AbstractModel {
         return id.equals(that.id);
 
     }
+
+    public boolean isNew() {
+        return null == getId();
+    }
+
 
     @Override
     public int hashCode() {

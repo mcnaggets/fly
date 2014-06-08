@@ -58,13 +58,14 @@
                 <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="buttonBar">
                     <Button text="Отмена" onAction="#cancel" cancelButton="true"/>
                     <Button text="Применить" onAction="#apply"/>
-                    <Button text="ОК" onAction="#save" fx:id="saveButton"/>
+                    <Button text="Готов" onAction="#save" fx:id="saveButton" styleClass="palegreenBackground"/>
                 </HBox>
             </children>
         </GridPane>
     </children>
     <stylesheets>
         <String fx:value="/css/master.css"/>
+        <String fx:value="/css/main.css"/>
     </stylesheets>
 
 </AnchorPane>

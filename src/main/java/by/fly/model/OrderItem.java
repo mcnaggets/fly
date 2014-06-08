@@ -62,7 +62,9 @@ public class OrderItem extends AbstractModel {
     private String additionalWork;
 
     @PersistenceConstructor
-    public OrderItem() {}
+    public OrderItem(long orderNumber) {
+        this.orderNumber = orderNumber;
+    }
 
     public OrderItem(LocalDateTime deadLine) {
         setDeadLine(deadLine);

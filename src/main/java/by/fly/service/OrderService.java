@@ -1,6 +1,7 @@
 package by.fly.service;
 
 import by.fly.model.OrderItem;
+import by.fly.model.OrderStatus;
 import by.fly.model.QOrderItem;
 import by.fly.repository.OrderItemRepository;
 import com.mysema.query.types.Predicate;
@@ -53,6 +54,10 @@ public class OrderService {
 
     public long getNexOrderNumber() {
         return sequenceService.getNextSequence(ORDER_NUMBER_PATH);
+    }
+
+    public OrderItem findInProgressItemByBarcode(String barcode) {
+        return findOne(QOrderItem.orderItem.barcode.eq(barcode).and(QOrderItem.orderItem.status.eq(OrderStatus.IN_PROGRESS)));
     }
 
     public OrderItem findLastItemByBarcode(String barcode) {
