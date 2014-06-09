@@ -6,6 +6,7 @@ import by.fly.model.OrderStatus;
 import by.fly.model.QOrderItem;
 import by.fly.service.CustomerService;
 import by.fly.service.OrderService;
+import by.fly.service.PrinterService;
 import by.fly.ui.control.OrderItemControl;
 import com.mysema.query.types.expr.BooleanExpression;
 import javafx.beans.property.SimpleStringProperty;
@@ -25,6 +26,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.awt.print.PrinterException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -91,6 +95,9 @@ public class OrdersController extends AbstractController {
 
     @Autowired
     private BeanFactory beanFactory;
+
+    @Autowired
+    private PrinterService printerService;
 
     private BooleanExpression filterPredicate;
 
@@ -272,6 +279,10 @@ public class OrdersController extends AbstractController {
 
     public void refreshData() {
         service.restart();
+    }
+
+    public void printTicket() throws PrinterException, IOException {
+        printerService.print(new File("x:\\work\\docs\\test.pdf"));
     }
 
     private class GetOrdersService extends Service<ObservableList<OrderItem>> {

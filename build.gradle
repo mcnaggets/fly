@@ -48,6 +48,8 @@ dependencies {
 
     compile "org.jfxtras:jfxtras-controls:8.0-r1"
 
+    compile "org.apache.pdfbox:pdfbox:1.8.5"
+
 }
 
 if (!JavaVersion.current().isJava8Compatible()) {

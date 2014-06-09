@@ -47,6 +47,7 @@
                                         <ColumnConstraints/>
                                     </columnConstraints>
                                     <children>
+                                        <Button onAction="#printTicket" text="Печать талона"/>
                                         <Button onAction="#addOrderItem" fx:id="addOrderItemButton" text="Добавить"
                                                 GridPane.columnIndex="1"/>
                                         <Label text="Итого:" GridPane.columnIndex="2"/>
