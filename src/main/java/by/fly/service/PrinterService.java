@@ -20,7 +20,7 @@ public class PrinterService {
 
     public Map<String, PrintService> getAvailablePrinters() {
         PrintService[] services = PrinterJob.lookupPrintServices();
-        return Arrays.asList(services).stream().collect(Collectors.toMap(PrintService::getName, Function.<PrintService>identity()));
+        return Arrays.stream(services).collect(Collectors.toMap(PrintService::getName, Function.<PrintService>identity()));
     }
 
     public void setCurrentPrinter(String name) {

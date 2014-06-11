@@ -242,7 +242,7 @@ public class OrdersController extends AbstractController {
         barCodeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBarcode()));
         printerTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterType().getMessage()));
         printerModelColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterModel()));
-        workTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWorkType().getMessage()));
+        workTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWorkTypeMessages("\n")));
         statusColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus().getMessage()));
         priceColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getPrice())));
         clientNameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getClientName()));

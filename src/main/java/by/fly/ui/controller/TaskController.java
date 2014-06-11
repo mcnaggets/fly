@@ -168,7 +168,7 @@ public class TaskController extends AbstractController {
         private String getTaskLabel(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, boolean overdue) {
             return String.format("Заказ №%d %s %s %s %s %s\n%s %s %s %s",
                     order.getOrderNumber(), order.getOrderCode(), order.getBarcode(),
-                    order.getPrinterModel(), order.getWorkType().getMessage(), UIUtils.TIME_FORMATTER.format(order.getDeadLine()),
+                    order.getPrinterModel(), order.getWorkTypeMessages(", "), UIUtils.TIME_FORMATTER.format(order.getDeadLine()),
                     overdue ? "Задача просрочена на" : "Осталось",
                     UIUtils.daysCountMessage(betweenDays), UIUtils.hoursCountMessage(betweenHours), UIUtils.minutesCountMessage(betweenMinutes));
         }

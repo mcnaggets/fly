@@ -11,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -45,7 +44,6 @@ public class OrderItemControl extends FlowPane {
     private TextField printerModelText;
     private LocalTimeTextField deadLineTimePicker;
     private DatePicker deadLineDatePicker;
-    private ToggleGroup workTypeGroup;
     private TextArea descriptionArea;
     private RestrictiveTextField priceText;
 
@@ -53,6 +51,7 @@ public class OrderItemControl extends FlowPane {
     private final ObjectProperty<EventHandler<ActionEvent>> onBarcodeChanged = new SimpleObjectProperty<>();
 
     private final OrderItem orderItem;
+    private CheckBox[] workTypeCheckBoxes;
 
     public OrderItemControl(Optional<OrderItem> orderItem) {
         this.orderItem = orderItem.orElse(new OrderItem(null));
@@ -79,9 +78,7 @@ public class OrderItemControl extends FlowPane {
         createDescriptionArea();
         createPriceText();
 
-        workTypeGroup = new ToggleGroup();
         populateGrid(grid);
-        workTypeGroup.selectToggle(workTypeGroup.getToggles().iterator().next());
 
         getChildren().add(grid);
     }
@@ -127,12 +124,16 @@ public class OrderItemControl extends FlowPane {
         grid.add(priceText, 7, 2);
 
         grid.add(new Label("Вид работ:"), 6, 1);
-        grid.add(new VBox(5, Arrays.asList(WorkType.values()).stream().map(workType -> {
-            RadioButton radioButton = new RadioButton(workType.getMessage());
-            radioButton.setToggleGroup(workTypeGroup);
-            radioButton.setUserData(workType);
-            return radioButton;
-        }).toArray(Node[]::new)), 7, 1);
+        workTypeCheckBoxes = Arrays.asList(WorkType.values()).stream().map(workType -> {
+            CheckBox checkBox = new CheckBox(workType.getMessage());
+            checkBox.setUserData(workType);
+            checkBox.setOnAction(e -> {
+                if (checkBox.isSelected()) orderItem.addWorkType(workType);
+                else orderItem.removeWorkType(workType);
+            });
+            return checkBox;
+        }).toArray(CheckBox[]::new);
+        grid.add(new VBox(5, workTypeCheckBoxes), 7, 1);
     }
 
     private void createDescriptionArea() {
@@ -220,7 +221,9 @@ public class OrderItemControl extends FlowPane {
         barcodeText.setText(orderItem.getBarcode());
         printerModelText.setText(orderItem.getPrinterModel());
         printerTypeCombo.setValue(orderItem.getPrinterType());
-        workTypeGroup.selectToggle(workTypeGroup.getToggles().stream().filter(toggle -> toggle.getUserData() == orderItem.getWorkType()).findFirst().get());
+        Arrays.stream(workTypeCheckBoxes).forEach(cb -> {
+            cb.setSelected(orderItem.containsWorkType((WorkType) cb.getUserData()));
+        });
         descriptionArea.setText(orderItem.getDescription());
         priceText.setText(String.valueOf((long) orderItem.getPrice()));
     }
@@ -231,7 +234,7 @@ public class OrderItemControl extends FlowPane {
         orderItem.setBarcode(barcodeText.getText());
         orderItem.setPrinterModel(printerModelText.getText());
         orderItem.setPrinterType(printerTypeCombo.getValue());
-        orderItem.setWorkType((WorkType) workTypeGroup.getSelectedToggle().getUserData());
+        Arrays.stream(workTypeCheckBoxes).filter(CheckBox::isSelected).forEach(cb -> orderItem.addWorkType((WorkType) cb.getUserData()));
         orderItem.setDescription(descriptionArea.getText());
         orderItem.setPrice(getPrice());
         return orderItem;

@@ -90,7 +90,7 @@ public class MasterController extends AbstractController {
     private void bindOrderItem() {
         printerModelText.setText(orderItem.getPrinterModel());
         clientNameText.setText(orderItem.getClientName());
-        workTypeText.setText(orderItem.getWorkType().getMessage());
+        workTypeText.setText(orderItem.getWorkTypeMessages("\n"));
         descriptionArea.setText(orderItem.getDescription());
 
         if (orderItem.getMaster() != null) {

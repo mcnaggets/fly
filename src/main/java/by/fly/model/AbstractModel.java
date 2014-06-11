@@ -38,4 +38,6 @@ public abstract class AbstractModel {
                 "id='" + id + '\'' +
                 '}';
     }
+
+
 }

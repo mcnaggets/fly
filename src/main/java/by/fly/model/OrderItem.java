@@ -10,6 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @QueryEntity
 @Document
@@ -35,7 +38,7 @@ public class OrderItem extends AbstractModel {
     @Indexed
     private String orderCode;
 
-    private WorkType workType;
+    private Set<WorkType> workTypes = new HashSet<>();
 
     private PrinterType printerType;
 
@@ -155,12 +158,16 @@ public class OrderItem extends AbstractModel {
         this.printerType = printerType;
     }
 
-    public WorkType getWorkType() {
-        return workType;
+    public Set<WorkType> getWorkTypes() {
+        return workTypes;
     }
 
-    public void setWorkType(WorkType workType) {
-        this.workType = workType;
+    public boolean addWorkType(WorkType workType) {
+        return workTypes.add(workType);
+    }
+
+    public boolean removeWorkType(WorkType workType) {
+        return workTypes.remove(workType);
     }
 
     public String getOrderCode() {
@@ -203,6 +210,15 @@ public class OrderItem extends AbstractModel {
         this.additionalWork = additionalWork;
     }
 
+    @QueryTransient
+    public String getWorkTypeMessages(String delimiter) {
+        return workTypes.stream().map(WorkType::getMessage).collect(Collectors.joining(delimiter));
+    }
+
+    public boolean containsWorkType(WorkType workType) {
+        return workTypes.contains(workType);
+    }
+
     @Override
     public String toString() {
         return "OrderItem{" +
@@ -211,7 +227,7 @@ public class OrderItem extends AbstractModel {
                 ", barcode='" + barcode + '\'' +
                 ", orderNumber=" + orderNumber +
                 ", orderCode='" + orderCode + '\'' +
-                ", workType=" + workType +
+                ", workTypes=" + getWorkTypeMessages(", ") +
                 ", printerType=" + printerType +
                 ", printerModel='" + printerModel + '\'' +
                 ", description='" + description + '\'' +
