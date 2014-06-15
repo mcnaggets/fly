@@ -72,12 +72,6 @@ public class DailyOrdersController extends AbstractController {
         service.setOnRunning(e -> dailyOrdersTable.setPlaceholder(new Text("Загрузка...")));
     }
 
-    public void refreshData() {
-        doRefreshData.set(true);
-        service.restart();
-    }
-
-
     private class GetDailyOrdersService extends Service<ObservableList<DailyOrders>> {
         @Override
         protected Task<ObservableList<DailyOrders>> createTask() {
@@ -103,6 +97,7 @@ public class DailyOrdersController extends AbstractController {
 
     @Override
     public void refresh() {
+        doRefreshData.set(true);
         service.restart();
     }
 

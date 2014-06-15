@@ -83,6 +83,7 @@ public class MasterController extends AbstractController {
     public void save() {
         populateOrderItem();
         orderItem.setStatus(OrderStatus.READY);
+        orderItem.setDeadLine(LocalDateTime.now());
         orderService.save(orderItem);
         getView().getScene().getWindow().hide();
     }

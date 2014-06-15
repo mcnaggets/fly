@@ -28,7 +28,7 @@
                             <padding>
                                 <Insets left="10" />
                             </padding>
-                            <Button onAction="#refreshData" text="Обновить" />
+                            <Button onAction="#refresh" text="Обновить" />
                             <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>
                         </HBox>
                     </children>
