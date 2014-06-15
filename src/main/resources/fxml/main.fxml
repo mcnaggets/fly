@@ -16,21 +16,6 @@
                             <fx:include source="/fxml/barcode-reader.fxml"/>
                         </content>
                     </Tab>
-                    <Tab text="Задачи">
-                        <content>
-                            <fx:include source="/fxml/tasks.fxml"/>
-                        </content>
-                    </Tab>
-                    <Tab text="Заказы по дням">
-                        <content>
-                            <fx:include source="/fxml/daily-orders.fxml"/>
-                        </content>
-                    </Tab>
-                    <Tab text="Заказы">
-                        <content>
-                            <fx:include source="/fxml/orders.fxml"/>
-                        </content>
-                    </Tab>
                 </tabs>
             </TabPane>
         </AnchorPane>

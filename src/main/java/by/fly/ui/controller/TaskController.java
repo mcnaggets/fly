@@ -55,8 +55,6 @@ public class TaskController extends AbstractController {
         progressIndicator.visibleProperty().bind(service.runningProperty());
         taskList.itemsProperty().bind(service.valueProperty());
 
-        service.start();
-
         Timeline timeline = new Timeline(new KeyFrame(Duration.minutes(1), event -> service.restart()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
@@ -175,7 +173,8 @@ public class TaskController extends AbstractController {
 
     }
 
-    public void refreshTasks() {
+    @Override
+    public void refresh() {
         service.restart();
     }
 

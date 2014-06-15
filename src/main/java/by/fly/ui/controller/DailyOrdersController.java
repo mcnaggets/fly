@@ -70,7 +70,6 @@ public class DailyOrdersController extends AbstractController {
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
         service.setOnSucceeded(e -> updatePagination());
         service.setOnRunning(e -> dailyOrdersTable.setPlaceholder(new Text("Загрузка...")));
-        service.start();
     }
 
     public void refreshData() {
@@ -100,6 +99,11 @@ public class DailyOrdersController extends AbstractController {
     private void updatePagination() {
         int totalCount = (int) dailyOrdersService.count();
         refreshPagination(pagination, totalCount);
+    }
+
+    @Override
+    public void refresh() {
+        service.restart();
     }
 
 }

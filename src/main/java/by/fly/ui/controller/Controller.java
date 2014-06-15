@@ -9,4 +9,6 @@ public interface Controller extends Initializable {
 
     void setView(Node view);
 
+    void refresh();
+
 }

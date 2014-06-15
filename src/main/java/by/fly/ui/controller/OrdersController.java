@@ -233,7 +233,6 @@ public class OrdersController extends AbstractController {
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
         service.setOnRunning(e -> ordersTable.setPlaceholder(new Text("Загрузка...")));
         service.setOnSucceeded(e -> updatePagination());
-        service.start();
     }
 
     private void initializeColumns() {
@@ -331,4 +330,10 @@ public class OrdersController extends AbstractController {
         int totalCount = (int) orderService.count(filterPredicate);
         refreshPagination(pagination, totalCount);
     }
+
+    @Override
+    public void refresh() {
+        service.restart();
+    }
+
 }

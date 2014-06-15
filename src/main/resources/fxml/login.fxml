@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 <?import java.lang.String?>
-<GridPane xmlns:fx="http://javafx.com/fxml" fx:controller="by.fly.ui.controller.MainController"
+<GridPane xmlns:fx="http://javafx.com/fxml" fx:controller="by.fly.ui.controller.LoginController"
           fx:id="loginPane"
           alignment="center"
           hgap="10" vgap="10" styleClass="modal-dialog">

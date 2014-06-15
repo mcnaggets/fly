@@ -18,7 +18,7 @@
                             <padding>
                                 <Insets top="10" bottom="10" left="10"/>
                             </padding>
-                            <Button onAction="#refreshTasks" text="Обновить"/>
+                            <Button onAction="#refresh" text="Обновить"/>
                         </HBox>
                     </children>
                 </VBox>

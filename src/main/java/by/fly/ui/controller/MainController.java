@@ -4,8 +4,9 @@ import by.fly.ui.SpringFXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -17,63 +18,57 @@ import java.util.ResourceBundle;
 @Component
 public class MainController extends AbstractController {
 
-    public TextField userNameField;
-    public PasswordField passwordField;
-    public GridPane loginPane;
     public Hyperlink loginLink;
+
     public TabPane tabs;
-    public Tab organizationTab;
+
+    private Tab organizationTab;
+    private Tab dailyOrdersTab;
+    private Tab ordersTab;
+    private Tab tasksTab;
 
     private Stage stage;
-
-    public void handleCancelButtonAction() {
-        loginPane.getScene().getWindow().hide();
-    }
-
-    public void handleSubmitButtonAction() {
-        if (loginSuccess()) {
-            loginPane.getScene().getWindow().hide();
-            internalLogin();
-        } // TODO: illegal login handle
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
+        createTabs();
+    }
+
+    private void createTabs() {
+        tasksTab = new Tab("Задачи");
+        Controller tasksController = SpringFXMLLoader.load("/fxml/tasks.fxml");
+        tasksTab.setContent(tasksController.getView());
+        tabs.getTabs().add(tasksTab);
+
         organizationTab = new Tab("Настройки организации");
         organizationTab.setContent(SpringFXMLLoader.load("/fxml/organization.fxml").getView());
+
+        dailyOrdersTab = new Tab("Заказы по дням");
+        Controller dailyOrdersController = SpringFXMLLoader.load("/fxml/daily-orders.fxml");
+        dailyOrdersTab.setContent(dailyOrdersController.getView());
+
+        ordersTab = new Tab("Заказы");
+        Controller ordersController = SpringFXMLLoader.load("/fxml/orders.fxml");
+        ordersTab.setContent(ordersController.getView());
+
+        tabs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == dailyOrdersTab) dailyOrdersController.refresh();
+            else if (newValue == ordersTab) ordersController.refresh();
+            else if (newValue == tasksTab) tasksController.refresh();
+        });
     }
 
-    private boolean loginSuccess() {
-        return "admin".equals(userNameField.getText())
-                && "admin".equals(passwordField.getText());
-    }
-
-    public void doLogin() {
-        if (Boolean.TRUE.equals(loginLink.getUserData())) {
-            internalLogout();
-        } else {
-            final Stage dialog = new Stage(StageStyle.UTILITY);
-            dialog.initModality(Modality.WINDOW_MODAL);
-            dialog.setMaximized(false);
-            dialog.setResizable(false);
-            dialog.initOwner(stage);
-            Node view = SpringFXMLLoader.load("/fxml/login.fxml").getView();
-            dialog.setScene(new Scene((Parent) view));
-            dialog.show();
-        }
-    }
-
-    private void internalLogout() {
-        loginLink.setUserData(Boolean.FALSE);
-        loginLink.setText("Войти");
-        tabs.getTabs().remove(organizationTab);
-    }
-
-    private void internalLogin() {
-        loginLink.setUserData(Boolean.TRUE);
-        loginLink.setText("Выйти");
+    private void addAdminTabs() {
+        tabs.getTabs().add(ordersTab);
+        tabs.getTabs().add(dailyOrdersTab);
         tabs.getTabs().add(organizationTab);
+    }
+
+    private void removeAdminTabs() {
+        tabs.getTabs().remove(ordersTab);
+        tabs.getTabs().remove(dailyOrdersTab);
+        tabs.getTabs().remove(organizationTab);
     }
 
     public void setStage(Stage stage) {
@@ -84,4 +79,34 @@ public class MainController extends AbstractController {
         return stage;
     }
 
+    public void doLogin() {
+        if (isLoggedIn()) {
+            internalLogout();
+        } else {
+            final Stage dialog = new Stage(StageStyle.UTILITY);
+            dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setMaximized(false);
+            dialog.setResizable(false);
+            dialog.initOwner(getStage());
+            Node view = SpringFXMLLoader.load("/fxml/login.fxml").getView();
+            dialog.setScene(new Scene((Parent) view));
+            dialog.show();
+        }
+    }
+
+    private boolean isLoggedIn() {
+        return Boolean.TRUE.equals(loginLink.getUserData());
+    }
+
+    private void internalLogout() {
+        loginLink.setUserData(Boolean.FALSE);
+        loginLink.setText("Войти");
+        removeAdminTabs();
+    }
+
+    public void internalLogin() {
+        loginLink.setUserData(Boolean.TRUE);
+        loginLink.setText("Выйти");
+        addAdminTabs();
+    }
 }

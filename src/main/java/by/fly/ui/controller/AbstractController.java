@@ -22,6 +22,11 @@ public abstract class AbstractController implements Controller {
     }
 
     @Override
+    public void refresh() {
+        // do nothing by default
+    }
+
+    @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
     }
