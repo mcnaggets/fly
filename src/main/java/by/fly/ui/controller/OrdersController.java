@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static by.fly.ui.UIUtils.*;
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
@@ -103,6 +104,8 @@ public class OrdersController extends AbstractController {
 
     private long orderNumber;
 
+    private final AtomicBoolean doRefreshData = new AtomicBoolean(true);
+
     public void createNewOrder() {
         showOrderUI(Optional.empty());
     }
@@ -158,7 +161,20 @@ public class OrdersController extends AbstractController {
 
         saveOrderItems(saveCustomer());
 
+        doRefreshData.set(false);
+        clearFilter();
+        doRefreshData.set(true);
         service.restart();
+    }
+
+    private void clearFilter() {
+        orderDateFilter.setValue(LocalDate.now());
+        orderDateFilter.setDisable(false);
+        anyDateFilter.setSelected(false);
+        clientNameFilter.setText("");
+        clientPhoneFilter.setText("");
+        orderBarcodeFilter.setText("");
+        orderCodeFilter.setText("");
     }
 
     private void saveOrderItems(Customer customer) {
@@ -276,10 +292,6 @@ public class OrdersController extends AbstractController {
         orderTableRegion.toFront();
     }
 
-    public void refreshData() {
-        service.restart();
-    }
-
     public void printTicket() throws PrinterException, IOException {
         printerService.print(new File("x:\\work\\docs\\test.pdf"));
     }
@@ -290,6 +302,7 @@ public class OrdersController extends AbstractController {
             return new Task<ObservableList<OrderItem>>() {
                 @Override
                 protected ObservableList<OrderItem> call() throws Exception {
+                    if (!doRefreshData.get()) return FXCollections.emptyObservableList();
                     createFilterPredicate();
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
                             new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE,

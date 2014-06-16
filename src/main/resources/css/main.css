@@ -13,3 +13,8 @@
     -fx-border-color: grey;
     -fx-border-radius: 3;
 }
+
+TableView .table-cell {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}

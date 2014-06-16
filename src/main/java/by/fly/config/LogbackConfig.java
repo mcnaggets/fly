@@ -23,6 +23,8 @@ public class LogbackConfig {
 
     public static final String LOG_PATTERN = "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg %n";
     public static final String LOG_DIR = System.getProperty("user.dir") + "/logs/";
+    public static final int FLY_APP_VK_GROUP_ID = 72988334;
+    public static final int FLY_APP_VK_ID = 4414691;
 
     private final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 

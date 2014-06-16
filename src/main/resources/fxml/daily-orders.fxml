@@ -3,12 +3,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
+<?import java.lang.String?>
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="by.fly.ui.controller.DailyOrdersController">
     <children>
-        <StackPane fx:id="orderTableRegion" AnchorPane.bottomAnchor="0.0"
+        <StackPane AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -26,9 +25,9 @@
                         </TableView>
                         <HBox alignment="CENTER_LEFT">
                             <padding>
-                                <Insets left="10" />
+                                <Insets left="10"/>
                             </padding>
-                            <Button onAction="#refresh" text="Обновить" />
+                            <Button onAction="#refresh" text="Обновить"/>
                             <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>
                         </HBox>
                     </children>
@@ -37,4 +36,7 @@
             </children>
         </StackPane>
     </children>
+    <stylesheets>
+        <String fx:value="/css/main.css"/>
+    </stylesheets>
 </AnchorPane>
