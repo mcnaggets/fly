@@ -16,6 +16,7 @@ import javafx.scene.web.WebView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.stream.Collectors;
@@ -33,6 +34,9 @@ public class VKAuthorizeBrowser extends StackPane {
     }
 
     private void initializeBrowser() {
+        // reset cookies
+        CookieManager.setDefault(new CookieManager());
+
         progress.setMaxSize(150, 150);
         browser.setPrefSize(500, 500);
         getChildren().addAll(browser, progress);

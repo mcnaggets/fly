@@ -19,7 +19,7 @@
                 </tabs>
             </TabPane>
         </AnchorPane>
-        <Hyperlink text="Войти" StackPane.alignment="TOP_RIGHT" onAction="#doLogin" fx:id="loginLink">
+        <Hyperlink text="Войти как администратор (через vk.com)" StackPane.alignment="TOP_RIGHT" onAction="#doLogin" fx:id="loginLink">
             <padding>
                 <Insets right="5" top="5"/>
             </padding>

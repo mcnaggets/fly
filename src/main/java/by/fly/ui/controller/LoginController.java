@@ -4,6 +4,7 @@ import by.fly.ui.control.VKAuthorizeBrowser;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
+import org.controlsfx.dialog.Dialogs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,8 @@ public class LoginController extends AbstractController {
         loginPane.getScene().getWindow().hide();
         if (isAdmin) {
             mainController.internalLogin();
+        } else {
+            Dialogs.create().owner(loginPane.getScene().getWindow()).title("Инфромация").message("Вы не я вляетесь администратором. Некоторые области будут не видны.").showInformation();
         }
     }
 
