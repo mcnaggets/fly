@@ -3,11 +3,15 @@ package by.fly.service;
 import by.fly.model.Customer;
 import by.fly.model.QCustomer;
 import by.fly.repository.CustomerRepository;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static by.fly.util.Utils.containsIgnoreCasePattern;
 
 @Service
 public class CustomerService {
@@ -22,12 +26,14 @@ public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    public List<String> findCustomerNames() {
-        return mongoOperations.execute(callback -> callback.getCollection(CUSTOMER).distinct(CUSTOMER_NAME));
+    public List<String> findCustomerNames(String filter) {
+        DBObject query = BasicDBObjectBuilder.start(CUSTOMER_NAME, containsIgnoreCasePattern(filter)).get();
+        return mongoOperations.execute(callback -> callback.getCollection(CUSTOMER).distinct(CUSTOMER_NAME, query));
     }
 
-    public List<String> findCustomerPhones() {
-        return mongoOperations.execute(callback -> callback.getCollection(CUSTOMER).distinct(CUSTOMER_PHONE));
+    public List<String> findCustomerPhones(String filter) {
+        DBObject query = BasicDBObjectBuilder.start(CUSTOMER_PHONE, containsIgnoreCasePattern(filter)).get();
+        return mongoOperations.execute(callback -> callback.getCollection(CUSTOMER).distinct(CUSTOMER_PHONE, query));
     }
 
     public Customer findByNameAndPhone(String clientName, String clientPhone) {

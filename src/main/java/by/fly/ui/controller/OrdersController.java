@@ -9,6 +9,7 @@ import by.fly.service.OrderService;
 import by.fly.service.PrinterService;
 import by.fly.ui.control.OrderItemControl;
 import com.mysema.query.types.expr.BooleanExpression;
+import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -161,13 +162,12 @@ public class OrdersController extends AbstractController {
 
         saveOrderItems(saveCustomer());
 
-        doRefreshData.set(false);
         clearFilter();
-        doRefreshData.set(true);
         service.restart();
     }
 
     private void clearFilter() {
+        doRefreshData.set(false);
         orderDateFilter.setValue(LocalDate.now());
         orderDateFilter.setDisable(false);
         anyDateFilter.setSelected(false);
@@ -175,6 +175,7 @@ public class OrdersController extends AbstractController {
         clientPhoneFilter.setText("");
         orderBarcodeFilter.setText("");
         orderCodeFilter.setText("");
+        doRefreshData.set(true);
     }
 
     private void saveOrderItems(Customer customer) {
@@ -212,7 +213,13 @@ public class OrdersController extends AbstractController {
         initializeFilter();
         initializeColumns();
         initializeTable();
+        initializeClientFields();
         bindService();
+    }
+
+    private void initializeClientFields() {
+        new AutoCompletionTextFieldBinding<>(clientNameText, provider -> customerService.findCustomerNames(provider.getUserText()));
+        new AutoCompletionTextFieldBinding<>(clientPhoneText, provider -> customerService.findCustomerNames(provider.getUserText()));
     }
 
     private void initializeTable() {
@@ -228,17 +235,30 @@ public class OrdersController extends AbstractController {
     }
 
     private void initializeFilter() {
+        initializeDateFilter();
+        initializeOrderFilter();
+        initializeClientFilter();
+    }
+
+    private void initializeOrderFilter() {
+        orderCodeFilter.textProperty().addListener(e -> service.restart());
+        orderBarcodeFilter.textProperty().addListener(e -> service.restart());
+    }
+
+    private void initializeClientFilter() {
+        clientNameFilter.textProperty().addListener(e -> service.restart());
+        new AutoCompletionTextFieldBinding<>(clientNameFilter, provider -> customerService.findCustomerNames(provider.getUserText()));
+        clientPhoneFilter.textProperty().addListener(e -> service.restart());
+        new AutoCompletionTextFieldBinding<>(clientPhoneFilter, provider -> customerService.findCustomerPhones(provider.getUserText()));
+    }
+
+    private void initializeDateFilter() {
         orderDateFilter.setValue(LocalDate.now());
         orderDateFilter.setOnAction(e -> service.restart());
         anyDateFilter.setOnAction(e -> {
             orderDateFilter.setDisable(anyDateFilter.isSelected());
             service.restart();
         });
-
-        orderCodeFilter.textProperty().addListener(e -> service.restart());
-        orderBarcodeFilter.textProperty().addListener(e -> service.restart());
-        clientNameFilter.textProperty().addListener(e -> service.restart());
-        clientPhoneFilter.textProperty().addListener(e -> service.restart());
     }
 
     private void bindService() {

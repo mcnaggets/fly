@@ -4,6 +4,7 @@ import by.fly.model.OrderItem;
 import by.fly.model.PrinterType;
 import by.fly.model.WorkType;
 import by.fly.service.OrderService;
+import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -149,6 +150,7 @@ public class OrderItemControl extends FlowPane {
 
     private void createPrinterModelText() {
         printerModelText = new TextField();
+        new AutoCompletionTextFieldBinding<>(printerModelText, provider -> orderService.findPrinterModels(provider.getUserText()));
     }
 
     private GridPane createGridPane() {
