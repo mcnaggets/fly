@@ -40,6 +40,9 @@ public class QUser extends EntityPathBase<User> {
     //inherited
     public final StringPath name = _super.name;
 
+    //inherited
+    public final BooleanPath new$ = _super.new$;
+
     public final QOrganization organization;
 
     public final StringPath password = createString("password");

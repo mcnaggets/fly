@@ -21,6 +21,8 @@ public class QAbstractModel extends BeanPath<AbstractModel> {
 
     public final StringPath id = createString("id");
 
+    public final BooleanPath new$ = createBoolean("new");
+
     public QAbstractModel(String variable) {
         super(AbstractModel.class, forVariable(variable));
     }

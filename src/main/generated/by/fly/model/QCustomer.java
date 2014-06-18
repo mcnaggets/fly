@@ -34,6 +34,9 @@ public class QCustomer extends EntityPathBase<Customer> {
     public final StringPath name = _super.name;
 
     //inherited
+    public final BooleanPath new$ = _super.new$;
+
+    //inherited
     public final StringPath phone = _super.phone;
 
     public QCustomer(String variable) {

@@ -26,6 +26,9 @@ public class QRole extends EntityPathBase<Role> {
 
     public final StringPath name = createString("name");
 
+    //inherited
+    public final BooleanPath new$ = _super.new$;
+
     public QRole(String variable) {
         super(Role.class, forVariable(variable));
     }

@@ -30,6 +30,9 @@ public class QOrganization extends EntityPathBase<Organization> {
 
     public final StringPath name = createString("name");
 
+    //inherited
+    public final BooleanPath new$ = _super.new$;
+
     public final StringPath paymentAccount = createString("paymentAccount");
 
     public final StringPath registrationData = createString("registrationData");

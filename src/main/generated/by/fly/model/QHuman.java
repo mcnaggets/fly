@@ -30,6 +30,9 @@ public class QHuman extends BeanPath<Human> {
 
     public final StringPath name = createString("name");
 
+    //inherited
+    public final BooleanPath new$ = _super.new$;
+
     public final StringPath phone = createString("phone");
 
     public QHuman(String variable) {

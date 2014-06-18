@@ -45,6 +45,9 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
 
     public final QUser master;
 
+    //inherited
+    public final BooleanPath new$ = _super.new$;
+
     public final StringPath orderCode = createString("orderCode");
 
     public final NumberPath<Long> orderNumber = createNumber("orderNumber", Long.class);
@@ -59,7 +62,7 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
 
     public final BooleanPath test = createBoolean("test");
 
-    public final EnumPath<WorkType> workType = createEnum("workType", WorkType.class);
+    public final SetPath<WorkType, EnumPath<WorkType>> workTypes = this.<WorkType, EnumPath<WorkType>>createSet("workTypes", WorkType.class, EnumPath.class, PathInits.DIRECT2);
 
     public QOrderItem(String variable) {
         this(OrderItem.class, forVariable(variable), INITS);
