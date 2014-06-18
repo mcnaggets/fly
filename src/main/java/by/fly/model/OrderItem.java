@@ -40,7 +40,7 @@ public class OrderItem extends AbstractModel {
 
     private Set<WorkType> workTypes = new HashSet<>();
 
-    private PrinterType printerType;
+    private String itemType;
 
     @Indexed
     private String printerModel;
@@ -150,12 +150,12 @@ public class OrderItem extends AbstractModel {
         this.price = price;
     }
 
-    public PrinterType getPrinterType() {
-        return printerType;
+    public String getItemType() {
+        return itemType;
     }
 
-    public void setPrinterType(PrinterType printerType) {
-        this.printerType = printerType;
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
     }
 
     public Set<WorkType> getWorkTypes() {
@@ -228,7 +228,7 @@ public class OrderItem extends AbstractModel {
                 ", orderNumber=" + orderNumber +
                 ", orderCode='" + orderCode + '\'' +
                 ", workTypes=" + getWorkTypeMessages(", ") +
-                ", printerType=" + printerType +
+                ", itemType=" + itemType +
                 ", printerModel='" + printerModel + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +

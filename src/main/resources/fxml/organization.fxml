@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
@@ -8,8 +7,9 @@
 <AnchorPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.OrganizationController">
     <children>
-        <GridPane hgap="10" vgap="10"  AnchorPane.bottomAnchor="0.0"
-                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" styleClass="padding10">
+        <GridPane AnchorPane.bottomAnchor="0.0"
+                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                  styleClass="padding10">
             <columnConstraints>
                 <ColumnConstraints percentWidth="20"/>
                 <ColumnConstraints percentWidth="80"/>
@@ -28,44 +28,41 @@
                 <RowConstraints/>
             </rowConstraints>
             <children>
-                <Label text="Наименование организации" />
-                <Label text="УНП" GridPane.rowIndex="1" />
-                <Label text="Регистрационные данные" GridPane.rowIndex="2" />
-                <Label text="Дата регистрации" GridPane.rowIndex="3" />
-                <Label text="Юридический адрес" GridPane.rowIndex="4" />
-                <Label text="Банковские реквизиты" GridPane.rowIndex="5" />
-                <Label text="Р/С" GridPane.rowIndex="6" />
-                <Label text="Принтер" GridPane.rowIndex="7" />
-                <Label text="Фирменный знак" GridPane.rowIndex="8" />
-                <TextField fx:id="organizationName" GridPane.columnIndex="1" />
+                <Label text="Наименование организации"/>
+                <Label text="УНП" GridPane.rowIndex="1"/>
+                <Label text="Регистрационные данные" GridPane.rowIndex="2"/>
+                <Label text="Дата регистрации" GridPane.rowIndex="3"/>
+                <Label text="Юридический адрес" GridPane.rowIndex="4"/>
+                <Label text="Банковские реквизиты" GridPane.rowIndex="5"/>
+                <Label text="Р/С" GridPane.rowIndex="6"/>
+                <Label text="Фирменный знак" GridPane.rowIndex="7"/>
+                <TextField fx:id="organizationName" GridPane.columnIndex="1"/>
                 <TextField fx:id="organizationUnp" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <TextField fx:id="registrationData" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                 <DatePicker fx:id="registrationDate" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                 <TextField fx:id="address" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
                 <TextField fx:id="bankDetails" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
                 <TextField fx:id="paymentAccount" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-                <ComboBox fx:id="printerCombo" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
-                <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnSpan="2"
+                <HBox alignment="CENTER_LEFT" GridPane.columnSpan="2"
                       GridPane.rowIndex="10">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#createNewUser" text="Новый сотрудник" />
-                        <Button mnemonicParsing="false" onAction="#organizationSave" text="Сохранить" />
-                        <Button mnemonicParsing="false" onAction="#organizationCancel" text="Отмена" />
+                        <Button mnemonicParsing="false" onAction="#createNewUser" text="Новый сотрудник"/>
+                        <Button mnemonicParsing="false" onAction="#organizationSave" text="Сохранить"/>
+                        <Button mnemonicParsing="false" onAction="#organizationCancel" text="Отмена"/>
                     </children>
-                    <opaqueInsets>
-                        <Insets/>
-                    </opaqueInsets>
                 </HBox>
-                <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                <HBox GridPane.columnIndex="1" GridPane.rowIndex="7">
                     <children>
-                        <ImageView fx:id="organizationLogo" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true"
-                                   preserveRatio="true" />
+                        <Pane id="organizationLogoPane">
+                            <ImageView fx:id="organizationLogo" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true"
+                                       preserveRatio="true"/>
+                        </Pane>
                         <Button alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#loadOrganizationLogo"
-                                text="Загрузить" />
+                                text="Загрузить"/>
                     </children>
                 </HBox>
-                <ListView fx:id="userList" GridPane.columnSpan="2" GridPane.rowIndex="9"/>
+                <ListView fx:id="userList" GridPane.columnSpan="2" GridPane.rowIndex="8"/>
             </children>
         </GridPane>
     </children>

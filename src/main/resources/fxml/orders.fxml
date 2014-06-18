@@ -7,13 +7,13 @@
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="by.fly.ui.controller.OrdersController">
     <children>
-        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                   AnchorPane.topAnchor="0.0">
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <AnchorPane fx:id="createOrderRegion">
                     <children>
-                        <VBox prefHeight="200.0" spacing="10.0" AnchorPane.bottomAnchor="0.0"
-                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
                                 <HBox styleClass="createOrderHeader">
                                     <children>
@@ -36,10 +36,10 @@
                                 <Label text="Информация о заказе:" styleClass="createOrderHeader"/>
                                 <ScrollPane VBox.vgrow="ALWAYS">
                                     <content>
-                                        <VBox fx:id="orderItems" spacing="10.0" VBox.vgrow="ALWAYS"/>
+                                        <VBox fx:id="orderItems" VBox.vgrow="ALWAYS"/>
                                     </content>
                                 </ScrollPane>
-                                <GridPane hgap="10" vgap="10" styleClass="padding10">
+                                <GridPane styleClass="padding10">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="ALWAYS"/>
                                         <ColumnConstraints/>

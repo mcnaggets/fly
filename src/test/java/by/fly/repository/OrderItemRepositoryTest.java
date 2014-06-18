@@ -70,7 +70,7 @@ public class OrderItemRepositoryTest extends AbstractBaseTest {
         for (int i = 0; i < 250_000; i++) {
             OrderItem orderItem = new OrderItem(LocalDateTime.now().plusDays((long) (50 * Math.random())));
             orderItem.setOrderNumber(System.nanoTime());
-            orderItem.setPrinterType(Math.random() > 0.5 ? PrinterType.JET : PrinterType.LASER);
+            orderItem.setItemType(Math.random() > 0.5 ? PrinterType.JET.getMessage() : PrinterType.LASER.getMessage());
             orderItem.addWorkType(WorkType.values()[((int) (System.nanoTime() % 3))]);
             orderItem.setPrice((float) (1000 * Math.random()));
             orderItem.setStatus(Math.random() > 0.5 ? OrderStatus.READY : OrderStatus.PAID);

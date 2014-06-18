@@ -18,3 +18,16 @@ TableView .table-cell {
     -fx-alignment: center;
     -fx-text-alignment: center;
 }
+
+GridPane {
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+}
+
+HBox {
+    -fx-spacing: 10;
+}
+
+VBox {
+    -fx-spacing: 10;
+}

@@ -4,6 +4,7 @@ import by.fly.model.OrderItem;
 import by.fly.model.PrinterType;
 import by.fly.model.WorkType;
 import by.fly.service.OrderService;
+import by.fly.service.SettingsService;
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -15,7 +16,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.util.StringConverter;
 import jfxtras.scene.control.LocalTimeTextField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -40,8 +40,11 @@ public class OrderItemControl extends FlowPane {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private SettingsService settingsService;
+
     private TextField barcodeText;
-    private ComboBox<PrinterType> printerTypeCombo;
+    private ComboBox<String> printerTypeCombo;
     private TextField printerModelText;
     private LocalTimeTextField deadLineTimePicker;
     private DatePicker deadLineDatePicker;
@@ -94,7 +97,7 @@ public class OrderItemControl extends FlowPane {
         OrderItem item = orderService.findLastItemByBarcode(barcode);
         if (item != null) {
             printerModelText.setText(item.getPrinterModel());
-            printerTypeCombo.setValue(item.getPrinterType());
+            printerTypeCombo.setValue(item.getItemType());
             if (onBarcodeChanged.get() != null) {
                 onBarcodeChanged.get().handle(new ActionEvent(barcode, this));
             }
@@ -172,19 +175,8 @@ public class OrderItemControl extends FlowPane {
     }
 
     private void createPrinterTypeCombo() {
-        printerTypeCombo = new ComboBox<>(FXCollections.<PrinterType>observableArrayList(PrinterType.LASER, PrinterType.JET));
-        printerTypeCombo.setValue(PrinterType.LASER);
-        printerTypeCombo.setConverter(new StringConverter<PrinterType>() {
-            @Override
-            public String toString(PrinterType object) {
-                return object.getMessage();
-            }
-
-            @Override
-            public PrinterType fromString(String string) {
-                return PrinterType.fromMessage(string);
-            }
-        });
+        printerTypeCombo = new ComboBox<>(FXCollections.observableList(settingsService.getItemTypes()));
+        printerTypeCombo.setValue(PrinterType.LASER.getMessage());
     }
 
     private void createPriceText() {
@@ -222,7 +214,7 @@ public class OrderItemControl extends FlowPane {
         deadLineTimePicker.setLocalTime(orderItem.getDeadLine().toLocalTime());
         barcodeText.setText(orderItem.getBarcode());
         printerModelText.setText(orderItem.getPrinterModel());
-        printerTypeCombo.setValue(orderItem.getPrinterType());
+        printerTypeCombo.setValue(orderItem.getItemType());
         Arrays.stream(workTypeCheckBoxes).forEach(cb -> {
             cb.setSelected(orderItem.containsWorkType((WorkType) cb.getUserData()));
         });
@@ -235,7 +227,7 @@ public class OrderItemControl extends FlowPane {
         orderItem.setDeadLine(deadLine);
         orderItem.setBarcode(barcodeText.getText());
         orderItem.setPrinterModel(printerModelText.getText());
-        orderItem.setPrinterType(printerTypeCombo.getValue());
+        orderItem.setItemType(printerTypeCombo.getValue());
         Arrays.stream(workTypeCheckBoxes).filter(CheckBox::isSelected).forEach(cb -> orderItem.addWorkType((WorkType) cb.getUserData()));
         orderItem.setDescription(descriptionArea.getText());
         orderItem.setPrice(getPrice());

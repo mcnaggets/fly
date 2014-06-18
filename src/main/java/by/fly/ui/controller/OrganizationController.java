@@ -3,9 +3,7 @@ package by.fly.ui.controller;
 import by.fly.model.Organization;
 import by.fly.model.User;
 import by.fly.service.OrganizationService;
-import by.fly.service.PrinterService;
 import by.fly.service.UserService;
-import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -26,7 +24,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 @Component
 public class OrganizationController extends AbstractController {
@@ -40,16 +37,12 @@ public class OrganizationController extends AbstractController {
     public TextField address;
     public TextField bankDetails;
     public TextField paymentAccount;
-    public ComboBox<String> printerCombo;
 
     @Autowired
     private OrganizationService organizationService;
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private PrinterService printerService;
 
     private Organization organization;
 
@@ -107,7 +100,6 @@ public class OrganizationController extends AbstractController {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
         bindRootOrganization();
-        printerCombo.setItems(FXCollections.observableList(printerService.getAvailablePrinters().keySet().stream().collect(Collectors.toList())));
     }
 
     public void loadOrganizationLogo() throws IOException {

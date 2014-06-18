@@ -21,6 +21,7 @@ public class MainController extends AbstractController {
     private Tab dailyOrdersTab;
     private Tab ordersTab;
     private Tab tasksTab;
+    private Tab settingsTab;
 
     private Stage stage;
 
@@ -38,6 +39,9 @@ public class MainController extends AbstractController {
 
         organizationTab = new Tab("Настройки организации");
         organizationTab.setContent(SpringFXMLLoader.load("/fxml/organization.fxml").getView());
+
+        settingsTab = new Tab("Настройки системы");
+        settingsTab.setContent(SpringFXMLLoader.load("/fxml/settings.fxml").getView());
 
         dailyOrdersTab = new Tab("Заказы по дням");
         Controller dailyOrdersController = SpringFXMLLoader.load("/fxml/daily-orders.fxml");
@@ -58,12 +62,14 @@ public class MainController extends AbstractController {
         tabs.getTabs().add(ordersTab);
         tabs.getTabs().add(dailyOrdersTab);
         tabs.getTabs().add(organizationTab);
+        tabs.getTabs().add(settingsTab);
     }
 
     private void removeAdminTabs() {
         tabs.getTabs().remove(ordersTab);
         tabs.getTabs().remove(dailyOrdersTab);
         tabs.getTabs().remove(organizationTab);
+        tabs.getTabs().remove(settingsTab);
     }
 
     public void setStage(Stage stage) {
