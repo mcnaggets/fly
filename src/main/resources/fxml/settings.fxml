@@ -2,6 +2,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.String?>
+<?import javafx.scene.web.HTMLEditor?>
 <AnchorPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.fly.ui.controller.SettingsController">
 
@@ -29,6 +30,8 @@
                         <Button onAction="#cancelSettings" text="Отмена"/>
                     </children>
                 </HBox>
+
+                <HTMLEditor GridPane.rowIndex="2" GridPane.columnSpan="2" />
 
             </children>
         </GridPane>

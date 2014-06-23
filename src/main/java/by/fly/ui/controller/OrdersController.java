@@ -106,6 +106,8 @@ public class OrdersController extends AbstractController {
     private long orderNumber;
 
     private final AtomicBoolean doRefreshData = new AtomicBoolean(true);
+    private AutoCompletionTextFieldBinding<String> clientNameAutoCompletionBinding;
+    private AutoCompletionTextFieldBinding<String> clientPhoneAutoCompletionBinding;
 
     public void createNewOrder() {
         showOrderUI(Optional.empty());
@@ -145,8 +147,10 @@ public class OrdersController extends AbstractController {
         orderCodeLabel.setText(orderItem.getOrderCode());
         orderDateLabel.setText(DateTimeFormatter.ISO_LOCAL_DATE.format(orderItem.getCreatedAt()));
 
+        disposeClientFieldsAutoCompletion();
         clientNameText.setText(orderItem.getClientName());
         clientPhoneText.setText(orderItem.getClientPhone());
+        applyClientFieldsAutoCompletion();
 
         totalPriceText.setText(String.valueOf(orderItem.getPrice()));
 
@@ -154,6 +158,16 @@ public class OrdersController extends AbstractController {
         inProgressButton.setVisible(false);
         paidButton.setVisible(orderItem.getStatus() == OrderStatus.READY);
         saveButton.setVisible(orderItem.getStatus() != OrderStatus.READY);
+    }
+
+    private void applyClientFieldsAutoCompletion() {
+        clientNameAutoCompletionBinding = new AutoCompletionTextFieldBinding<>(clientNameText, provider -> customerService.findCustomerNames(provider.getUserText()));
+        clientPhoneAutoCompletionBinding = new AutoCompletionTextFieldBinding<>(clientPhoneText, provider -> customerService.findCustomerNames(provider.getUserText()));
+    }
+
+    private void disposeClientFieldsAutoCompletion() {
+        clientNameAutoCompletionBinding.dispose();
+        clientPhoneAutoCompletionBinding.dispose();
     }
 
     public void saveOrder() {
@@ -213,13 +227,8 @@ public class OrdersController extends AbstractController {
         initializeFilter();
         initializeColumns();
         initializeTable();
-        initializeClientFields();
+        applyClientFieldsAutoCompletion();
         bindService();
-    }
-
-    private void initializeClientFields() {
-        new AutoCompletionTextFieldBinding<>(clientNameText, provider -> customerService.findCustomerNames(provider.getUserText()));
-        new AutoCompletionTextFieldBinding<>(clientPhoneText, provider -> customerService.findCustomerNames(provider.getUserText()));
     }
 
     private void initializeTable() {
@@ -268,7 +277,7 @@ public class OrdersController extends AbstractController {
         ordersTable.itemsProperty().bind(service.valueProperty());
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
         service.setOnRunning(e -> ordersTable.setPlaceholder(new Text("Загрузка...")));
-        service.setOnSucceeded(e -> updatePagination());
+        service.setOnSucceeded(e -> afterDataLoaded());
     }
 
     private void initializeColumns() {
@@ -359,9 +368,12 @@ public class OrdersController extends AbstractController {
         }
     }
 
-    private void updatePagination() {
+    private void afterDataLoaded() {
         int totalCount = (int) orderService.count(filterPredicate);
         refreshPagination(pagination, totalCount);
+        if (totalCount == 0) {
+            ordersTable.setPlaceholder(new Text("Ничего не найдено"));
+        }
     }
 
     @Override

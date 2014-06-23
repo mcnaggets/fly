@@ -68,7 +68,7 @@ public class DailyOrdersController extends AbstractController {
         progressIndicator.visibleProperty().bind(service.runningProperty());
         dailyOrdersTable.itemsProperty().bind(service.valueProperty());
         pagination.currentPageIndexProperty().addListener((observable, oldValue, newValue) -> service.restart());
-        service.setOnSucceeded(e -> updatePagination());
+        service.setOnSucceeded(e -> afterDataLoaded());
         service.setOnRunning(e -> dailyOrdersTable.setPlaceholder(new Text("Загрузка...")));
     }
 
@@ -90,9 +90,12 @@ public class DailyOrdersController extends AbstractController {
         }
     }
 
-    private void updatePagination() {
+    private void afterDataLoaded() {
         int totalCount = (int) dailyOrdersService.count();
         refreshPagination(pagination, totalCount);
+        if (totalCount == 0) {
+            dailyOrdersTable.setPlaceholder(new Text("Ничего не найдено"));
+        }
     }
 
     @Override

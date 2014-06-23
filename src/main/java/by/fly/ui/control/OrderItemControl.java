@@ -66,9 +66,18 @@ public class OrderItemControl extends FlowPane {
         if (!orderItem.isNew()) {
             bindOrderItem();
         }
-        setBorder(new Border(
+        applyAutoCompletion();
+        setBorder(controlBorder());
+    }
+
+    private void applyAutoCompletion() {
+        new AutoCompletionTextFieldBinding<>(printerModelText, provider -> orderService.findPrinterModels(provider.getUserText()));
+    }
+
+    private Border controlBorder() {
+        return new Border(
                 new BorderStroke(Color.GRAY, BorderStrokeStyle.DOTTED, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)
-        ));
+        );
     }
 
     private void createChildren() {
@@ -98,9 +107,13 @@ public class OrderItemControl extends FlowPane {
         if (item != null) {
             printerModelText.setText(item.getPrinterModel());
             printerTypeCombo.setValue(item.getItemType());
-            if (onBarcodeChanged.get() != null) {
-                onBarcodeChanged.get().handle(new ActionEvent(barcode, this));
-            }
+            fireBarcodeChanged(barcode);
+        }
+    }
+
+    private void fireBarcodeChanged(String barcode) {
+        if (onBarcodeChanged.get() != null) {
+            onBarcodeChanged.get().handle(new ActionEvent(barcode, this));
         }
     }
 
@@ -128,6 +141,11 @@ public class OrderItemControl extends FlowPane {
         grid.add(priceText, 7, 2);
 
         grid.add(new Label("Вид работ:"), 6, 1);
+        createWorkTypeCheckBoxes();
+        grid.add(new VBox(5, workTypeCheckBoxes), 7, 1);
+    }
+
+    private void createWorkTypeCheckBoxes() {
         workTypeCheckBoxes = Arrays.asList(WorkType.values()).stream().map(workType -> {
             CheckBox checkBox = new CheckBox(workType.getMessage());
             checkBox.setUserData(workType);
@@ -137,7 +155,6 @@ public class OrderItemControl extends FlowPane {
             });
             return checkBox;
         }).toArray(CheckBox[]::new);
-        grid.add(new VBox(5, workTypeCheckBoxes), 7, 1);
     }
 
     private void createDescriptionArea() {
@@ -153,7 +170,6 @@ public class OrderItemControl extends FlowPane {
 
     private void createPrinterModelText() {
         printerModelText = new TextField();
-        new AutoCompletionTextFieldBinding<>(printerModelText, provider -> orderService.findPrinterModels(provider.getUserText()));
     }
 
     private GridPane createGridPane() {
