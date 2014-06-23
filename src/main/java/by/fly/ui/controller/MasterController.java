@@ -4,12 +4,17 @@ import by.fly.model.OrderItem;
 import by.fly.model.OrderStatus;
 import by.fly.model.User;
 import by.fly.service.OrderService;
+import by.fly.service.PrinterService;
 import by.fly.service.UserService;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.awt.print.PrinterException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ResourceBundle;
@@ -39,6 +44,9 @@ public class MasterController extends AbstractController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PrinterService printerService;
 
     private OrderItem orderItem;
     private User master;
@@ -119,5 +127,13 @@ public class MasterController extends AbstractController {
         orderItem.setTest(testCheckBox.isSelected());
         orderItem.setMaster(master);
         orderItem.setAdditionalWork(additionalWorkText.getText());
+    }
+
+    public void printReport() throws PrinterException, IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("pdf документы", "*.pdf"));
+
+        File file = fileChooser.showOpenDialog(null);
+        printerService.printPDF(file);
     }
 }

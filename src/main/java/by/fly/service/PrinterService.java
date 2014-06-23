@@ -1,6 +1,8 @@
 package by.fly.service;
 
+import by.fly.model.Settings;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.print.PrintService;
@@ -11,36 +13,57 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import static by.fly.model.QSettings.settings;
+import static by.fly.model.Settings.DEFAULT_PRINTER;
+import static by.fly.util.Utils.getCurrentMachineHardwareAddress;
+import static java.awt.print.PrinterJob.lookupPrintServices;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class PrinterService {
 
     private PrintService currentPrinter;
 
+    @Autowired
+    private SettingsService settingsService;
+
     public Map<String, PrintService> getAvailablePrinters() {
-        PrintService[] services = PrinterJob.lookupPrintServices();
-        return Arrays.stream(services).collect(Collectors.toMap(PrintService::getName, Function.<PrintService>identity()));
+        PrintService[] services = lookupPrintServices();
+        return Arrays.stream(services).collect(toMap(PrintService::getName, Function.<PrintService>identity()));
     }
 
     public void setCurrentPrinter(String name) {
+        findPrinterByName(name);
+        settingsService.save(new Settings(DEFAULT_PRINTER, name, getCurrentMachineHardwareAddress()));
+    }
+
+    private void findPrinterByName(String name) {
         currentPrinter = getAvailablePrinters().get(name);
     }
 
     public PrintService getCurrentPrinter() {
         if (currentPrinter == null) {
-            currentPrinter = getAvailablePrinters().values().stream().findFirst().get();
+            initializePrinter();
         }
         return currentPrinter;
     }
 
-    public void print(File file) throws PrinterException, IOException {
-        PrintService[] services = PrinterJob.lookupPrintServices();
+    public void initializePrinter() {
+        Settings printerSetting = settingsService.findOne(settings.name.eq(DEFAULT_PRINTER)
+                .and(settings.userData.eq(getCurrentMachineHardwareAddress())));
+        if (printerSetting != null) {
+            findPrinterByName((String) printerSetting.getValue());
+        } else {
+            currentPrinter = getAvailablePrinters().values().stream().findFirst().orElse(null);
+        }
+    }
+
+    public void printPDF(File file) throws PrinterException, IOException {
         PrinterJob printerJob = PrinterJob.getPrinterJob();
-        printerJob.setPrintService(services[0]);
+        printerJob.setPrintService(getCurrentPrinter());
         PDDocument pdDocument = PDDocument.load(file);
         pdDocument.silentPrint(printerJob);
-//        Desktop.getDesktop().print(new File("x:\\work\\docs\\test.docx"));
-
     }
+
 }

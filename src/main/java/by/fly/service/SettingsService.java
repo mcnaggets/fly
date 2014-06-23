@@ -3,6 +3,7 @@ package by.fly.service;
 import by.fly.model.PrinterType;
 import by.fly.model.Settings;
 import by.fly.repository.SettingsRepository;
+import com.mysema.query.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,9 @@ public class SettingsService {
 
     public void save(Settings setting) {
         settingsRepository.save(setting);
+    }
+
+    public Settings findOne(Predicate predicate) {
+        return settingsRepository.findOne(predicate);
     }
 }

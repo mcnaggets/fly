@@ -56,6 +56,9 @@
                 <Label text="Примечание:" GridPane.rowIndex="2" GridPane.valignment="TOP" GridPane.halignment="CENTER"/>
                 <TextArea fx:id="descriptionArea" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
                 <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="buttonBar">
+                    <Button text="Печать отчёта" onAction="#printReport"/>
+                </HBox>
+                <HBox GridPane.rowIndex="4" GridPane.columnIndex="1" styleClass="buttonBar">
                     <Button text="Отмена" onAction="#cancel" cancelButton="true"/>
                     <Button text="Применить" onAction="#apply"/>
                     <Button text="Готов" onAction="#save" fx:id="saveButton" styleClass="palegreenBackground"/>

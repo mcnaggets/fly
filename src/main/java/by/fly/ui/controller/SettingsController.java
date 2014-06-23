@@ -9,6 +9,7 @@ import javafx.scene.control.TextArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.print.PrintService;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
@@ -43,8 +44,8 @@ public class SettingsController extends AbstractController {
 
     private void initializePrinterCombo() {
         printerCombo.setItems(FXCollections.observableList(printerService.getAvailablePrinters().keySet().stream().collect(Collectors.toList())));
-        final Settings defaultPrinter = settingsService.findOne(Settings.DEFAULT_PRINTER);
-        printerCombo.setValue(defaultPrinter != null ? (String) defaultPrinter.getValue() : "");
+        final PrintService defaultPrinter = printerService.getCurrentPrinter();
+        printerCombo.setValue(defaultPrinter != null ? defaultPrinter.getName() : "");
     }
 
     public void cancelSettings() {
@@ -53,7 +54,7 @@ public class SettingsController extends AbstractController {
 
 
     public void saveSettings() {
-        settingsService.save(new Settings(Settings.DEFAULT_PRINTER, printerCombo.getValue()));
+        printerService.setCurrentPrinter(printerCombo.getValue());
         settingsService.save(new Settings(Settings.ITEM_TYPES, Arrays.asList(itemTypes.getText().split("\\n"))));
     }
 }
