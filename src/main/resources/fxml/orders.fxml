@@ -34,11 +34,7 @@
                                     </children>
                                 </HBox>
                                 <Label text="Информация о заказе:" styleClass="createOrderHeader"/>
-                                <ScrollPane VBox.vgrow="ALWAYS">
-                                    <content>
-                                        <VBox fx:id="orderItems" VBox.vgrow="ALWAYS"/>
-                                    </content>
-                                </ScrollPane>
+                                <ListView fx:id="orderItems" VBox.vgrow="ALWAYS"/>
                                 <GridPane styleClass="padding10">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="ALWAYS"/>

@@ -18,8 +18,8 @@ import javafx.concurrent.Task;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import org.controlsfx.dialog.Dialogs;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -68,7 +68,7 @@ public class OrdersController extends AbstractController {
     public ProgressIndicator progressIndicator;
     public TableView<OrderItem> ordersTable;
 
-    public VBox orderItems;
+    public ListView<OrderItemControl> orderItems;
     public TextField clientPhoneText;
     public TextField clientNameText;
 
@@ -114,8 +114,8 @@ public class OrdersController extends AbstractController {
     }
 
     private void showOrderUI(Optional<OrderItem> orderItemOptional) {
-        orderItems.getChildren().clear();
-        orderItems.getChildren().add(createOrderItemControl(orderItemOptional));
+        orderItems.getItems().clear();
+        orderItems.getItems().add(createOrderItemControl(orderItemOptional));
 
         if (orderItemOptional.isPresent()) {
             bindPresentedOrderItem(orderItemOptional.get());
@@ -171,13 +171,26 @@ public class OrdersController extends AbstractController {
     }
 
     public void saveOrder() {
+        try {
+            checkOrderState();
+            showOrderTable();
+            saveOrderItems(saveCustomer());
+            clearFilter();
+            refresh();
+        } catch (IllegalStateException x) {
+            Dialogs.create().title("Предупреждение").message(x.getMessage()).showWarning();
+        }
+    }
+
+    private void showOrderTable() {
         createOrderRegion.toBack();
         orderTableRegion.toFront();
+    }
 
-        saveOrderItems(saveCustomer());
-
-        clearFilter();
-        service.restart();
+    private void checkOrderState() throws IllegalStateException{
+        if (orderItems.getItems().stream().anyMatch(node -> orderService.findInProgressItemByBarcode(node.getBarcode()) != null)) {
+            throw new IllegalStateException();
+        }
     }
 
     private void clearFilter() {
@@ -193,8 +206,8 @@ public class OrdersController extends AbstractController {
     }
 
     private void saveOrderItems(Customer customer) {
-        orderItems.getChildren().forEach(node -> {
-            OrderItem orderItem = ((OrderItemControl) node).getOrderItem();
+        orderItems.getItems().forEach(node -> {
+            OrderItem orderItem = node.getOrderItem();
             setOrderItemStatus(orderItem);
             orderItem.setOrderNumber(orderNumber);
             orderItem.setCustomer(customer);
@@ -296,7 +309,7 @@ public class OrdersController extends AbstractController {
     }
 
     public void addOrderItem() {
-        orderItems.getChildren().add(createOrderItemControl(Optional.empty()));
+        orderItems.getItems().add(createOrderItemControl(Optional.empty()));
     }
 
     private OrderItemControl createOrderItemControl(Optional<OrderItem> orderItemOptional) {
@@ -313,12 +326,11 @@ public class OrdersController extends AbstractController {
     }
 
     private double calculateTotalPrice() {
-        return orderItems.getChildren().stream().mapToDouble(node -> ((OrderItemControl) node).getPrice()).sum();
+        return orderItems.getItems().stream().mapToDouble(OrderItemControl::getPrice).sum();
     }
 
     public void cancelOrder() {
-        createOrderRegion.toBack();
-        orderTableRegion.toFront();
+        showOrderTable();
     }
 
     public void printTicket() throws PrinterException, IOException {
