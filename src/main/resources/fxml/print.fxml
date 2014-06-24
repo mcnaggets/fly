@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.String?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.web.HTMLEditor?>
+<?import javafx.scene.control.Button?>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="by.fly.ui.controller.PrintController">
+
+    <ComboBox fx:id="printerCombo"/>
+    <HTMLEditor fx:id="htmlEditor"/>
+    <Button text="Печать" onAction="#print" />
+
+    <stylesheets>
+        <String fx:value="/css/main.css"/>
+    </stylesheets>
+
+</VBox>

@@ -11,8 +11,11 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static by.fly.model.QSettings.settings;
 import static by.fly.model.Settings.DEFAULT_PRINTER;
@@ -34,19 +37,19 @@ public class PrinterService {
     }
 
     public void setCurrentPrinter(String name) {
-        findPrinterByName(name);
+        currentPrinter = findPrinterByName(name);
         settingsService.save(new Settings(DEFAULT_PRINTER, name, getCurrentMachineHardwareAddress()));
     }
 
-    private void findPrinterByName(String name) {
-        currentPrinter = getAvailablePrinters().get(name);
+    public PrintService findPrinterByName(String name) {
+        return getAvailablePrinters().get(name);
     }
 
-    public PrintService getCurrentPrinter() {
+    public Optional<PrintService> getCurrentPrinter() {
         if (currentPrinter == null) {
             initializePrinter();
         }
-        return currentPrinter;
+        return Optional.ofNullable(currentPrinter);
     }
 
     public void initializePrinter() {
@@ -61,9 +64,13 @@ public class PrinterService {
 
     public void printPDF(File file) throws PrinterException, IOException {
         PrinterJob printerJob = PrinterJob.getPrinterJob();
-        printerJob.setPrintService(getCurrentPrinter());
+        printerJob.setPrintService(getCurrentPrinter().get());
         PDDocument pdDocument = PDDocument.load(file);
         pdDocument.silentPrint(printerJob);
+    }
+
+    public List<String> getAvailablePrinterNames() {
+        return getAvailablePrinters().keySet().stream().collect(Collectors.toList());
     }
 
 }
