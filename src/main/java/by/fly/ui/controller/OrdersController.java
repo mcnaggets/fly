@@ -322,7 +322,7 @@ public class OrdersController extends AbstractController {
     }
 
     public void printTicket() throws PrinterException, IOException {
-        printerService.print(new File("x:\\work\\docs\\test.pdf"));
+        printerService.printPDF(new File("x:\\work\\docs\\test.pdf"));
     }
 
     private class GetOrdersService extends Service<ObservableList<OrderItem>> {

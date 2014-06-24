@@ -43,6 +43,8 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
     //inherited
     public final StringPath id = _super.id;
 
+    public final StringPath itemType = createString("itemType");
+
     public final QUser master;
 
     //inherited
@@ -55,8 +57,6 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
     public final NumberPath<Float> price = createNumber("price", Float.class);
 
     public final StringPath printerModel = createString("printerModel");
-
-    public final EnumPath<PrinterType> printerType = createEnum("printerType", PrinterType.class);
 
     public final EnumPath<OrderStatus> status = createEnum("status", OrderStatus.class);
 
