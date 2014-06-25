@@ -117,6 +117,10 @@ public class OrderItemControl extends FlowPane {
         }
     }
 
+    public boolean isNewItem() {
+        return this.orderItem.isNew();
+    }
+
     private void populateGrid(GridPane grid) {
         TextField currentTime = new TextField(TIME_FORMATTER.format(LocalTime.now()));
         currentTime.setEditable(false);

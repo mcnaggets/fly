@@ -178,7 +178,7 @@ public class OrdersController extends AbstractController {
             clearFilter();
             refresh();
         } catch (IllegalStateException x) {
-            Dialogs.create().title("Предупреждение").message(x.getMessage()).showWarning();
+            Dialogs.create().owner(orderTableRegion.getScene().getWindow()).title("Предупреждение").message(x.getMessage()).showWarning();
         }
     }
 
@@ -188,8 +188,8 @@ public class OrdersController extends AbstractController {
     }
 
     private void checkOrderState() throws IllegalStateException{
-        if (orderItems.getItems().stream().anyMatch(node -> orderService.findInProgressItemByBarcode(node.getBarcode()) != null)) {
-            throw new IllegalStateException();
+        if (orderItems.getItems().stream().anyMatch(node -> node.isNewItem() && orderService.findInProgressItemByBarcode(node.getBarcode()) != null)) {
+            throw new IllegalStateException("Заказ с таким штрихкодом уже нахожится в работе.");
         }
     }
 
