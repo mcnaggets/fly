@@ -10,6 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.controlsfx.dialog.Dialogs;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,11 +55,18 @@ public class MasterController extends AbstractController {
 
     private User master;
 
+    private ValidationSupport validationSupport = new ValidationSupport();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
         initializeMasterBarcodeText();
         initializeHeaderLabels();
+        applyValidation();
+    }
+
+    private void applyValidation() {
+        validationSupport.registerValidator(masterBarcodeText, Validator.createEmptyValidator("Мастер должен быть заполнен"));
     }
 
     public void initializeMasterBarcodeText() {
@@ -89,7 +98,7 @@ public class MasterController extends AbstractController {
 
     public void apply() {
         try {
-            checkOrderItem();
+            validateOrderItem();
             populateOrderItem();
             saveOrder();
         } catch (IllegalStateException x) {
@@ -97,9 +106,9 @@ public class MasterController extends AbstractController {
         }
     }
 
-    private void checkOrderItem() throws IllegalStateException{
+    private void validateOrderItem() throws IllegalStateException{
         if (master == null) {
-            throw new IllegalStateException("Мастер должен быть заполнен.");
+            throw new IllegalStateException("Мастер должен быть заполнен");
         }
     }
 
@@ -109,7 +118,7 @@ public class MasterController extends AbstractController {
 
     public void save() {
         try {
-            checkOrderItem();
+            validateOrderItem();
             populateOrderItem();
             markOrderItemReady();
             saveOrder();

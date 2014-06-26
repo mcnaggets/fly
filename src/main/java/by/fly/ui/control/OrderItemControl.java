@@ -17,16 +17,22 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import jfxtras.scene.control.LocalTimeTextField;
+import org.controlsfx.validation.ValidationMessage;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import sun.plugin.dom.exception.InvalidStateException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static by.fly.ui.UIUtils.TIME_FORMATTER;
 import static jdk.nashorn.internal.runtime.JSType.isNumber;
@@ -36,13 +42,13 @@ import static jdk.nashorn.internal.runtime.JSType.isNumber;
 public class OrderItemControl extends FlowPane {
 
     public static final String NAME = "orderItemControl";
-
+    private final ObjectProperty<EventHandler<ActionEvent>> onPriceChanged = new SimpleObjectProperty<>();
+    private final ObjectProperty<EventHandler<ActionEvent>> onBarcodeChanged = new SimpleObjectProperty<>();
+    private final OrderItem orderItem;
     @Autowired
     private OrderService orderService;
-
     @Autowired
     private SettingsService settingsService;
-
     private TextField barcodeText;
     private ComboBox<String> printerTypeCombo;
     private TextField printerModelText;
@@ -50,55 +56,23 @@ public class OrderItemControl extends FlowPane {
     private DatePicker deadLineDatePicker;
     private TextArea descriptionArea;
     private RestrictiveTextField priceText;
-
-    private final ObjectProperty<EventHandler<ActionEvent>> onPriceChanged = new SimpleObjectProperty<>();
-    private final ObjectProperty<EventHandler<ActionEvent>> onBarcodeChanged = new SimpleObjectProperty<>();
-
-    private final OrderItem orderItem;
     private CheckBox[] workTypeCheckBoxes;
 
-    public OrderItemControl(Optional<OrderItem> orderItem) {
-        this.orderItem = orderItem.orElse(new OrderItem(null));
-    }
+    private ValidationSupport validationSupport = new ValidationSupport();
 
-    public void initialize() {
-        createChildren();
-        if (!orderItem.isNew()) {
-            bindOrderItem();
-        }
-        applyAutoCompletion();
-        setBorder(controlBorder());
+    public OrderItemControl(Optional<OrderItem> orderItem, Optional<ValidationSupport> validationSupport) {
+        this.validationSupport = validationSupport.orElse(new ValidationSupport());
+        this.orderItem = orderItem.orElse(new OrderItem(null));
     }
 
     private void applyAutoCompletion() {
         new AutoCompletionTextFieldBinding<>(printerModelText, provider -> orderService.findPrinterModels(provider.getUserText()));
     }
 
-    private Border controlBorder() {
-        return new Border(
-                new BorderStroke(Color.GRAY, BorderStrokeStyle.DOTTED, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)
-        );
-    }
-
-    private void createChildren() {
-        GridPane grid = createGridPane();
-
-        createBarcodeText();
-        createColumnConstraints(grid);
-        createPrinterTypeCombo();
-        createPrinterModelText();
-        createDeadLineControls();
-        createDescriptionArea();
-        createPriceText();
-
-        populateGrid(grid);
-
-        getChildren().add(grid);
-    }
-
-    private void createBarcodeText() {
-        barcodeText = new TextField();
-        barcodeText.textProperty().addListener(e -> barcodeChanged());
+    private void applyValidation() {
+        validationSupport.registerValidator(barcodeText, Validator.createEmptyValidator("Штрихкод должен быть заполнен"));
+        validationSupport.registerValidator(priceText, (Control c, String newValue) ->
+                ValidationResult.fromErrorIf(c, "Цена должны быть положительным числом", newValue.isEmpty() || Float.valueOf(newValue) <= 0));
     }
 
     private void barcodeChanged() {
@@ -111,14 +85,140 @@ public class OrderItemControl extends FlowPane {
         }
     }
 
+    public void bindOrderItem() {
+        deadLineDatePicker.setValue(orderItem.getDeadLine().toLocalDate());
+        deadLineTimePicker.setLocalTime(orderItem.getDeadLine().toLocalTime());
+        barcodeText.setText(orderItem.getBarcode());
+        printerModelText.setText(orderItem.getPrinterModel());
+        printerTypeCombo.setValue(orderItem.getItemType());
+        Arrays.stream(workTypeCheckBoxes).forEach(cb -> cb.setSelected(orderItem.containsWorkType((WorkType) cb.getUserData())));
+        descriptionArea.setText(orderItem.getDescription());
+        priceText.setText(String.valueOf((long) orderItem.getPrice()));
+    }
+
+    private String collectValidationMessages() {
+        return validationSupport.getValidationResult().getMessages().stream().map(ValidationMessage::getText).collect(Collectors.joining("\n"));
+    }
+
+    private Border controlBorder() {
+        return new Border(
+                new BorderStroke(Color.GRAY, BorderStrokeStyle.DOTTED, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)
+        );
+    }
+
+    private void createBarcodeText() {
+        barcodeText = new TextField();
+        barcodeText.textProperty().addListener(e -> barcodeChanged());
+    }
+
+    private void createChildren() {
+        GridPane grid = createGridPane();
+
+        createBarcodeText();
+        createColumnConstraints(grid);
+        createPrinterTypeCombo();
+        createPrinterModelText();
+        createDeadLineControls();
+        createDescriptionArea();
+        createPriceText();
+        applyValidation();
+
+        populateGrid(grid);
+
+        getChildren().add(grid);
+    }
+
+    private void createColumnConstraints(GridPane grid) {
+        ColumnConstraints constraints = new ColumnConstraints();
+        constraints.setHalignment(HPos.RIGHT);
+        grid.getColumnConstraints().add(constraints);
+        grid.getColumnConstraints().add(new ColumnConstraints(70));
+        grid.getColumnConstraints().add(constraints);
+        grid.getColumnConstraints().add(constraints);
+        grid.getColumnConstraints().add(constraints);
+    }
+
+    private void createDeadLineControls() {
+        deadLineTimePicker = new LocalTimeTextField(LocalTime.now());
+        deadLineDatePicker = new DatePicker(LocalDate.now());
+        deadLineDatePicker.setPrefWidth(100);
+    }
+
+    private void createDescriptionArea() {
+        descriptionArea = new TextArea();
+        descriptionArea.setPrefRowCount(3);
+    }
+
+    private GridPane createGridPane() {
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setHgap(10);
+        grid.setVgap(10);
+        return grid;
+    }
+
+    private void createPriceText() {
+        priceText = new RestrictiveTextField();
+        priceText.setText("0");
+        priceText.setRestrict("[0-9]");
+        priceText.setMaxLength(10);
+        priceText.textProperty().addListener(e -> priceChanged());
+    }
+
+    private void createPrinterModelText() {
+        printerModelText = new TextField();
+    }
+
+    private void createPrinterTypeCombo() {
+        printerTypeCombo = new ComboBox<>(FXCollections.observableList(settingsService.getItemTypes()));
+        printerTypeCombo.setValue(PrinterType.LASER.getMessage());
+    }
+
+    private void createWorkTypeCheckBoxes() {
+        workTypeCheckBoxes = Arrays.asList(WorkType.values()).stream().map(workType -> {
+            CheckBox checkBox = new CheckBox(workType.getMessage());
+            checkBox.setUserData(workType);
+            checkBox.setOnAction(e -> {
+                if (checkBox.isSelected()) orderItem.addWorkType(workType);
+                else orderItem.removeWorkType(workType);
+            });
+            return checkBox;
+        }).toArray(CheckBox[]::new);
+    }
+
     private void fireBarcodeChanged(String barcode) {
         if (onBarcodeChanged.get() != null) {
             onBarcodeChanged.get().handle(new ActionEvent(barcode, this));
         }
     }
 
-    public boolean isNewItem() {
-        return this.orderItem.isNew();
+    public String getBarcode() {
+        return barcodeText.getText();
+    }
+
+    public OrderItem getOrderItem() {
+        LocalDateTime deadLine = LocalDateTime.of(deadLineDatePicker.getValue(), deadLineTimePicker.getLocalTime());
+        orderItem.setDeadLine(deadLine);
+        orderItem.setBarcode(barcodeText.getText());
+        orderItem.setPrinterModel(printerModelText.getText());
+        orderItem.setItemType(printerTypeCombo.getValue());
+        Arrays.stream(workTypeCheckBoxes).filter(CheckBox::isSelected).forEach(cb -> orderItem.addWorkType((WorkType) cb.getUserData()));
+        orderItem.setDescription(descriptionArea.getText());
+        orderItem.setPrice(getPrice());
+        return orderItem;
+    }
+
+    public float getPrice() {
+        return Float.valueOf(priceText.getText());
+    }
+
+    public void initialize() {
+        createChildren();
+        if (!orderItem.isNew()) {
+            bindOrderItem();
+        }
+        applyAutoCompletion();
+        setBorder(controlBorder());
     }
 
     private void populateGrid(GridPane grid) {
@@ -149,109 +249,26 @@ public class OrderItemControl extends FlowPane {
         grid.add(new VBox(5, workTypeCheckBoxes), 7, 1);
     }
 
-    private void createWorkTypeCheckBoxes() {
-        workTypeCheckBoxes = Arrays.asList(WorkType.values()).stream().map(workType -> {
-            CheckBox checkBox = new CheckBox(workType.getMessage());
-            checkBox.setUserData(workType);
-            checkBox.setOnAction(e -> {
-                if (checkBox.isSelected()) orderItem.addWorkType(workType);
-                else orderItem.removeWorkType(workType);
-            });
-            return checkBox;
-        }).toArray(CheckBox[]::new);
-    }
-
-    private void createDescriptionArea() {
-        descriptionArea = new TextArea();
-        descriptionArea.setPrefRowCount(3);
-    }
-
-    private void createDeadLineControls() {
-        deadLineTimePicker = new LocalTimeTextField(LocalTime.now());
-        deadLineDatePicker = new DatePicker(LocalDate.now());
-        deadLineDatePicker.setPrefWidth(100);
-    }
-
-    private void createPrinterModelText() {
-        printerModelText = new TextField();
-    }
-
-    private GridPane createGridPane() {
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(10));
-        grid.setHgap(10);
-        grid.setVgap(10);
-        return grid;
-    }
-
-    private void createColumnConstraints(GridPane grid) {
-        ColumnConstraints constraints = new ColumnConstraints();
-        constraints.setHalignment(HPos.RIGHT);
-        grid.getColumnConstraints().add(constraints);
-        grid.getColumnConstraints().add(new ColumnConstraints(70));
-        grid.getColumnConstraints().add(constraints);
-        grid.getColumnConstraints().add(constraints);
-        grid.getColumnConstraints().add(constraints);
-    }
-
-    private void createPrinterTypeCombo() {
-        printerTypeCombo = new ComboBox<>(FXCollections.observableList(settingsService.getItemTypes()));
-        printerTypeCombo.setValue(PrinterType.LASER.getMessage());
-    }
-
-    private void createPriceText() {
-        priceText = new RestrictiveTextField();
-        priceText.setText("0");
-        priceText.setRestrict("[0-9]");
-        priceText.setMaxLength(10);
-        priceText.textProperty().addListener(e -> priceChanged());
-    }
-
     private void priceChanged() {
         if (onPriceChanged.get() != null && isNumber(priceText.getText())) {
             onPriceChanged.get().handle(new ActionEvent(getPrice(), this));
         }
     }
 
-    public float getPrice() {
-        return Float.valueOf(priceText.getText());
-    }
-
-    public String getBarcode() {
-        return barcodeText.getText();
+    public void setOnBarcodeChanged(EventHandler<ActionEvent> handler) {
+        this.onBarcodeChanged.set(handler);
     }
 
     public void setOnPriceChanged(EventHandler<ActionEvent> handler) {
         this.onPriceChanged.set(handler);
     }
 
-    public void setOnBarcodeChanged(EventHandler<ActionEvent> handler) {
-        this.onBarcodeChanged.set(handler);
-    }
-
-    public void bindOrderItem() {
-        deadLineDatePicker.setValue(orderItem.getDeadLine().toLocalDate());
-        deadLineTimePicker.setLocalTime(orderItem.getDeadLine().toLocalTime());
-        barcodeText.setText(orderItem.getBarcode());
-        printerModelText.setText(orderItem.getPrinterModel());
-        printerTypeCombo.setValue(orderItem.getItemType());
-        Arrays.stream(workTypeCheckBoxes).forEach(cb -> {
-            cb.setSelected(orderItem.containsWorkType((WorkType) cb.getUserData()));
-        });
-        descriptionArea.setText(orderItem.getDescription());
-        priceText.setText(String.valueOf((long) orderItem.getPrice()));
-    }
-
-    public OrderItem getOrderItem() {
-        LocalDateTime deadLine = LocalDateTime.of(deadLineDatePicker.getValue(), deadLineTimePicker.getLocalTime());
-        orderItem.setDeadLine(deadLine);
-        orderItem.setBarcode(barcodeText.getText());
-        orderItem.setPrinterModel(printerModelText.getText());
-        orderItem.setItemType(printerTypeCombo.getValue());
-        Arrays.stream(workTypeCheckBoxes).filter(CheckBox::isSelected).forEach(cb -> orderItem.addWorkType((WorkType) cb.getUserData()));
-        orderItem.setDescription(descriptionArea.getText());
-        orderItem.setPrice(getPrice());
-        return orderItem;
+    public void validate() throws InvalidStateException {
+        if (validationSupport.isInvalid()) {
+            throw new IllegalStateException(collectValidationMessages());
+        } else if (orderItem.isNew() && orderService.findInProgressItemByBarcode(getBarcode()) != null) {
+            throw new IllegalStateException("Заказ с таким штрихкодом уже нахожится в работе");
+        }
     }
 
 }
