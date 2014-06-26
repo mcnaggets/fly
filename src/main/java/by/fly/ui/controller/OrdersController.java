@@ -249,7 +249,7 @@ public class OrdersController extends AbstractController {
 
     private void applyValidation() {
         validationSupport.registerValidator(clientNameText, Validator.createEmptyValidator("Имя клиента должно быть заполено"));
-        validationSupport.registerValidator(clientPhoneText, Validator.createEmptyValidator("Телефон клиента должно быть заполен"));
+        validationSupport.registerValidator(clientPhoneText, Validator.createEmptyValidator("Телефон клиента должен быть заполен"));
     }
 
     private void initializeClientFilter() {
