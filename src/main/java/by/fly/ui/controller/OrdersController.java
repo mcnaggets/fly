@@ -106,6 +106,7 @@ public class OrdersController extends AbstractController {
     private long orderNumber;
 
     private final AtomicBoolean doRefreshData = new AtomicBoolean(true);
+
     private AutoCompletionTextFieldBinding<String> clientNameAutoCompletionBinding;
     private AutoCompletionTextFieldBinding<String> clientPhoneAutoCompletionBinding;
 
@@ -133,13 +134,12 @@ public class OrdersController extends AbstractController {
         orderCodeLabel.setText(OrderItem.ORDER_CODE_PREFIX + orderNumber);
         orderDateLabel.setText(DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()));
 
+        disposeClientFieldsAutoCompletion();
         clientNameText.setText("");
         clientPhoneText.setText("");
+        applyClientFieldsAutoCompletion();
 
-        addOrderItemButton.setDisable(false);
-        inProgressButton.setVisible(true);
-        paidButton.setVisible(false);
-        saveButton.setVisible(false);
+        bindButtonsForNewOrder();
     }
 
     private void bindPresentedOrderItem(OrderItem orderItem) {
@@ -154,6 +154,17 @@ public class OrdersController extends AbstractController {
 
         totalPriceText.setText(String.valueOf(orderItem.getPrice()));
 
+        bindButtonsForOrderItem(orderItem);
+    }
+
+    private void bindButtonsForNewOrder() {
+        addOrderItemButton.setDisable(false);
+        inProgressButton.setVisible(true);
+        paidButton.setVisible(false);
+        saveButton.setVisible(false);
+    }
+
+    private void bindButtonsForOrderItem(OrderItem orderItem) {
         addOrderItemButton.setDisable(true);
         inProgressButton.setVisible(false);
         paidButton.setVisible(orderItem.getStatus() == OrderStatus.READY);
