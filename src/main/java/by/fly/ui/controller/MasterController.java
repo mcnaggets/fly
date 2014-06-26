@@ -9,6 +9,7 @@ import by.fly.service.UserService;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import org.controlsfx.dialog.Dialogs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,12 +50,17 @@ public class MasterController extends AbstractController {
     private PrinterService printerService;
 
     private OrderItem orderItem;
+
     private User master;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
+        initializeMasterBarcodeText();
+        initializeHeaderLabels();
+    }
 
+    public void initializeMasterBarcodeText() {
         masterBarcodeText.textProperty().addListener(e -> {
             String barcode = masterBarcodeText.getText();
             master = userService.findMasterByBarcode(barcode);
@@ -64,8 +70,6 @@ public class MasterController extends AbstractController {
                 masterNameText.setText("");
             }
         });
-
-        initializeHeaderLabels();
     }
 
     private void initializeHeaderLabels() {
@@ -80,20 +84,48 @@ public class MasterController extends AbstractController {
     }
 
     public void cancel() {
-        getView().getScene().getWindow().hide();
+        closeWindow();
     }
 
     public void apply() {
-        populateOrderItem();
+        try {
+            checkOrderItem();
+            populateOrderItem();
+            saveOrder();
+        } catch (IllegalStateException x) {
+            Dialogs.create().owner(masterBarcodeText.getScene().getWindow()).title("Предупреждение").message(x.getMessage()).showWarning();
+        }
+    }
+
+    private void checkOrderItem() throws IllegalStateException{
+        if (master == null) {
+            throw new IllegalStateException("Мастер должен быть заполнен.");
+        }
+    }
+
+    public void saveOrder() {
         orderService.save(orderItem);
     }
 
     public void save() {
-        populateOrderItem();
+        try {
+            checkOrderItem();
+            populateOrderItem();
+            markOrderItemReady();
+            saveOrder();
+            closeWindow();
+        } catch (IllegalStateException x) {
+            Dialogs.create().owner(masterBarcodeText.getScene().getWindow()).title("Предупреждение").message(x.getMessage()).showWarning();
+        }
+    }
+
+    public void closeWindow() {
+        getView().getScene().getWindow().hide();
+    }
+
+    public void markOrderItemReady() {
         orderItem.setStatus(OrderStatus.READY);
         orderItem.setDeadLine(LocalDateTime.now());
-        orderService.save(orderItem);
-        getView().getScene().getWindow().hide();
     }
 
     private void bindOrderItem() {
