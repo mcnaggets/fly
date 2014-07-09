@@ -44,7 +44,7 @@ public class TaskController extends AbstractController {
 
     static final Background orangeBackground = new Background(new BackgroundFill(Color.ORANGE, new CornerRadii(5), null));
     static final Background greenBackground = new Background(new BackgroundFill(Color.PALEGREEN, new CornerRadii(5), null));
-    static final Background redBackground = new Background(new BackgroundFill(Color.CRIMSON, new CornerRadii(5), null));
+    static final Background redBackground = new Background(new BackgroundFill(Color.INDIANRED, new CornerRadii(5), null));
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

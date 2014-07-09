@@ -24,14 +24,14 @@
                 <Label text="Типы обслуживаемой техники" GridPane.rowIndex="1" />
                 <TextArea fx:id="itemTypes" GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
-                <HBox alignment="BOTTOM_LEFT" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                <HTMLEditor GridPane.rowIndex="2" GridPane.columnSpan="2" fx:id="htmlEditor"/>
+
+                <HBox alignment="BOTTOM_LEFT" GridPane.columnSpan="2" GridPane.rowIndex="3">
                     <children>
                         <Button onAction="#saveSettings" text="Сохранить"/>
                         <Button onAction="#cancelSettings" text="Отмена"/>
                     </children>
                 </HBox>
-
-                <HTMLEditor GridPane.rowIndex="2" GridPane.columnSpan="2" />
 
             </children>
         </GridPane>

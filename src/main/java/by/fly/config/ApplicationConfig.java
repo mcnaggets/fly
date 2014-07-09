@@ -1,5 +1,8 @@
 package by.fly.config;
 
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -12,4 +15,14 @@ import org.springframework.context.annotation.Import;
         LogbackConfig.class
 })
 public class ApplicationConfig {
+
+    @Bean
+    public VelocityEngine velocityEngine() {
+        VelocityEngine velocityEngine = new VelocityEngine();
+        velocityEngine.setProperty("resource.loader", "class");
+        velocityEngine.setProperty("class.resource.loader.class", ClasspathResourceLoader.class.getName());
+        velocityEngine.init();
+        return velocityEngine;
+    }
+
 }
