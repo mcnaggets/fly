@@ -23,7 +23,7 @@ public class SpringFXMLLoader {
         try (InputStream fxmlStream = SpringFXMLLoader.class.getResourceAsStream(url)) {
             FXMLLoader loader = new FXMLLoader();
             loader.setResources(ResourceBundle.getBundle("i18n.messages"));
-            loader.setControllerFactory(aClass -> APPLICATION_CONTEXT.getBean(aClass));
+            loader.setControllerFactory(APPLICATION_CONTEXT::getBean);
 
             Node view = loader.load(fxmlStream);
             Controller controller = loader.getController();
