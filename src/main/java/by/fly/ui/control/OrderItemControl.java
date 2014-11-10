@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -263,7 +262,7 @@ public class OrderItemControl extends FlowPane {
         this.onPriceChanged.set(handler);
     }
 
-    public void validate() throws InvalidStateException {
+    public void validate() {
         if (validationSupport.isInvalid()) {
             throw new IllegalStateException(collectValidationMessages());
         } else if (orderItem.isNew() && orderService.findInProgressItemByBarcode(getBarcode()) != null) {

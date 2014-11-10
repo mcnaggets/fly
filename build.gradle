@@ -66,6 +66,7 @@ task generateQueryDSL(type: JavaCompile, group: 'build', description: 'Generates
             "-proc:only",
             "-processor", "com.mysema.query.apt.QuerydslAnnotationProcessor"
     ]
+    options.encoding = "UTF-8"
     destinationDir = sourceSets.generated.java.srcDirs.iterator().next()
 }
 
