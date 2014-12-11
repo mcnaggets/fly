@@ -24,7 +24,7 @@
                             <children>
                                 <Label text="Клиент:"/>
                                 <TextField fx:id="clientNameFilter"/>
-                                <Label text="Местер:"/>
+                                <Label text="Мастер:"/>
                                 <TextField fx:id="masterFilter"/>
                                 <Label text="Тип:"/>
                                 <TextField fx:id="workTypeFilter"/>

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@Component
 public abstract class AbstractController implements Controller {
 
     static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);

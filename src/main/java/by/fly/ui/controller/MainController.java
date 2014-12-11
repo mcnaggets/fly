@@ -21,6 +21,7 @@ public class MainController extends AbstractController {
     private Tab dailyOrdersTab;
     private Tab ordersTab;
     private Tab tasksTab;
+    private Tab reportsTab;
     private Tab settingsTab;
 
     private Stage stage;
@@ -33,7 +34,7 @@ public class MainController extends AbstractController {
 
     private void createTabs() {
         tasksTab = new Tab("Задачи");
-        Controller tasksController = SpringFXMLLoader.load("/fxml/tasks.fxml");
+        final Controller tasksController = SpringFXMLLoader.load("/fxml/tasks.fxml");
         tasksTab.setContent(tasksController.getView());
         tabs.getTabs().add(tasksTab);
 
@@ -44,22 +45,28 @@ public class MainController extends AbstractController {
         settingsTab.setContent(SpringFXMLLoader.load("/fxml/settings.fxml").getView());
 
         dailyOrdersTab = new Tab("Заказы по дням");
-        Controller dailyOrdersController = SpringFXMLLoader.load("/fxml/daily-orders.fxml");
+        final Controller dailyOrdersController = SpringFXMLLoader.load("/fxml/daily-orders.fxml");
         dailyOrdersTab.setContent(dailyOrdersController.getView());
 
         ordersTab = new Tab("Заказы");
-        Controller ordersController = SpringFXMLLoader.load("/fxml/orders.fxml");
+        final Controller ordersController = SpringFXMLLoader.load("/fxml/orders.fxml");
         ordersTab.setContent(ordersController.getView());
+
+        reportsTab = new Tab("Отчёты");
+        final Controller reportsController = SpringFXMLLoader.load("/fxml/reports.fxml");
+        reportsTab.setContent(reportsController.getView());
 
         tabs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == dailyOrdersTab) dailyOrdersController.refresh();
             else if (newValue == ordersTab) ordersController.refresh();
             else if (newValue == tasksTab) tasksController.refresh();
+            else if (newValue == reportsTab) reportsController.refresh();
         });
     }
 
     private void addAdminTabs() {
         tabs.getTabs().add(ordersTab);
+        tabs.getTabs().add(reportsTab);
         tabs.getTabs().add(dailyOrdersTab);
         tabs.getTabs().add(organizationTab);
         tabs.getTabs().add(settingsTab);
@@ -67,6 +74,7 @@ public class MainController extends AbstractController {
 
     private void removeAdminTabs() {
         tabs.getTabs().remove(ordersTab);
+        tabs.getTabs().remove(reportsTab);
         tabs.getTabs().remove(dailyOrdersTab);
         tabs.getTabs().remove(organizationTab);
         tabs.getTabs().remove(settingsTab);

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -30,12 +31,14 @@ import static by.fly.ui.UIUtils.DEFAULT_PAGE_SIZE;
 import static by.fly.ui.UIUtils.TIME_FORMATTER;
 import static by.fly.ui.UIUtils.refreshPagination;
 
+@Component
 public class ReportsController extends AbstractController {
     private final GetOrdersService service = new GetOrdersService();
     private final AtomicBoolean doRefreshData = new AtomicBoolean(true);
     public DatePicker orderStartDateFilter;
     public DatePicker orderEndDateFilter;
     public TextField clientNameFilter;
+    public TextField printerTypeFilter;
     public TextField masterFilter;
     public TextField printerModelFilter;
     public TextField workTypeFilter;
@@ -128,28 +131,24 @@ public class ReportsController extends AbstractController {
     }
 
     private void createDateFilterPredicate() {
-        LocalDate filterDate = orderDateFilter.getValue();
-        filterPredicate = QOrderItem.orderItem.orderCode.isNotNull();
-        if (!anyDateFilter.isSelected()) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
-                    Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                    Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())));
-        }
+        filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
+                Date.from(orderStartDateFilter.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                Date.from(orderEndDateFilter.getValue().plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())));
     }
 
     private void createFilterPredicate() {
         createDateFilterPredicate();
-        if (!orderCodeFilter.getText().trim().isEmpty()) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.orderCode.containsIgnoreCase(orderCodeFilter.getText().trim()));
-        }
-        if (!orderBarcodeFilter.getText().trim().isEmpty()) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.barcode.containsIgnoreCase(orderBarcodeFilter.getText().trim()));
-        }
         if (!clientNameFilter.getText().trim().isEmpty()) {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
         }
-        if (!clientPhoneFilter.getText().trim().isEmpty()) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientPhone.containsIgnoreCase(clientPhoneFilter.getText().trim()));
+        if (!printerTypeFilter.getText().trim().isEmpty()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.itemType.containsIgnoreCase(printerTypeFilter.getText().trim()));
+        }
+        if (!masterFilter.getText().trim().isEmpty()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.barcode.containsIgnoreCase(masterFilter.getText().trim()));
+        }
+        if (!printerModelFilter.getText().trim().isEmpty()) {
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientPhone.containsIgnoreCase(printerModelFilter.getText().trim()));
         }
     }
 
