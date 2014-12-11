@@ -8,6 +8,7 @@ import by.fly.service.CustomerService;
 import by.fly.service.OrderService;
 import by.fly.service.PrinterService;
 import by.fly.ui.control.OrderItemControl;
+import by.fly.util.Utils;
 import com.mysema.query.types.expr.BooleanExpression;
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.beans.property.SimpleStringProperty;
@@ -193,8 +194,7 @@ public class OrdersController extends AbstractController {
         filterPredicate = QOrderItem.orderItem.orderCode.isNotNull();
         if (!anyDateFilter.isSelected()) {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
-                    Date.from(filterDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                    Date.from(filterDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())));
+                    Utils.toDate(filterDate), Utils.toDate(filterDate.plusDays(1))));
         }
     }
 
@@ -375,7 +375,7 @@ public class OrdersController extends AbstractController {
         createOrderRegion.toFront();
     }
 
-    private void validateOrder() throws IllegalStateException{
+    private void validateOrder() throws IllegalStateException {
         orderItems.getItems().stream().forEach(OrderItemControl::validate);
     }
 
@@ -387,10 +387,16 @@ public class OrdersController extends AbstractController {
                 protected ObservableList<OrderItem> call() throws Exception {
                     if (!doRefreshData.get()) return FXCollections.emptyObservableList();
                     createFilterPredicate();
-                    Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
-                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE,
-                                    new Sort(Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())));
+                    Page<OrderItem> orderItems = orderService.findAll(filterPredicate, getPageable());
                     return FXCollections.observableList(orderItems.getContent());
+                }
+
+                private PageRequest getPageable() {
+                    return new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE, getSort());
+                }
+
+                private Sort getSort() {
+                    return new Sort(Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName());
                 }
             };
         }

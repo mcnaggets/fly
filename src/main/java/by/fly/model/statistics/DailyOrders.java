@@ -1,5 +1,6 @@
 package by.fly.model.statistics;
 
+import by.fly.util.Utils;
 import com.mysema.query.annotations.QueryEntity;
 import com.mysema.query.annotations.QueryTransient;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,7 @@ public class DailyOrders {
 
     @QueryTransient
     public LocalDate getDate() {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalDate();
+        return Utils.toLocalDate(date);
     }
 
     @Override

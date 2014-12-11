@@ -5,6 +5,7 @@ import by.fly.model.QOrderItem;
 import by.fly.service.CustomerService;
 import by.fly.service.OrderService;
 import by.fly.service.UserService;
+import by.fly.util.Utils;
 import com.mysema.query.types.expr.BooleanExpression;
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.beans.property.SimpleStringProperty;
@@ -41,7 +42,6 @@ public class ReportsController extends AbstractController {
     public TextField printerTypeFilter;
     public TextField masterFilter;
     public TextField printerModelFilter;
-    public TextField workTypeFilter;
     public TableView<OrderItem> ordersTable;
     public TableColumn<OrderItem, String> printerModelColumn;
     public TableColumn<OrderItem, String> workTypeColumn;
@@ -121,19 +121,26 @@ public class ReportsController extends AbstractController {
                 protected ObservableList<OrderItem> call() throws Exception {
                     if (!doRefreshData.get()) return FXCollections.emptyObservableList();
                     createFilterPredicate();
-                    Page<OrderItem> orderItems = orderService.findAll(filterPredicate,
-                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE,
-                                    new Sort(Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName())));
+                    Page<OrderItem> orderItems = orderService.findAll(filterPredicate, getPageable());
                     return FXCollections.observableList(orderItems.getContent());
+                }
+
+                private PageRequest getPageable() {
+                    return new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE, getSort());
+                }
+
+                private Sort getSort() {
+                    return new Sort(Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName());
                 }
             };
         }
     }
 
     private void createDateFilterPredicate() {
+        filterPredicate = QOrderItem.orderItem.orderCode.isNotNull();
         filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
-                Date.from(orderStartDateFilter.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                Date.from(orderEndDateFilter.getValue().plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())));
+                Utils.toDate(orderStartDateFilter.getValue()),
+                Utils.toDate(orderEndDateFilter.getValue().plusDays(1))));
     }
 
     private void createFilterPredicate() {
@@ -145,11 +152,16 @@ public class ReportsController extends AbstractController {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.itemType.containsIgnoreCase(printerTypeFilter.getText().trim()));
         }
         if (!masterFilter.getText().trim().isEmpty()) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.barcode.containsIgnoreCase(masterFilter.getText().trim()));
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.master.name.containsIgnoreCase(masterFilter.getText().trim()));
         }
         if (!printerModelFilter.getText().trim().isEmpty()) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientPhone.containsIgnoreCase(printerModelFilter.getText().trim()));
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.printerModel.containsIgnoreCase(printerModelFilter.getText().trim()));
         }
+    }
+
+    @Override
+    public void refresh() {
+        service.restart();
     }
 
 }

@@ -7,7 +7,8 @@
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="by.fly.ui.controller.ReportsController">
     <children>
-        <StackPane>
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <VBox AnchorPane.bottomAnchor="0.0"
                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -27,7 +28,7 @@
                                 <Label text="Мастер:"/>
                                 <TextField fx:id="masterFilter"/>
                                 <Label text="Тип:"/>
-                                <TextField fx:id="workTypeFilter"/>
+                                <TextField fx:id="printerTypeFilter"/>
                                 <Label text="Модель:"/>
                                 <TextField fx:id="printerModelFilter"/>
                             </children>

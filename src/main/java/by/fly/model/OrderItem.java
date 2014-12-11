@@ -1,5 +1,6 @@
 package by.fly.model;
 
+import by.fly.util.Utils;
 import com.mysema.query.annotations.QueryEntity;
 import com.mysema.query.annotations.QueryTransient;
 import org.springframework.data.annotation.PersistenceConstructor;
@@ -109,20 +110,20 @@ public class OrderItem extends AbstractModel {
 
     @QueryTransient
     public LocalDateTime getCreatedAt() {
-        return createdAt != null ? LocalDateTime.ofInstant(createdAt.toInstant(), ZoneId.systemDefault()) : null;
+        return Utils.toLocalDateTime(createdAt);
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt != null ? Date.from(createdAt.atZone(ZoneId.systemDefault()).toInstant()) : null;
+        this.createdAt = Utils.toDate(createdAt);
     }
 
     @QueryTransient
     public LocalDateTime getDeadLine() {
-        return deadLine != null ? LocalDateTime.ofInstant(deadLine.toInstant(), ZoneId.systemDefault()) : null;
+        return Utils.toLocalDateTime(deadLine);
     }
 
     public void setDeadLine(LocalDateTime deadLine) {
-        this.deadLine = deadLine != null ? Date.from(deadLine.atZone(ZoneId.systemDefault()).toInstant()) : null;
+        this.deadLine = Utils.toDate(deadLine);
     }
 
     public void setDescription(String description) {

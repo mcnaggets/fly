@@ -1,5 +1,6 @@
 package by.fly.model;
 
+import by.fly.util.Utils;
 import com.mysema.query.annotations.QueryEntity;
 import com.mysema.query.annotations.QueryTransient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -43,11 +44,11 @@ public class Organization extends AbstractModel {
 
     @QueryTransient
     public LocalDate getRegistrationDate() {
-        return registrationDate != null ? LocalDateTime.ofInstant(registrationDate.toInstant(), ZoneId.systemDefault()).toLocalDate() : null;
+        return Utils.toLocalDate(registrationDate);
     }
 
     public void setRegistrationDate(LocalDate registrationDate) {
-        this.registrationDate = registrationDate != null ? Date.from(registrationDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()) : null;
+        this.registrationDate = Utils.toDate(registrationDate);
     }
 
     public String getAddress() {
