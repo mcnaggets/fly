@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="by.fly.ui.controller.ReportsController">
+    <children>
+        <StackPane>
+            <children>
+                <VBox AnchorPane.bottomAnchor="0.0"
+                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <children>
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
+                            <children>
+                                <Label text="Заказы за период:"/>
+                                <DatePicker fx:id="orderStartDateFilter"/>
+                                <DatePicker fx:id="orderEndDateFilter"/>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
+                            <children>
+                                <Label text="Клиент:"/>
+                                <TextField fx:id="clientNameFilter"/>
+                                <Label text="Местер:"/>
+                                <TextField fx:id="masterFilter"/>
+                                <Label text="Тип:"/>
+                                <TextField fx:id="workTypeFilter"/>
+                                <Label text="Модель:"/>
+                                <TextField fx:id="printerModelFilter"/>
+                            </children>
+                        </HBox>
+                        <TableView fx:id="ordersTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="printerModelColumn" text="Модель"/>
+                                <TableColumn fx:id="workTypeColumn" text="Вид работ"/>
+                                <TableColumn fx:id="masterColumn" text="Мастер"/>
+                                <TableColumn fx:id="deadLineColumn" text="Время выполнения"/>
+                                <TableColumn fx:id="priceColumn" text="Стоимость"/>
+                                <TableColumn fx:id="printerTypeColumn" text="Тип"/>
+                            </columns>
+                        </TableView>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <padding>
+                                <Insets left="10"/>
+                            </padding>
+                            <Button onAction="#refresh" text="Обновить"/>
+                            <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </children>
+                </VBox>
+                <ProgressIndicator fx:id="progressIndicator" progress="-1"/>
+            </children>
+        </StackPane>
+    </children>
+    <stylesheets>
+        <String fx:value="/css/main.css"/>
+        <String fx:value="/css/orders.css"/>
+    </stylesheets>
+</AnchorPane>

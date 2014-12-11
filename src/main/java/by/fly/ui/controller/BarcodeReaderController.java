@@ -10,12 +10,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@Component
 public class BarcodeReaderController extends AbstractController {
 
     public TextField barcodeText;
