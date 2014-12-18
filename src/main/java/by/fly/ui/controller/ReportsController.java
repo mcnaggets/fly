@@ -1,5 +1,6 @@
 package by.fly.ui.controller;
 
+import by.fly.model.Human;
 import by.fly.model.OrderItem;
 import by.fly.model.QOrderItem;
 import by.fly.service.CustomerService;
@@ -25,6 +26,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -90,6 +92,7 @@ public class ReportsController extends AbstractController {
     private void initializeColumns() {
         printerTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getItemType()));
         printerModelColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrinterModel()));
+        masterColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMasterName()));
         workTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWorkTypeMessages("\n")));
         priceColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getPrice())));
         deadLineColumn.setCellValueFactory(data -> new SimpleStringProperty(TIME_FORMATTER.format(data.getValue().getDeadLine())));
@@ -152,7 +155,7 @@ public class ReportsController extends AbstractController {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.itemType.containsIgnoreCase(printerTypeFilter.getText().trim()));
         }
         if (!masterFilter.getText().trim().isEmpty()) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.master.name.containsIgnoreCase(masterFilter.getText().trim()));
+            filterPredicate = filterPredicate.and(QOrderItem.orderItem.masterName.containsIgnoreCase(masterFilter.getText().trim()));
         }
         if (!printerModelFilter.getText().trim().isEmpty()) {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.printerModel.containsIgnoreCase(printerModelFilter.getText().trim()));

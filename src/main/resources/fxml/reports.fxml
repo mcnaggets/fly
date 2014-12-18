@@ -15,9 +15,11 @@
                     <children>
                         <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
                             <children>
-                                <Label text="Заказы за период:"/>
+                                <Label text="Заказы за период c"/>
                                 <DatePicker fx:id="orderStartDateFilter"/>
+                                <Label text="по"/>
                                 <DatePicker fx:id="orderEndDateFilter"/>
+                                <Button onAction="#refresh" text="Применить фильтр" HBox.margin="30"/>
                             </children>
                         </HBox>
 
@@ -47,7 +49,6 @@
                             <padding>
                                 <Insets left="10"/>
                             </padding>
-                            <Button onAction="#refresh" text="Обновить"/>
                             <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>
                         </HBox>
                     </children>

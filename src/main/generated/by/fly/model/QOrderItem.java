@@ -47,6 +47,8 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
 
     public final QUser master;
 
+    public final StringPath masterName = createString("masterName");
+
     //inherited
     public final BooleanPath new$ = _super.new$;
 

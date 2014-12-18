@@ -3,6 +3,7 @@ package by.fly.model;
 import by.fly.util.Utils;
 import com.mysema.query.annotations.QueryEntity;
 import com.mysema.query.annotations.QueryTransient;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -63,6 +64,9 @@ public class OrderItem extends AbstractModel {
     @DBRef
     private User master;
 
+    @Indexed
+    private String masterName;
+
     private String additionalWork;
 
     @PersistenceConstructor
@@ -102,7 +106,7 @@ public class OrderItem extends AbstractModel {
         return status;
     }
 
-    public void setCustomer(Customer customer) {
+    public void setCustomer(@NotNull Customer customer) {
         this.clientName = customer.getName();
         this.clientPhone = customer.getPhone();
         this.customer = customer;
@@ -203,7 +207,8 @@ public class OrderItem extends AbstractModel {
         this.test = test;
     }
 
-    public void setMaster(User master) {
+    public void setMaster(@NotNull User master) {
+        this.masterName = master.getName();
         this.master = master;
     }
 
@@ -239,4 +244,7 @@ public class OrderItem extends AbstractModel {
                 '}';
     }
 
+    public String getMasterName() {
+        return masterName;
+    }
 }
