@@ -52,15 +52,15 @@ public class MainController extends AbstractController {
         final Controller ordersController = SpringFXMLLoader.load("/fxml/orders.fxml");
         ordersTab.setContent(ordersController.getView());
 
-        reportsTab = new Tab("Отчёты");
-        final Controller reportsController = SpringFXMLLoader.load("/fxml/reports.fxml");
-        reportsTab.setContent(reportsController.getView());
+//        reportsTab = new Tab("Отчёты");
+//        final Controller reportsController = SpringFXMLLoader.load("/fxml/reports.fxml");
+//        reportsTab.setContent(reportsController.getView());
 
         tabs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == dailyOrdersTab) dailyOrdersController.refresh();
             else if (newValue == ordersTab) ordersController.refresh();
             else if (newValue == tasksTab) tasksController.refresh();
-            else if (newValue == reportsTab) reportsController.refresh();
+//            else if (newValue == reportsTab) reportsController.refresh();
         });
     }
 

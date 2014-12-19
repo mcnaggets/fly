@@ -97,7 +97,7 @@ public class OrdersController extends AbstractController {
     private AutoCompletionTextFieldBinding<String> clientNameAutoCompletionBinding;
     private AutoCompletionTextFieldBinding<String> clientPhoneAutoCompletionBinding;
 
-    private ValidationSupport validationSupport = new ValidationSupport();
+    private ValidationSupport validationSupport;
 
     public void addOrderItem() {
         orderItems.getItems().add(createOrderItemControl(Optional.empty()));
@@ -109,6 +109,10 @@ public class OrdersController extends AbstractController {
         if (totalCount == 0) {
             ordersTable.setPlaceholder(new Text("Ничего не найдено"));
         }
+    }
+
+    public ValidationSupport getValidationSupport() {
+        return Optional.ofNullable(validationSupport).orElse(validationSupport = new ValidationSupport());
     }
 
     private void applyClientFieldsAutoCompletion() {
@@ -219,7 +223,7 @@ public class OrdersController extends AbstractController {
     }
 
     private OrderItemControl createOrderItemControl(Optional<OrderItem> orderItemOptional) {
-        OrderItemControl orderItemControl = (OrderItemControl) beanFactory.getBean(OrderItemControl.NAME, orderItemOptional, Optional.of(validationSupport));
+        OrderItemControl orderItemControl = (OrderItemControl) beanFactory.getBean(OrderItemControl.NAME, orderItemOptional, Optional.of(getValidationSupport()));
         orderItemControl.initialize();
         orderItemControl.setOnPriceChanged(e -> totalPriceText.setText(String.valueOf(calculateTotalPrice())));
         orderItemControl.setOnBarcodeChanged(e -> {
@@ -248,8 +252,8 @@ public class OrdersController extends AbstractController {
     }
 
     private void applyValidation() {
-        validationSupport.registerValidator(clientNameText, Validator.createEmptyValidator("Имя клиента должно быть заполено"));
-        validationSupport.registerValidator(clientPhoneText, Validator.createEmptyValidator("Телефон клиента должен быть заполен"));
+        getValidationSupport().registerValidator(clientNameText, Validator.createEmptyValidator("Имя клиента должно быть заполено"));
+        getValidationSupport().registerValidator(clientPhoneText, Validator.createEmptyValidator("Телефон клиента должен быть заполен"));
     }
 
     private void initializeClientFilter() {

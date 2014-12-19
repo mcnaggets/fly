@@ -1,6 +1,5 @@
 package by.fly.ui.controller;
 
-import by.fly.model.Human;
 import by.fly.model.OrderItem;
 import by.fly.model.QOrderItem;
 import by.fly.service.CustomerService;
@@ -16,23 +15,21 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static by.fly.ui.UIUtils.DEFAULT_PAGE_SIZE;
-import static by.fly.ui.UIUtils.TIME_FORMATTER;
-import static by.fly.ui.UIUtils.refreshPagination;
+import static by.fly.ui.UIUtils.*;
+import static by.fly.util.Utils.readyOrdersPredicate;
+import static by.fly.util.Utils.sortByOrderDeadLine;
+import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 
 @Component
 public class ReportsController extends AbstractController {
@@ -67,10 +64,15 @@ public class ReportsController extends AbstractController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
+        initializeTable();
         initializeFilter();
         initializeColumns();
         applyFilterFieldsAutoCompletion();
         bindService();
+    }
+
+    private void initializeTable() {
+        ordersTable.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
     }
 
     private void applyFilterFieldsAutoCompletion() {
@@ -129,35 +131,31 @@ public class ReportsController extends AbstractController {
                 }
 
                 private PageRequest getPageable() {
-                    return new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE, getSort());
-                }
-
-                private Sort getSort() {
-                    return new Sort(Sort.Direction.ASC, QOrderItem.orderItem.deadLine.getMetadata().getName());
+                    return new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE, sortByOrderDeadLine());
                 }
             };
         }
     }
 
     private void createDateFilterPredicate() {
-        filterPredicate = QOrderItem.orderItem.orderCode.isNotNull();
         filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
                 Utils.toDate(orderStartDateFilter.getValue()),
                 Utils.toDate(orderEndDateFilter.getValue().plusDays(1))));
     }
 
     private void createFilterPredicate() {
+        filterPredicate = readyOrdersPredicate();
         createDateFilterPredicate();
-        if (!clientNameFilter.getText().trim().isEmpty()) {
+        if (StringUtils.isNotBlank(clientNameFilter.getText())) {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
         }
-        if (!printerTypeFilter.getText().trim().isEmpty()) {
+        if (StringUtils.isNotBlank(printerTypeFilter.getText())) {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.itemType.containsIgnoreCase(printerTypeFilter.getText().trim()));
         }
-        if (!masterFilter.getText().trim().isEmpty()) {
+        if (StringUtils.isNotBlank(masterFilter.getText())) {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.masterName.containsIgnoreCase(masterFilter.getText().trim()));
         }
-        if (!printerModelFilter.getText().trim().isEmpty()) {
+        if (StringUtils.isNotBlank(printerModelFilter.getText())) {
             filterPredicate = filterPredicate.and(QOrderItem.orderItem.printerModel.containsIgnoreCase(printerModelFilter.getText().trim()));
         }
     }

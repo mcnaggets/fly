@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static by.fly.ui.UIUtils.DATE_FORMATTER;
@@ -55,7 +56,7 @@ public class MasterController extends AbstractController {
 
     private User master;
 
-    private ValidationSupport validationSupport = new ValidationSupport();
+    private ValidationSupport validationSupport;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -65,8 +66,12 @@ public class MasterController extends AbstractController {
         applyValidation();
     }
 
+    public ValidationSupport getValidationSupport() {
+        return Optional.ofNullable(validationSupport).orElse(validationSupport = new ValidationSupport());
+    }
+
     private void applyValidation() {
-        validationSupport.registerValidator(masterBarcodeText, Validator.createEmptyValidator("Мастер должен быть заполнен"));
+        getValidationSupport().registerValidator(masterBarcodeText, Validator.createEmptyValidator("Мастер должен быть заполнен"));
     }
 
     public void initializeMasterBarcodeText() {

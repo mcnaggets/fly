@@ -82,9 +82,12 @@ public class DailyOrdersController extends AbstractController {
                         dailyOrdersService.refreshData();
                     }
                     Page<DailyOrders> orderItems = dailyOrdersService.findAll(
-                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE, new Sort(Sort.Direction.DESC, QDailyOrders.dailyOrders.date.getMetadata().getName()))
-                    );
+                            new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE, getSort()));
                     return FXCollections.observableList(orderItems.getContent());
+                }
+
+                private Sort getSort() {
+                    return new Sort(Sort.Direction.DESC, QDailyOrders.dailyOrders.date.getMetadata().getName());
                 }
             };
         }

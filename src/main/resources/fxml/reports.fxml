@@ -37,11 +37,11 @@
                         </HBox>
                         <TableView fx:id="ordersTable" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="printerModelColumn" text="Модель"/>
+                                <TableColumn fx:id="printerModelColumn" text="Наименование"/>
                                 <TableColumn fx:id="workTypeColumn" text="Вид работ"/>
                                 <TableColumn fx:id="masterColumn" text="Мастер"/>
-                                <TableColumn fx:id="deadLineColumn" text="Время выполнения"/>
-                                <TableColumn fx:id="priceColumn" text="Стоимость"/>
+                                <TableColumn fx:id="deadLineColumn" text="Дата"/>
+                                <TableColumn fx:id="priceColumn" text="Сумма"/>
                                 <TableColumn fx:id="printerTypeColumn" text="Тип"/>
                             </columns>
                         </TableView>
