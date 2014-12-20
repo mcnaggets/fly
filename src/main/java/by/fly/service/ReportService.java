@@ -35,13 +35,14 @@ public class ReportService {
 
     public OrderItemFacets generateFacets() {
         OrderItemFacets facets = new OrderItemFacets();
+        facets.setTotalPrice(getTotalPrice());
         for (Path path : OrderItemFacets.AVAILABLE_PROPERTIES) {
             facets.addFacets(path, getFacets(path));
         }
         return facets;
     }
 
-    public long getTotalPrice() {
+    public float getTotalPrice() {
         final String sumField = "sum";
         final AggregationOutput output = mongoOperations.execute(call -> call.getCollection(QOrderItem.orderItem.getMetadata().getName()).aggregate(
                 Stream.of(
@@ -52,7 +53,7 @@ public class ReportService {
                 ).collect(Collectors.toList())
         ));
         final Number sum = (Number) output.results().iterator().next().get(sumField);
-        return sum.longValue();
+        return sum.floatValue();
     }
 
     private List<ValueCount> getFacets(Path path) {

@@ -53,6 +53,11 @@ public class ReportsController extends AbstractController {
     public TableColumn<OrderItem, String> printerTypeColumn;
 
     public TableColumn<OrderItemFacets, String> printerModelFacetColumn;
+    public TableColumn<OrderItemFacets, String> workTypeFacetColumn;
+    public TableColumn<OrderItemFacets, String> masterFacetColumn;
+    public TableColumn<OrderItemFacets, String> deadLineFacetColumn;
+    public TableColumn<OrderItemFacets, String> priceFacetColumn;
+    public TableColumn<OrderItemFacets, String> printerTypeFacetColumn;
 
     public ProgressIndicator progressIndicator;
     public Pagination pagination;
@@ -84,6 +89,10 @@ public class ReportsController extends AbstractController {
     private void initializeTotalsTable() {
         ordersFacetTable.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
         printerModelFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.printerModel, "\n")));
+        workTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.workTypes, "\n")));
+        masterFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.masterName, "\n")));
+        priceFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getTotalPrice())));
+        printerTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.itemType, "\n")));
     }
 
     private void initializeTable() {
