@@ -1,8 +1,12 @@
 package by.fly.service;
 
 import by.fly.model.OrderItem;
+import by.fly.model.QOrderItem;
 import by.fly.model.facet.OrderItemFacets;
 import by.fly.model.facet.ValueCount;
+import com.mongodb.AggregationOutput;
+import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import com.mysema.query.types.Path;
 import com.mysema.query.types.path.CollectionPathBase;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -36,10 +41,24 @@ public class ReportService {
         return facets;
     }
 
+    public long getTotalPrice() {
+        final String sumField = "sum";
+        final AggregationOutput output = mongoOperations.execute(call -> call.getCollection(QOrderItem.orderItem.getMetadata().getName()).aggregate(
+                Stream.of(
+                        new BasicDBObject("$group",
+                                BasicDBObjectBuilder.start()
+                                        .add("_id", "null")
+                                        .add(sumField, new BasicDBObject("$sum", "$" + QOrderItem.orderItem.price.getMetadata().getName())).get())
+                ).collect(Collectors.toList())
+        ));
+        final Number sum = (Number) output.results().iterator().next().get(sumField);
+        return sum.longValue();
+    }
+
     private List<ValueCount> getFacets(Path path) {
         final String tagName = path.getMetadata().getName();
-        TypedAggregation<OrderItem> agg = new TypedAggregation<>(OrderItem.class, getAggregationOperations(path, tagName));
-        AggregationResults<DBObject> results = mongoOperations.aggregate(agg, DBObject.class);
+        TypedAggregation<OrderItem> aggregation = new TypedAggregation<>(OrderItem.class, getAggregationOperations(path, tagName));
+        AggregationResults<DBObject> results = mongoOperations.aggregate(aggregation, DBObject.class);
         return results.getMappedResults().stream().map(obj -> new ValueCount((String) obj.get(tagName),
                 (Integer) obj.get(COUNT_FIELD_NAME))).collect(Collectors.toList());
     }

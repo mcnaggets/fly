@@ -3,14 +3,14 @@ package by.fly.service;
 import by.fly.model.Customer;
 import by.fly.model.OrderItem;
 import by.fly.model.OrderStatus;
-import by.fly.model.QOrderItem;
 import by.fly.repository.AbstractBaseTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
 import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
 
 public class ReportServiceTest extends AbstractBaseTest {
 
@@ -32,16 +32,23 @@ public class ReportServiceTest extends AbstractBaseTest {
             orderItem.setCustomer(customer);
             orderItem.setStatus(OrderStatus.READY);
             orderItem.setPrinterModel("HP" + random.nextInt(10));
+            orderItem.setPrice(random.nextInt(1_000_000));
             orderService.save(orderItem);
         }
     }
 
 
     @Test
-    @Rollback(false)
     public void testAggregation() {
         populateData();
         reportService.generateFacets();
+    }
+
+    @Test
+    public void testSum() {
+        populateData();
+        final long totalPrice = reportService.getTotalPrice();
+        assertTrue(totalPrice > 0);
     }
 
 }
