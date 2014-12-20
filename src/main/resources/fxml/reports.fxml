@@ -19,7 +19,7 @@
                                 <DatePicker fx:id="orderStartDateFilter"/>
                                 <Label text="по"/>
                                 <DatePicker fx:id="orderEndDateFilter"/>
-                                <Button onAction="#refresh" text="Применить фильтр" HBox.margin="30"/>
+                                <Button onAction="#refresh" text="Применить фильтр"/>
                             </children>
                         </HBox>
 
@@ -43,6 +43,16 @@
                                 <TableColumn fx:id="deadLineColumn" text="Дата"/>
                                 <TableColumn fx:id="priceColumn" text="Сумма"/>
                                 <TableColumn fx:id="printerTypeColumn" text="Тип"/>
+                            </columns>
+                        </TableView>
+                        <TableView fx:id="ordersFacetTable">
+                            <columns>
+                                <TableColumn fx:id="printerModelFacetColumn"/>
+                                <TableColumn fx:id="workTypeFacetColumn" />
+                                <TableColumn fx:id="masterFacetColumn" />
+                                <TableColumn fx:id="deadLineFacetColumn" />
+                                <TableColumn fx:id="priceFacetColumn" />
+                                <TableColumn fx:id="printerTypeFacetColumn"/>
                             </columns>
                         </TableView>
                         <HBox alignment="CENTER_LEFT" spacing="10">

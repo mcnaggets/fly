@@ -41,7 +41,7 @@ public class ReportServiceTest extends AbstractBaseTest {
     @Rollback(false)
     public void testAggregation() {
         populateData();
-        reportService.getOrderFieldValueCounts(QOrderItem.orderItem.printerModel.getMetadata().getName());
+        reportService.generateFacets();
     }
 
 }

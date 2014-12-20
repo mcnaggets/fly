@@ -2,8 +2,10 @@ package by.fly.ui.controller;
 
 import by.fly.model.OrderItem;
 import by.fly.model.QOrderItem;
+import by.fly.model.facet.OrderItemFacets;
 import by.fly.service.CustomerService;
 import by.fly.service.OrderService;
+import by.fly.service.ReportService;
 import by.fly.service.UserService;
 import by.fly.util.Utils;
 import com.mysema.query.types.expr.BooleanExpression;
@@ -42,14 +44,18 @@ public class ReportsController extends AbstractController {
     public TextField masterFilter;
     public TextField printerModelFilter;
     public TableView<OrderItem> ordersTable;
+    public TableView<OrderItemFacets> ordersFacetTable;
     public TableColumn<OrderItem, String> printerModelColumn;
     public TableColumn<OrderItem, String> workTypeColumn;
     public TableColumn<OrderItem, String> masterColumn;
     public TableColumn<OrderItem, String> deadLineColumn;
     public TableColumn<OrderItem, String> priceColumn;
     public TableColumn<OrderItem, String> printerTypeColumn;
-    public Pagination pagination;
+
+    public TableColumn<OrderItemFacets, String> printerModelFacetColumn;
+
     public ProgressIndicator progressIndicator;
+    public Pagination pagination;
     private BooleanExpression filterPredicate;
 
     @Autowired
@@ -61,14 +67,23 @@ public class ReportsController extends AbstractController {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private ReportService reportService;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
         initializeTable();
+        initializeTotalsTable();
         initializeFilter();
         initializeColumns();
         applyFilterFieldsAutoCompletion();
         bindService();
+    }
+
+    private void initializeTotalsTable() {
+        ordersFacetTable.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
+        printerModelFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.printerModel, "\n")));
     }
 
     private void initializeTable() {
@@ -127,6 +142,7 @@ public class ReportsController extends AbstractController {
                     if (!doRefreshData.get()) return FXCollections.emptyObservableList();
                     createFilterPredicate();
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate, getPageable());
+                    ordersFacetTable.setItems(FXCollections.observableArrayList(reportService.generateFacets()));
                     return FXCollections.observableList(orderItems.getContent());
                 }
 
