@@ -47,7 +47,7 @@ public class ReportServiceTest extends AbstractBaseTest {
     @Test
     public void testSum() {
         populateData();
-        final long totalPrice = reportService.getTotalPrice();
+        final float totalPrice = reportService.getTotalPrice();
         assertTrue(totalPrice > 0);
     }
 

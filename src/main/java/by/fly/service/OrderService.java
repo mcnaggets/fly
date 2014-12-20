@@ -7,6 +7,7 @@ import by.fly.repository.OrderItemRepository;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import com.mysema.query.types.Predicate;
+import com.mysema.query.types.expr.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,6 +70,10 @@ public class OrderService {
         return orderItemRepository.findAll(
                 QOrderItem.orderItem.barcode.eq(barcode),
                 new PageRequest(0, 1, Sort.Direction.DESC, CREATED_AT)).getContent().stream().findFirst().orElse(null);
+    }
+
+    public List<OrderItem> findAll(Predicate predicate) {
+        return (List<OrderItem>) orderItemRepository.findAll(predicate);
     }
 
 }

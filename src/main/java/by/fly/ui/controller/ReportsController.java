@@ -15,16 +15,23 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import java.io.*;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -139,6 +146,55 @@ public class ReportsController extends AbstractController {
         refreshPagination(pagination, totalCount);
         if (totalCount == 0) {
             ordersTable.setPlaceholder(new Text("Ничего не найдено"));
+        }
+    }
+
+    public void export(ActionEvent actionEvent) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet();
+        createReportHeader(sheet);
+        createReportCells(sheet);
+        autoSizeReportColumns(sheet);
+        saveReportFile(workbook);
+    }
+
+    private void autoSizeReportColumns(XSSFSheet sheet) {
+        for (int columnIndex = 0; columnIndex < sheet.getRow(0).getLastCellNum(); columnIndex++) {
+            sheet.autoSizeColumn(columnIndex);
+        }
+    }
+
+    private void saveReportFile(XSSFWorkbook workbook) throws IOException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Сохранить отчёт");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xlsx"));
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                workbook.write(fileOutputStream);
+            }
+        }
+    }
+
+    private void createReportCells(XSSFSheet sheet) {
+        // XXX: may be performance and memory issues
+        final List<OrderItem> orderItems = orderService.findAll(filterPredicate);
+        for (int itemIndex = 0; itemIndex < orderItems.size(); itemIndex++) {
+            createReportRowCells(sheet.createRow(itemIndex + 1), orderItems.get(itemIndex));
+        }
+    }
+
+    private void createReportRowCells(Row row, OrderItem item) {
+        for (int columnIndex = 0; columnIndex < ordersTable.getColumns().size(); columnIndex++) {
+            final TableColumn<OrderItem, ?> column = ordersTable.getColumns().get(columnIndex);
+            row.createCell(columnIndex).setCellValue((String) column.getCellObservableValue(item).getValue());
+        }
+    }
+
+    private void createReportHeader(XSSFSheet sheet) {
+        Row header = sheet.createRow(0);
+        for (int i = 0; i < ordersTable.getColumns().size(); i++) {
+            header.createCell(i).setCellValue(ordersTable.getColumns().get(i).getText());
         }
     }
 

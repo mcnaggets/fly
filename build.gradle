@@ -53,6 +53,8 @@ dependencies {
 
     compile "org.apache.pdfbox:pdfbox:1.8.5"
 
+    compile "org.apache.poi:poi-ooxml:3.10-FINAL"
+
 }
 
 if (!JavaVersion.current().isJava8Compatible()) {

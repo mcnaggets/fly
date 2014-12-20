@@ -20,6 +20,7 @@
                                 <Label text="по"/>
                                 <DatePicker fx:id="orderEndDateFilter"/>
                                 <Button onAction="#refresh" text="Применить фильтр"/>
+                                <Button onAction="#export" text="Экспорт в Excel"/>
                             </children>
                         </HBox>
 
