@@ -30,10 +30,10 @@
                                 <TextField fx:id="clientNameFilter"/>
                                 <Label text="Мастер:"/>
                                 <TextField fx:id="masterFilter"/>
-                                <Label text="Тип:"/>
-                                <TextField fx:id="printerTypeFilter"/>
                                 <Label text="Модель:"/>
                                 <TextField fx:id="printerModelFilter"/>
+                                <Label text="Тип:"/>
+                                <VBox fx:id="printerTypeFilterContainer"/>
                             </children>
                         </HBox>
                         <TableView fx:id="ordersTable" VBox.vgrow="ALWAYS">

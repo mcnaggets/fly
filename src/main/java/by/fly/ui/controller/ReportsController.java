@@ -3,11 +3,9 @@ package by.fly.ui.controller;
 import by.fly.model.OrderItem;
 import by.fly.model.QOrderItem;
 import by.fly.model.facet.OrderItemFacets;
-import by.fly.service.CustomerService;
-import by.fly.service.OrderService;
-import by.fly.service.ReportService;
-import by.fly.service.UserService;
+import by.fly.service.*;
 import by.fly.util.Utils;
+import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.expr.BooleanExpression;
 import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +15,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang.StringUtils;
@@ -33,11 +32,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static by.fly.ui.UIUtils.*;
+import static by.fly.ui.UIUtils.DATE_FORMATTER;
+import static by.fly.ui.UIUtils.refreshPagination;
 import static by.fly.util.Utils.readyOrdersPredicate;
 import static by.fly.util.Utils.sortByOrderDeadLine;
 import static javafx.scene.control.Alert.AlertType.WARNING;
@@ -46,14 +47,18 @@ import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 
 @Component
 public class ReportsController extends AbstractController {
+    public static final int TABLE_PAGE_SIZE = 30;
     private final GetOrdersService service = new GetOrdersService();
     private final AtomicBoolean doRefreshData = new AtomicBoolean(true);
+
     public DatePicker orderStartDateFilter;
     public DatePicker orderEndDateFilter;
     public TextField clientNameFilter;
-    public TextField printerTypeFilter;
     public TextField masterFilter;
     public TextField printerModelFilter;
+    public VBox printerTypeFilterContainer;
+    private CheckBox[] itemTypeCheckBoxes;
+
     public TableView<OrderItem> ordersTable;
     public TableView<OrderItemFacets> ordersFacetTable;
     public TableColumn<OrderItem, String> printerModelColumn;
@@ -72,7 +77,7 @@ public class ReportsController extends AbstractController {
 
     public ProgressIndicator progressIndicator;
     public Pagination pagination;
-    private BooleanExpression filterPredicate;
+    private BooleanBuilder filterPredicate;
 
     @Autowired
     private CustomerService customerService;
@@ -86,6 +91,9 @@ public class ReportsController extends AbstractController {
     @Autowired
     private ReportService reportService;
 
+    @Autowired
+    private SettingsService settingsService;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
@@ -95,6 +103,7 @@ public class ReportsController extends AbstractController {
         initializeColumns();
         applyFilterFieldsAutoCompletion();
         bindService();
+        createItemTypeCheckBoxes();
     }
 
     private void initializeTotalsTable() {
@@ -207,6 +216,15 @@ public class ReportsController extends AbstractController {
         }
     }
 
+    private void createItemTypeCheckBoxes() {
+        itemTypeCheckBoxes = settingsService.getItemTypes().stream().map(itemType -> {
+            CheckBox checkBox = new CheckBox(itemType);
+            checkBox.setUserData(itemType);
+            return checkBox;
+        }).toArray(CheckBox[]::new);
+        printerTypeFilterContainer.getChildren().addAll(itemTypeCheckBoxes);
+    }
+
     private class GetOrdersService extends Service<ObservableList<OrderItem>> {
         @Override
         protected Task<ObservableList<OrderItem>> createTask() {
@@ -215,38 +233,63 @@ public class ReportsController extends AbstractController {
                 protected ObservableList<OrderItem> call() throws Exception {
                     if (!doRefreshData.get()) return FXCollections.emptyObservableList();
                     createFilterPredicate();
+                    return getOrderItems();
+                }
+
+                private ObservableList<OrderItem> getOrderItems() {
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate, getPageable());
                     ordersFacetTable.setItems(FXCollections.observableArrayList(reportService.generateFacets()));
                     return FXCollections.observableList(orderItems.getContent());
                 }
 
                 private PageRequest getPageable() {
-                    return new PageRequest(pagination.getCurrentPageIndex(), DEFAULT_PAGE_SIZE, sortByOrderDeadLine());
+                    return new PageRequest(pagination.getCurrentPageIndex(), TABLE_PAGE_SIZE, sortByOrderDeadLine());
                 }
             };
         }
     }
 
+    private void createFilterPredicate() {
+        initializeFilterPredicate();
+        createDateFilterPredicate();
+        createClientNamePredicate();
+        createItemTypePredicate();
+        createMasterNamePredicate();
+        createPrinterModelPredicate();
+    }
+
+    private void initializeFilterPredicate() {
+        filterPredicate = new BooleanBuilder(readyOrdersPredicate());
+    }
+
     private void createDateFilterPredicate() {
-        filterPredicate = filterPredicate.and(QOrderItem.orderItem.deadLine.between(
+        filterPredicate.and(QOrderItem.orderItem.deadLine.between(
                 Utils.toDate(orderStartDateFilter.getValue()),
                 Utils.toDate(orderEndDateFilter.getValue().plusDays(1))));
     }
 
-    private void createFilterPredicate() {
-        filterPredicate = readyOrdersPredicate();
-        createDateFilterPredicate();
-        if (StringUtils.isNotBlank(clientNameFilter.getText())) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
-        }
-        if (StringUtils.isNotBlank(printerTypeFilter.getText())) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.itemType.containsIgnoreCase(printerTypeFilter.getText().trim()));
-        }
-        if (StringUtils.isNotBlank(masterFilter.getText())) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.masterName.containsIgnoreCase(masterFilter.getText().trim()));
-        }
+    private void createPrinterModelPredicate() {
         if (StringUtils.isNotBlank(printerModelFilter.getText())) {
-            filterPredicate = filterPredicate.and(QOrderItem.orderItem.printerModel.containsIgnoreCase(printerModelFilter.getText().trim()));
+            filterPredicate.and(QOrderItem.orderItem.printerModel.containsIgnoreCase(printerModelFilter.getText().trim()));
+        }
+    }
+
+    private void createMasterNamePredicate() {
+        if (StringUtils.isNotBlank(masterFilter.getText())) {
+            filterPredicate.and(QOrderItem.orderItem.masterName.containsIgnoreCase(masterFilter.getText().trim()));
+        }
+    }
+
+    private void createItemTypePredicate() {
+        Arrays.stream(itemTypeCheckBoxes).filter(CheckBox::isSelected)
+                .map(cb -> QOrderItem.orderItem.itemType.eq((String) cb.getUserData()))
+                .reduce(BooleanExpression::or)
+                .ifPresent(filterPredicate::and);
+    }
+
+    private void createClientNamePredicate() {
+        if (StringUtils.isNotBlank(clientNameFilter.getText())) {
+            filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
         }
     }
 
