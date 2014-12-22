@@ -1,7 +1,6 @@
 package by.fly.ui.controller;
 
 import by.fly.model.OrderItem;
-import by.fly.model.QOrderItem;
 import by.fly.model.WorkType;
 import by.fly.model.facet.OrderItemFacets;
 import by.fly.service.*;
@@ -20,7 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +36,23 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import static by.fly.model.QOrderItem.orderItem;
 import static by.fly.ui.UIUtils.DATE_FORMATTER;
 import static by.fly.ui.UIUtils.refreshPagination;
 import static by.fly.util.Utils.readyOrdersPredicate;
 import static by.fly.util.Utils.sortByOrderDeadLine;
+import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.CLOSE;
 
 @Component
 public class ReportsController extends AbstractController {
+
     public static final int TABLE_PAGE_SIZE = 30;
+
     private final GetOrdersService service = new GetOrdersService();
     private final AtomicBoolean doRefreshData = new AtomicBoolean(true);
 
@@ -107,12 +112,12 @@ public class ReportsController extends AbstractController {
     }
 
     private void initializeTotalsTable() {
-        printerModelFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.printerModel)));
-        workTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.workTypes,
+        printerModelFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(orderItem.printerModel)));
+        workTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(orderItem.workTypes,
                 v -> String.format("%d - %s", v.getCount(), WorkType.valueOf(v.getValue()).getMessage()))));
-        masterFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.masterName)));
+        masterFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(orderItem.masterName)));
         priceFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getTotalPrice())));
-        printerTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.itemType)));
+        printerTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(orderItem.itemType)));
     }
 
     private void applyFilterFieldsAutoCompletion() {
@@ -163,26 +168,38 @@ public class ReportsController extends AbstractController {
     }
 
     public void export(ActionEvent actionEvent) throws IOException {
+        if (toMuchExportData()) return;
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet();
-        createReportHeader(sheet);
-        createReportCells(sheet);
+
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setWrapText(true);
+
+        final int rowOffset = createReportHeader(sheet);
+        createReportCells(sheet, cellStyle, rowOffset);
+        createReportFooter(sheet, rowOffset);
         autoSizeReportColumns(sheet);
         saveReportFile(workbook);
     }
 
-    private void autoSizeReportColumns(XSSFSheet sheet) {
-        for (int columnIndex = 0; columnIndex < sheet.getRow(0).getLastCellNum(); columnIndex++) {
-            sheet.autoSizeColumn(columnIndex);
-        }
+    private void createReportFooter(XSSFSheet sheet, int rowOffset) {
+
     }
 
-    private void saveReportFile(XSSFWorkbook workbook) throws IOException {
+    private boolean toMuchExportData() {
         final long count = orderService.count(filterPredicate);
         if (count > 10_000) {
             new Alert(WARNING, "Слишком много данных для отчёта", CLOSE).showAndWait();
-            return;
+            return true;
         }
+        return false;
+    }
+
+    private void autoSizeReportColumns(XSSFSheet sheet) {
+        IntStream.range(0, ordersTable.getColumns().size()).forEach(sheet::autoSizeColumn);
+    }
+
+    private void saveReportFile(XSSFWorkbook workbook) throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Сохранить отчёт");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xlsx"));
@@ -190,30 +207,60 @@ public class ReportsController extends AbstractController {
         if (file != null) {
             try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
                 workbook.write(fileOutputStream);
+            } catch (IOException x) {
+                new Alert(ERROR, x.getMessage(), CLOSE).showAndWait();
             }
         }
     }
 
-    private void createReportCells(XSSFSheet sheet) {
+    private void createReportCells(XSSFSheet sheet, CellStyle cellStyle, int rowOffset) {
         // XXX: may be performance and memory issues
         final List<OrderItem> orderItems = orderService.findAll(filterPredicate);
         for (int itemIndex = 0; itemIndex < orderItems.size(); itemIndex++) {
-            createReportRowCells(sheet.createRow(itemIndex + 1), orderItems.get(itemIndex));
+            createReportRowCells(sheet.createRow(rowOffset + itemIndex + 1), cellStyle, orderItems.get(itemIndex));
         }
     }
 
-    private void createReportRowCells(Row row, OrderItem item) {
+    private void createReportRowCells(Row row, CellStyle cellStyle, OrderItem item) {
         for (int columnIndex = 0; columnIndex < ordersTable.getColumns().size(); columnIndex++) {
             final TableColumn<OrderItem, ?> column = ordersTable.getColumns().get(columnIndex);
-            row.createCell(columnIndex).setCellValue((String) column.getCellObservableValue(item).getValue());
+            final org.apache.poi.ss.usermodel.Cell cell = row.createCell(columnIndex);
+            cell.setCellValue((String) column.getCellObservableValue(item).getValue());
+            cell.setCellStyle(cellStyle);
         }
     }
 
-    private void createReportHeader(XSSFSheet sheet) {
-        Row header = sheet.createRow(0);
+    private int createReportHeader(XSSFSheet sheet) {
+        int rowOffset = 0;
+        if (!anyDateFilter.isSelected()) {
+            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("За число c %s по %s",
+                    DATE_FORMATTER.format(orderStartDateFilter.getValue()), orderEndDateFilter.getValue().format(DATE_FORMATTER)));
+        }
+        if (StringUtils.isNotBlank(printerModelFilter.getText())) {
+            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Модель принтера %s", printerModelFilter.getText()));
+        }
+        if (StringUtils.isNotBlank(masterFilter.getText())) {
+            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Мастер %s", masterFilter.getText()));
+        }
+        if (StringUtils.isNotBlank(clientNameFilter.getText())) {
+            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Клиент %s", clientNameFilter.getText()));
+        }
+        final String itemTypes = Arrays.stream(itemTypeCheckBoxes).filter(CheckBox::isSelected)
+                .map(cb -> (String) cb.getUserData())
+                .collect(Collectors.joining(", "));
+        if (StringUtils.isNotBlank(itemTypes)) {
+            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Тип(ы) %s", clientNameFilter.getText()));
+        }
+
+        return createReportTableHeader(sheet, rowOffset);
+    }
+
+    private int createReportTableHeader(XSSFSheet sheet, int rowOffset) {
+        Row header = sheet.createRow(rowOffset++);
         for (int i = 0; i < ordersTable.getColumns().size(); i++) {
             header.createCell(i).setCellValue(ordersTable.getColumns().get(i).getText());
         }
+        return rowOffset;
     }
 
     private void createItemTypeCheckBoxes() {
@@ -264,7 +311,7 @@ public class ReportsController extends AbstractController {
 
     private void createDateFilterPredicate() {
         if (!anyDateFilter.isSelected()) {
-            filterPredicate.and(QOrderItem.orderItem.deadLine.between(
+            filterPredicate.and(orderItem.deadLine.between(
                     Utils.toDate(orderStartDateFilter.getValue()),
                     Utils.toDate(orderEndDateFilter.getValue().plusDays(1))));
         }
@@ -272,26 +319,26 @@ public class ReportsController extends AbstractController {
 
     private void createPrinterModelPredicate() {
         if (StringUtils.isNotBlank(printerModelFilter.getText())) {
-            filterPredicate.and(QOrderItem.orderItem.printerModel.containsIgnoreCase(printerModelFilter.getText().trim()));
+            filterPredicate.and(orderItem.printerModel.containsIgnoreCase(printerModelFilter.getText().trim()));
         }
     }
 
     private void createMasterNamePredicate() {
         if (StringUtils.isNotBlank(masterFilter.getText())) {
-            filterPredicate.and(QOrderItem.orderItem.masterName.containsIgnoreCase(masterFilter.getText().trim()));
+            filterPredicate.and(orderItem.masterName.containsIgnoreCase(masterFilter.getText().trim()));
         }
     }
 
     private void createItemTypePredicate() {
         Arrays.stream(itemTypeCheckBoxes).filter(CheckBox::isSelected)
-                .map(cb -> QOrderItem.orderItem.itemType.eq((String) cb.getUserData()))
+                .map(cb -> orderItem.itemType.eq((String) cb.getUserData()))
                 .reduce(BooleanExpression::or)
                 .ifPresent(filterPredicate::and);
     }
 
     private void createClientNamePredicate() {
         if (StringUtils.isNotBlank(clientNameFilter.getText())) {
-            filterPredicate.and(QOrderItem.orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
+            filterPredicate.and(orderItem.clientName.containsIgnoreCase(clientNameFilter.getText().trim()));
         }
     }
 
