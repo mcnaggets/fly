@@ -43,7 +43,6 @@ import static by.fly.util.Utils.readyOrdersPredicate;
 import static by.fly.util.Utils.sortByOrderDeadLine;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.CLOSE;
-import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 
 @Component
 public class ReportsController extends AbstractController {
@@ -58,6 +57,7 @@ public class ReportsController extends AbstractController {
     public TextField printerModelFilter;
     public VBox printerTypeFilterContainer;
     private CheckBox[] itemTypeCheckBoxes;
+    public CheckBox anyDateFilter;
 
     public TableView<OrderItem> ordersTable;
     public TableView<OrderItemFacets> ordersFacetTable;
@@ -97,7 +97,6 @@ public class ReportsController extends AbstractController {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
-        initializeTable();
         initializeTotalsTable();
         initializeFilter();
         initializeColumns();
@@ -107,16 +106,11 @@ public class ReportsController extends AbstractController {
     }
 
     private void initializeTotalsTable() {
-        ordersFacetTable.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
         printerModelFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.printerModel, "\n")));
         workTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.workTypes, "\n")));
         masterFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.masterName, "\n")));
         priceFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getTotalPrice())));
         printerTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.itemType, "\n")));
-    }
-
-    private void initializeTable() {
-        ordersTable.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
     }
 
     private void applyFilterFieldsAutoCompletion() {
@@ -127,6 +121,10 @@ public class ReportsController extends AbstractController {
     }
 
     private void initializeDateFilter() {
+        anyDateFilter.setOnAction(e -> {
+            orderStartDateFilter.setDisable(anyDateFilter.isSelected());
+            orderEndDateFilter.setDisable(anyDateFilter.isSelected());
+        });
         orderStartDateFilter.setValue(LocalDate.now());
         orderEndDateFilter.setValue(LocalDate.now());
     }
@@ -263,9 +261,11 @@ public class ReportsController extends AbstractController {
     }
 
     private void createDateFilterPredicate() {
-        filterPredicate.and(QOrderItem.orderItem.deadLine.between(
-                Utils.toDate(orderStartDateFilter.getValue()),
-                Utils.toDate(orderEndDateFilter.getValue().plusDays(1))));
+        if (!anyDateFilter.isSelected()) {
+            filterPredicate.and(QOrderItem.orderItem.deadLine.between(
+                    Utils.toDate(orderStartDateFilter.getValue()),
+                    Utils.toDate(orderEndDateFilter.getValue().plusDays(1))));
+        }
     }
 
     private void createPrinterModelPredicate() {

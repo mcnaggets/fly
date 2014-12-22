@@ -22,10 +22,7 @@
                                         <Label fx:id="orderDateLabel"/>
                                     </children>
                                 </HBox>
-                                <HBox spacing="10" alignment="CENTER_LEFT">
-                                    <padding>
-                                        <Insets left="10"/>
-                                    </padding>
+                                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
                                     <children>
                                         <Label text="Информация о заказчике:"/>
                                         <TextField fx:id="clientNameText"/>
@@ -69,9 +66,9 @@
                 <StackPane fx:id="orderTableRegion">
                     <children>
                         <VBox AnchorPane.bottomAnchor="0.0"
-                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" styleClass="padding10">
                             <children>
-                                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
                                     <children>
                                         <Label text="Заказы за число:"/>
                                         <DatePicker fx:id="orderDateFilter"/>
@@ -79,7 +76,7 @@
                                     </children>
                                 </HBox>
 
-                                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="padding10">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
                                     <children>
                                         <Label text="Код:"/>
                                         <TextField fx:id="orderCodeFilter"/>
@@ -92,6 +89,9 @@
                                     </children>
                                 </HBox>
                                 <TableView fx:id="ordersTable" VBox.vgrow="ALWAYS">
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
                                     <columns>
                                         <TableColumn fx:id="numberColumn" text="№"/>
                                         <TableColumn fx:id="orderNumberColumn" text="Код"/>
@@ -108,9 +108,6 @@
                                     </columns>
                                 </TableView>
                                 <HBox alignment="CENTER_LEFT" spacing="10">
-                                    <padding>
-                                        <Insets left="10"/>
-                                    </padding>
                                     <Button onAction="#createNewOrder" text="Добавить заказ"/>
                                     <Button onAction="#refresh" text="Обновить"/>
                                     <Pagination fx:id="pagination" pageCount="1" HBox.hgrow="ALWAYS"/>

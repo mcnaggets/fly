@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static by.fly.ui.UIUtils.*;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.CLOSE;
-import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 
 @Component
 public class OrdersController extends AbstractController {
@@ -298,7 +297,6 @@ public class OrdersController extends AbstractController {
     }
 
     private void initializeTable() {
-        ordersTable.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
         ordersTable.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                 OrderItem orderItem = ordersTable.getSelectionModel().getSelectedItem();

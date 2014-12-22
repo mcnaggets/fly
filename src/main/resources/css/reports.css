@@ -1,0 +1,12 @@
+#ordersFacetTable .column-header-background {
+    visibility: hidden;
+    -fx-padding: -1em;
+}
+
+#ordersFacetTable .table-row-cell {
+    -fx-cell-size: 98px;
+}
+
+.ordersFacetTable {
+    -fx-pref-height: 100px;
+}
