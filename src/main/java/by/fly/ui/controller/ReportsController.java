@@ -2,6 +2,7 @@ package by.fly.ui.controller;
 
 import by.fly.model.OrderItem;
 import by.fly.model.QOrderItem;
+import by.fly.model.WorkType;
 import by.fly.model.facet.OrderItemFacets;
 import by.fly.service.*;
 import by.fly.util.Utils;
@@ -106,11 +107,12 @@ public class ReportsController extends AbstractController {
     }
 
     private void initializeTotalsTable() {
-        printerModelFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.printerModel, "\n")));
-        workTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.workTypes, "\n")));
-        masterFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.masterName, "\n")));
+        printerModelFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.printerModel)));
+        workTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.workTypes,
+                v -> String.format("%d - %s", v.getCount(), WorkType.valueOf(v.getValue()).getMessage()))));
+        masterFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.masterName)));
         priceFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getTotalPrice())));
-        printerTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.itemType, "\n")));
+        printerTypeFacetColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFacetsAsString(QOrderItem.orderItem.itemType)));
     }
 
     private void applyFilterFieldsAutoCompletion() {
