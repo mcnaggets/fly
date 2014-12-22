@@ -20,7 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -38,6 +40,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static by.fly.ui.UIUtils.*;
 import static by.fly.util.Utils.readyOrdersPredicate;
 import static by.fly.util.Utils.sortByOrderDeadLine;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 
 @Component
@@ -128,7 +132,7 @@ public class ReportsController extends AbstractController {
         masterColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getMasterName()));
         workTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWorkTypeMessages("\n")));
         priceColumn.setCellValueFactory(data -> new SimpleStringProperty(String.valueOf(data.getValue().getPrice())));
-        deadLineColumn.setCellValueFactory(data -> new SimpleStringProperty(TIME_FORMATTER.format(data.getValue().getDeadLine())));
+        deadLineColumn.setCellValueFactory(data -> new SimpleStringProperty(DATE_FORMATTER.format(data.getValue().getDeadLine())));
     }
 
     private void bindService() {
@@ -165,6 +169,11 @@ public class ReportsController extends AbstractController {
     }
 
     private void saveReportFile(XSSFWorkbook workbook) throws IOException {
+        final long count = orderService.count(filterPredicate);
+        if (count > 10_000) {
+            new Alert(WARNING, "Слишком много данных для отчёта", CLOSE).showAndWait();
+            return;
+        }
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Сохранить отчёт");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xlsx"));

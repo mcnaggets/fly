@@ -9,7 +9,6 @@ import by.fly.service.UserService;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,8 @@ import java.util.ResourceBundle;
 
 import static by.fly.ui.UIUtils.DATE_FORMATTER;
 import static by.fly.ui.UIUtils.TIME_FORMATTER;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+import static javafx.scene.control.ButtonType.CLOSE;
 
 @Component
 public class MasterController extends AbstractController {
@@ -107,7 +108,7 @@ public class MasterController extends AbstractController {
             populateOrderItem();
             saveOrder();
         } catch (IllegalStateException x) {
-            Dialogs.create().owner(masterBarcodeText.getScene().getWindow()).title("Предупреждение").message(x.getMessage()).showWarning();
+            new Alert(WARNING, x.getMessage(), CLOSE).showAndWait();
         }
     }
 
@@ -129,7 +130,7 @@ public class MasterController extends AbstractController {
             saveOrder();
             closeWindow();
         } catch (IllegalStateException x) {
-            Dialogs.create().owner(masterBarcodeText.getScene().getWindow()).title("Предупреждение").message(x.getMessage()).showWarning();
+            new Alert(WARNING, x.getMessage(), CLOSE);
         }
     }
 

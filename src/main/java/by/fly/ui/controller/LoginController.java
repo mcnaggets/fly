@@ -1,15 +1,19 @@
 package by.fly.ui.controller;
 
 import by.fly.ui.control.VKAuthorizeBrowser;
+import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
-import org.controlsfx.dialog.Dialogs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static javafx.scene.control.Alert.AlertType.INFORMATION;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+import static javafx.scene.control.ButtonType.CLOSE;
 
 @Component
 public class LoginController extends AbstractController {
@@ -40,7 +44,9 @@ public class LoginController extends AbstractController {
     public void handleSubmitButtonAction() {
         if (loginSuccess()) {
             doLogin(true);
-        } // TODO: illegal login handle
+        } else {
+            new Alert(WARNING, "Неверное имя пользователя или пароль", CLOSE).showAndWait();
+        }
     }
 
     private void doLogin(boolean isAdmin) {
@@ -48,7 +54,7 @@ public class LoginController extends AbstractController {
         if (isAdmin) {
             mainController.internalLogin();
         } else {
-            Dialogs.create().owner(loginPane.getScene().getWindow()).title("Инфромация").message("Вы не я вляетесь администратором. Некоторые области будут не видны.").showInformation();
+            new Alert(INFORMATION, "Вы не я вляетесь администратором. Некоторые области будут не видны.", CLOSE).showAndWait();
         }
     }
 

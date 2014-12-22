@@ -42,9 +42,9 @@ public class TaskController extends AbstractController {
 
     private final GetOrdersService service = new GetOrdersService();
 
-    static final Background orangeBackground = new Background(new BackgroundFill(Color.ORANGE, new CornerRadii(5), null));
-    static final Background greenBackground = new Background(new BackgroundFill(Color.PALEGREEN, new CornerRadii(5), null));
-    static final Background redBackground = new Background(new BackgroundFill(Color.INDIANRED, new CornerRadii(5), null));
+    private static final Background ORANGE_BACKGROUND = new Background(new BackgroundFill(Color.ORANGE, new CornerRadii(5), null));
+    private static final Background GREEN_BACKGROUND = new Background(new BackgroundFill(Color.PALEGREEN, new CornerRadii(5), null));
+    private static final Background RED_BACKGROUND = new Background(new BackgroundFill(Color.INDIANRED, new CornerRadii(5), null));
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -130,10 +130,10 @@ public class TaskController extends AbstractController {
 
         private void createWorkingRegion(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, GridPane gridPane, Label label) {
             Region rect = new Region();
-            rect.setBackground(greenBackground);
+            rect.setBackground(GREEN_BACKGROUND);
             gridPane.add(rect, 0, 0);
             rect = new Pane();
-            rect.setBackground(orangeBackground);
+            rect.setBackground(ORANGE_BACKGROUND);
             gridPane.add(rect, 1, 0);
 
             label.setFont(Font.font("System", 14));
@@ -142,7 +142,7 @@ public class TaskController extends AbstractController {
 
         private void createOverdueRegion(OrderItem order, long betweenDays, long betweenHours, long betweenMinutes, GridPane gridPane, Label label) {
             Region rect = new Region();
-            rect.setBackground(redBackground);
+            rect.setBackground(RED_BACKGROUND);
             gridPane.add(rect, 1, 0);
 
             label.setFont(Font.font("System bold", FontWeight.BOLD, 14));

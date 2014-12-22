@@ -20,7 +20,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
-import org.controlsfx.dialog.Dialogs;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.springframework.beans.factory.BeanFactory;
@@ -35,14 +34,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static by.fly.ui.UIUtils.*;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY;
 
 @Component
@@ -338,7 +337,7 @@ public class OrdersController extends AbstractController {
             clearFilter();
             refresh();
         } catch (IllegalStateException x) {
-            Dialogs.create().owner(orderTableRegion.getScene().getWindow()).title("Предупреждение").message(x.getMessage()).showWarning();
+            new Alert(WARNING, x.getMessage(), CLOSE);
         }
     }
 
