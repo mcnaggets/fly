@@ -19,9 +19,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +35,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -99,6 +101,8 @@ public class ReportsController extends AbstractController {
 
     @Autowired
     private SettingsService settingsService;
+    private CellStyle boldCellStyle;
+    private CellStyle defaultCellStyle;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -169,21 +173,38 @@ public class ReportsController extends AbstractController {
 
     public void export(ActionEvent actionEvent) throws IOException {
         if (toMuchExportData()) return;
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet();
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet();
 
-        CellStyle cellStyle = workbook.createCellStyle();
-        cellStyle.setWrapText(true);
+        boldCellStyle = createBoldCellStyle(workbook);
+        defaultCellStyle = createDefaultCellStyle(workbook);
 
-        final int rowOffset = createReportHeader(sheet);
-        createReportCells(sheet, cellStyle, rowOffset);
+        int rowOffset = createReportHeader(sheet);
+        rowOffset = createReportCells(sheet, rowOffset);
         createReportFooter(sheet, rowOffset);
         autoSizeReportColumns(sheet);
         saveReportFile(workbook);
     }
 
-    private void createReportFooter(XSSFSheet sheet, int rowOffset) {
+    private CellStyle createDefaultCellStyle(HSSFWorkbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        cellStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        cellStyle.setWrapText(true);
+        return cellStyle;
+    }
 
+    private void createReportFooter(HSSFSheet sheet, int rowOffset) {
+        Row footer = sheet.createRow(rowOffset++);
+        for (int i = 0; i < ordersFacetTable.getColumns().size(); i++) {
+            final Cell cell = footer.createCell(i);
+            cell.setCellStyle(boldCellStyle);
+            Optional.ofNullable(ordersFacetTable.getColumns().get(i).getCellObservableValue(0))
+                    .ifPresent(v -> cell.setCellValue((String) v.getValue()));
+        }
+        final HSSFCell cell = sheet.createRow(rowOffset).createCell(0);
+        cell.setCellStyle(boldCellStyle);
+        cell.setCellValue(String.format("Всего: %s", orderService.count(filterPredicate)));
     }
 
     private boolean toMuchExportData() {
@@ -195,14 +216,14 @@ public class ReportsController extends AbstractController {
         return false;
     }
 
-    private void autoSizeReportColumns(XSSFSheet sheet) {
+    private void autoSizeReportColumns(HSSFSheet sheet) {
         IntStream.range(0, ordersTable.getColumns().size()).forEach(sheet::autoSizeColumn);
     }
 
-    private void saveReportFile(XSSFWorkbook workbook) throws IOException {
+    private void saveReportFile(HSSFWorkbook workbook) throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Сохранить отчёт");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xlsx"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xls"));
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
@@ -213,54 +234,87 @@ public class ReportsController extends AbstractController {
         }
     }
 
-    private void createReportCells(XSSFSheet sheet, CellStyle cellStyle, int rowOffset) {
+    private int createReportCells(HSSFSheet sheet, int rowOffset) {
         // XXX: may be performance and memory issues
-        final List<OrderItem> orderItems = orderService.findAll(filterPredicate);
-        for (int itemIndex = 0; itemIndex < orderItems.size(); itemIndex++) {
-            createReportRowCells(sheet.createRow(rowOffset + itemIndex + 1), cellStyle, orderItems.get(itemIndex));
+        for (OrderItem item : orderService.findAll(filterPredicate)) {
+            createReportRowCells(sheet.createRow(rowOffset++), item);
         }
+        return rowOffset;
     }
 
-    private void createReportRowCells(Row row, CellStyle cellStyle, OrderItem item) {
+    private void createReportRowCells(Row row, OrderItem item) {
         for (int columnIndex = 0; columnIndex < ordersTable.getColumns().size(); columnIndex++) {
             final TableColumn<OrderItem, ?> column = ordersTable.getColumns().get(columnIndex);
             final org.apache.poi.ss.usermodel.Cell cell = row.createCell(columnIndex);
+            cell.setCellStyle(defaultCellStyle);
             cell.setCellValue((String) column.getCellObservableValue(item).getValue());
-            cell.setCellStyle(cellStyle);
         }
     }
 
-    private int createReportHeader(XSSFSheet sheet) {
-        int rowOffset = 0;
-        if (!anyDateFilter.isSelected()) {
-            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("За число c %s по %s",
-                    DATE_FORMATTER.format(orderStartDateFilter.getValue()), orderEndDateFilter.getValue().format(DATE_FORMATTER)));
-        }
-        if (StringUtils.isNotBlank(printerModelFilter.getText())) {
-            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Модель принтера %s", printerModelFilter.getText()));
-        }
-        if (StringUtils.isNotBlank(masterFilter.getText())) {
-            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Мастер %s", masterFilter.getText()));
-        }
-        if (StringUtils.isNotBlank(clientNameFilter.getText())) {
-            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Клиент %s", clientNameFilter.getText()));
-        }
-        final String itemTypes = Arrays.stream(itemTypeCheckBoxes).filter(CheckBox::isSelected)
-                .map(cb -> (String) cb.getUserData())
-                .collect(Collectors.joining(", "));
-        if (StringUtils.isNotBlank(itemTypes)) {
-            sheet.createRow(rowOffset++).createCell(0).setCellValue(String.format("Тип(ы) %s", clientNameFilter.getText()));
-        }
-
+    private int createReportHeader(HSSFSheet sheet) {
+        int rowOffset = createReportDateHeader(sheet, 0);
+        rowOffset = createReportPrinterModelHeader(sheet, rowOffset);
+        rowOffset = createReportMasterHeader(sheet, rowOffset);
+        rowOffset = createReportClientNameHeader(sheet, rowOffset);
+        rowOffset = createReportItemTypesHeader(sheet, rowOffset);
+        rowOffset++;
         return createReportTableHeader(sheet, rowOffset);
     }
 
-    private int createReportTableHeader(XSSFSheet sheet, int rowOffset) {
-        Row header = sheet.createRow(rowOffset++);
-        for (int i = 0; i < ordersTable.getColumns().size(); i++) {
-            header.createCell(i).setCellValue(ordersTable.getColumns().get(i).getText());
+    private int createReportFilterHeader(HSSFSheet sheet, int rowOffset, String headerName, String headerValue) {
+        if (StringUtils.isNotBlank(headerValue)) {
+            final HSSFRow row = sheet.createRow(rowOffset++);
+            final HSSFCell cell = row.createCell(0);
+            cell.setCellValue(headerName);
+            cell.setCellStyle(boldCellStyle);
+            row.createCell(1).setCellValue(headerValue);
         }
         return rowOffset;
+    }
+
+    private int createReportItemTypesHeader(HSSFSheet sheet, int rowOffset) {
+        final String itemTypes = Arrays.stream(itemTypeCheckBoxes).filter(CheckBox::isSelected)
+                .map(cb -> (String) cb.getUserData())
+                .collect(Collectors.joining(", "));
+        return createReportFilterHeader(sheet, rowOffset, "Типы", itemTypes);
+    }
+
+    private int createReportClientNameHeader(HSSFSheet sheet, int rowOffset) {
+        return createReportFilterHeader(sheet, rowOffset, "Клиент", clientNameFilter.getText());
+    }
+
+    private int createReportMasterHeader(HSSFSheet sheet, int rowOffset) {
+        return createReportFilterHeader(sheet, rowOffset, "Мастер", masterFilter.getText());
+    }
+
+    private int createReportPrinterModelHeader(HSSFSheet sheet, int rowOffset) {
+        return createReportFilterHeader(sheet, rowOffset, "Модель принтера", printerModelFilter.getText());
+    }
+
+    private int createReportDateHeader(HSSFSheet sheet, int rowOffset) {
+        if (!anyDateFilter.isSelected()) {
+            return createReportFilterHeader(sheet, rowOffset, "За число", String.format("c %s по %s",
+                    DATE_FORMATTER.format(orderStartDateFilter.getValue()), orderEndDateFilter.getValue().format(DATE_FORMATTER)));
+        }
+        return rowOffset;
+    }
+
+    private int createReportTableHeader(HSSFSheet sheet, int rowOffset) {
+        Row header = sheet.createRow(rowOffset++);
+        for (int i = 0; i < ordersTable.getColumns().size(); i++) {
+            final Cell cell = header.createCell(i);
+            cell.setCellStyle(boldCellStyle);
+            cell.setCellValue(ordersTable.getColumns().get(i).getText());
+        }
+        return rowOffset;
+    }
+
+    private CellStyle createBoldCellStyle(HSSFWorkbook workbook) {
+        final CellStyle cellStyle = createDefaultCellStyle(workbook);
+        final HSSFFont font = workbook.createFont();
+        font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        cellStyle.setFont(font);
+        return cellStyle;
     }
 
     private void createItemTypeCheckBoxes() {
