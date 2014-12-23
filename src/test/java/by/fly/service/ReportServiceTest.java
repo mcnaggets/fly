@@ -41,7 +41,7 @@ public class ReportServiceTest extends AbstractBaseTest {
     @Test
     public void testAggregation() {
         populateData();
-        reportService.generateFacets();
+        reportService.generateFacets(filterPredicate);
     }
 
     @Test

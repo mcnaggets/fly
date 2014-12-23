@@ -9,12 +9,14 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.Predicate;
 import com.mysema.query.types.path.CollectionPathBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.repository.support.SpringDataMongodbSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -33,7 +35,10 @@ public class ReportService {
     @Autowired
     private MongoOperations mongoOperations;
 
-    public OrderItemFacets generateFacets() {
+    public OrderItemFacets generateFacets(Predicate predicate) {
+        // TODO: process predicate
+        predicate.accept();
+        new SpringDataMongodbSerializer(mongoOperations.getConverter());
         OrderItemFacets facets = new OrderItemFacets();
         facets.setTotalPrice(getTotalPrice());
         for (Path path : OrderItemFacets.AVAILABLE_PROPERTIES) {

@@ -85,6 +85,7 @@ public class ReportsController extends AbstractController {
 
     public ProgressIndicator progressIndicator;
     public Pagination pagination;
+
     private BooleanBuilder filterPredicate;
 
     @Autowired
@@ -334,12 +335,16 @@ public class ReportsController extends AbstractController {
                 protected ObservableList<OrderItem> call() throws Exception {
                     if (!doRefreshData.get()) return FXCollections.emptyObservableList();
                     createFilterPredicate();
+                    populateFacets();
                     return getOrderItems();
+                }
+
+                private void populateFacets() {
+                    ordersFacetTable.setItems(FXCollections.observableArrayList(reportService.generateFacets(filterPredicate)));
                 }
 
                 private ObservableList<OrderItem> getOrderItems() {
                     Page<OrderItem> orderItems = orderService.findAll(filterPredicate, getPageable());
-                    ordersFacetTable.setItems(FXCollections.observableArrayList(reportService.generateFacets()));
                     return FXCollections.observableList(orderItems.getContent());
                 }
 
