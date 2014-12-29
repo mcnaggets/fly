@@ -3,7 +3,9 @@ package by.fly.service;
 import by.fly.model.Customer;
 import by.fly.model.OrderItem;
 import by.fly.model.OrderStatus;
+import by.fly.model.QOrderItem;
 import by.fly.repository.AbstractBaseTest;
+import com.mongodb.BasicDBObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,13 +43,13 @@ public class ReportServiceTest extends AbstractBaseTest {
     @Test
     public void testAggregation() {
         populateData();
-        reportService.generateFacets(filterPredicate);
+        reportService.generateFacets(QOrderItem.orderItem.status.in(OrderStatus.READY, OrderStatus.PAID));
     }
 
     @Test
     public void testSum() {
         populateData();
-        final float totalPrice = reportService.getTotalPrice();
+        final float totalPrice = reportService.getTotalPrice(new BasicDBObject());
         assertTrue(totalPrice > 0);
     }
 
