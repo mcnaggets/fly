@@ -37,9 +37,11 @@ public class Utils {
 
     public static String getCurrentMachineHardwareAddress() {
         try {
-            return Arrays.toString(NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress());
-        } catch (UnknownHostException | SocketException e) {
-            throw new RuntimeException(e);
+            InetAddress localHost = InetAddress.getLocalHost();
+            NetworkInterface address = NetworkInterface.getByInetAddress(localHost);
+            return address != null ? Arrays.toString(address.getHardwareAddress()) : localHost.toString();
+        } catch (Exception e) {
+            return "";
         }
     }
 
